@@ -1,0 +1,307 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGCBA TABLEAU DE BORD</title>
+    <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
+    
+     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static '/css/tabs.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="sidebar">
+       <div class="logo">
+     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+    <span>SGCBA</span>
+</div>
+
+      <nav>
+  <ul>
+    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}" class="active"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+    <li id="menu-inscription"><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-eleve"><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+    <li id="menu-presence"><a href="{% url 'Presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+    <li id="menu-note"><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
+    <li id="menu-bulletin"><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+    <li id="menu-utilisateur"><a href="{% url 'Utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+    <li id="menu-parametre"><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+  </ul>
+</nav>
+
+       
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>TABLEAU DE BORD</h1>
+            <div class="search-profile">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
+                </div>
+               <div class="profile">
+    <i class="fas fa-bell notification-icon"></i>
+     <h6 class="username"><span id="username"></span></h6>
+    <div class="user-avatar" id="profileDropdownToggle">
+        <img src="{% static '/image/pro.png' %}"> 
+    </div>
+
+    <!-- Dropdown menu -->
+    <div class="profile-dropdown" id="profileDropdown">
+        <ul>
+            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+        </ul>
+    </div>
+</div>
+
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="left-column">
+                <div class="card top-performers">
+                    <div class="card-header">
+                        <h2>Meilleur Performeur</h2>
+                        <div class="tabs">
+                            <span class="active">Aujourd'hui</span>
+                            <span>Mois</span>
+                            <span>Année</span>
+                        </div>
+                        <a href="#" class="action-button">Voir tout</a>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Note</th>
+                                <th>Année</th>
+                                <th>Heure</th>
+                                <th>Classe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="profile-info">
+                                         {% comment %} <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img"> {% endcomment %}
+                                    </div>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>00:00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="profile-info">
+                                        {% comment %} <img src="https://via.placeholder.com/35/ADD8E6" alt="Angela Lauren">  {% endcomment %}
+                                    </div>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>00:00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="profile-info">
+                                        {% comment %} <img src="https://via.placeholder.com/35/90EE90" alt="Zack Lee">  {% endcomment %}
+                                    </div>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>00:00</td>
+                                <td></td>
+                            </tr>
+                             <tr>
+                                <td>
+                                    <div class="profile-info">
+                                        {% comment %} <img src="https://via.placeholder.com/35/DDA0DD" alt="David Mark"> {% endcomment %}
+                                    </div>
+                                </td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>00:00</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card schedule">
+                    <div class="card-header">
+                        <h2>Dernières activités scolaires</h2>
+                        <div>
+                           
+                        </div>
+                        <div>
+                           
+                        </div>
+                        <div>
+                           
+                        </div>
+                    </div>
+                    <div class="calendar">
+                       
+                        
+                      
+                       
+                      
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="summary-cards">
+                    <div class="summary-card students">
+                        <div class="icon"><i class="fa-solid fa-notes-medical"></i></div>
+                        <div class="value">0</div>
+                        <div class="label">Total Inscription</div>
+                    </div>
+                    <div class="summary-card income">
+                        <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
+                        <div class="value">0</div>
+                        <div class="label">Total Eleve</div>
+                    </div>
+                    <div class="summary-card expenses">
+                        <div class="icon"><i class="fa-solid fa-percent"></i></div>
+                        <div class="value">0%</div>
+                        <div class="label">Taux Reussite</div>
+                    </div>
+                </div>
+
+                <div class="card payment">
+                    <div class="card-header">
+                        <h2>Présence</h2>
+                        <a href="#" class="action-button">Voir tout</a>
+                    </div>
+                    <div class="payment-section">
+                        <div class="payment-chart">
+                            <canvas id="paymentPieChart"></canvas>
+                        </div>
+                        <div class="payment-list">
+                            <ul>
+                                <li>
+                                    <span><i class="fas fa-circle text-full-blue"></i> Toujours Present</span>
+                                    <span class="student-name"></span>
+                                    {% comment %} <span class="status paid">Payé</span> {% endcomment %}
+                                </li>
+                                <li>
+                                    <span><i class="fas fa-circle text-red"></i> Élèves supprimés(e)</span>
+                                    <span class="student-name"></span>
+                                    {% comment %} <span class="status due">Dû</span> {% endcomment %}
+                                </li>
+                                <li>
+                                    <span><i class="fas fa-circle text-green"></i> Tres Present</span>
+                                    <span class="student-name"></span>
+                                    {% comment %} <span class="status paid">Payé</span> {% endcomment %}
+                                </li>
+                                <li>
+                                    <span><i class="fas fa-circle text-orange"></i> Presence en attente </span>
+                                    <span class="student-name"></span>
+                                    {% comment %} <span class="status pending">En attente</span> {% endcomment %}
+                                </li>
+                                <li>
+                                    <span><i class="fas fa-circle text-info"></i>Peu Present </span>
+                                    <span class="student-name"></span>
+                                    <span class="status refund"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card attendance">
+                    <div class="card-header">
+                        <h2>Présence</h2>
+                        <a href="#" class="action-button">Voir tout</a>
+                    </div>
+                    <div class="attendance-charts">
+                        <div class="attendance-chart-container">
+                            <h3>Élèves</h3>
+                            <canvas id="studentsAttendanceChart"></canvas>
+                        </div>
+                        <div class="attendance-chart-container">
+                            <h3>Notes</h3>
+                            <canvas id="teachersAttendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} rele done utilisateur ki connecter a via local storage {% endcomment %}
+
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+        // Si pa gen session => retounen login
+        window.location.href = "/connexion/";
+    } else {
+        // Affiche username
+        document.getElementById("username").textContent = user.username;
+
+        // Gère selon role
+        if (user.role === "directeur") {
+            document.getElementById("directeur-section").style.display = "block";
+        } else if (user.role === "secretaire") {
+            document.getElementById("secretaire-section").style.display = "block";
+        } else if (user.role === "censeur") {
+            document.getElementById("censeur-section").style.display = "block";
+        }
+    }
+});
+</script>
+
+     {% comment %} visiblite selon role utilisateur a {% endcomment %}
+      
+     <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Ranmase user nan localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    if (!user) return; // si pa gen user, pa fè anyen
+
+    // Default: kache tout
+    document.querySelectorAll("nav ul li").forEach(li => li.style.display = "none");
+
+    // Wòl itilizatè a
+    const role = user.role; // asire API a retounen yon "role" (directeur, secretaire, censeur)
+
+    if (role === "directeur") {
+        // Directeur ka wè tout
+        document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
+    } 
+    else if (role === "secretaire") {
+        document.getElementById("menu-dashboard").style.display = "block";
+        document.getElementById("menu-inscription").style.display = "block";
+        document.getElementById("menu-eleve").style.display = "block";
+        document.getElementById("menu-presence").style.display = "block";
+    } 
+    else if (role === "censeur") {
+        document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
+        // retire utilisateur + parametre
+        document.getElementById("menu-utilisateur").style.display = "none";
+        document.getElementById("menu-parametre").style.display = "none";
+    }
+});
+</script>
+
+    
+
+
+
+    <script src="{% static 'js/dropdown.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+</body>
+   
+ 
+</html>

@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <title>Connexion API</title>
+  <link rel="stylesheet" href="{% static 'css/connexions.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="signin-signup">
+      <div class="sign-in-form">
+        <h2 class="title">Connexion</h2>
+
+        <div class="social-icons">
+          <a href="#" class="icon"><i class="fab fa-google"></i></a>
+          <a href="#" class="icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="icon"><i class="fab fa-github"></i></a>
+          <a href="#" class="icon"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+
+        <span></span><br>
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Votre email">
+
+        <label>Mot de passe</label>
+        <input type="password" id="password" placeholder="Votre mot de passe">
+
+        <div id="errorMsg" style="color:red; margin-top:10px;"></div>
+
+        <a href="#">Mot de passe oublié ?</a>
+        <button id="loginBtn" class="btn">Connecter</button>
+      </div>
+    </div>
+
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel">
+           <img src="{% static 'image/naz.jpg' %}" alt="Logo" width="200" class="i">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Font Awesome CDN for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', async function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const csrftoken = '{{ csrf_token }}';
+
+        if(!email || !password){
+            document.getElementById('errorMsg').textContent = 'Email et mot de passe requis';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if(data.success){
+               // 👉 Isit la ou mete sove user lan nan browser
+                localStorage.setItem("user", JSON.stringify(data.user));
+                window.location.href = '/dashboard/';
+            } else {
+                document.getElementById('errorMsg').textContent = data.error;
+            }
+        } catch (err) {
+            document.getElementById('errorMsg').textContent = 'Erreur réseau ou serveur';
+            console.error(err);
+        }
+    });
+  </script>
+</body>
+</html>
