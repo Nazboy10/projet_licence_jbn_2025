@@ -55,7 +55,10 @@
     <div class="profile-dropdown" id="profileDropdown">
         <ul>
             <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+             <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
         </ul>
+       
+         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
     </div>
 </div>
 

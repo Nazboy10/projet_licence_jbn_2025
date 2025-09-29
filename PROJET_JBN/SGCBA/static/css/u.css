@@ -19,6 +19,10 @@
     box-sizing: border-box;
 }
 
+.modal-overlay.active{
+    display: flex;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #F8F8F8;
@@ -26,6 +30,160 @@ body {
     min-height: 100vh;
     color: var(--text-dark);
 }
+
+/* Switch (toggle) style */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #0d6efd;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Opsyon pou fè switch round */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+/* Bouton personnalisé */
+.btn-custom {
+  border-radius: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 5px;
+  border-color: #0b5ed7;
+   background-color: #0d6efd;
+   color: white;
+   margin-left: 87%;
+   margin-top: 30px;
+}
+
+.btn-custom.btn-ajouter {
+  background-color: #0d6efd; /* Bleu */
+  color: #fff;
+}
+.btn-custom.btn-ajouter:hover {
+  background-color: #0b5ed7;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.6); /* Background semi-transparent */
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal box */
+.modal-content {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+  position: relative;
+  animation: popup 0.3s ease;
+}
+
+/* Animasyon modal */
+@keyframes popup {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Bouton fermer (X) */
+.close {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.close:hover {
+  color: #000;
+}
+
+/* Style pou tablo */
+#tableUsers {
+  width: 100%;
+  border-collapse: collapse; /* retire espas double ant bordure */
+  margin-top: 20px;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#tableUsers th, #tableUsers td {
+  padding: 12px 15px;  /* ajoute espas enteryè */
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#tableUsers th {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 600;
+}
+
+#tableUsers tr:hover {
+  background-color: #f5f5f5; /* mete ti koulè lè souri pase sou yon liy */
+}
+
+
+
+
 
 /* Sidebar */
 .sidebar {

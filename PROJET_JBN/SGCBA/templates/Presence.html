@@ -20,18 +20,18 @@
     <span>SGCBA</span>
 </div>
 
-       <nav>
-        <ul>
-           <li><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-           <li><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-           <li><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-           <li><a href="{% url 'Presence' %}"class="active"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-           <li><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
-           <li><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-           <li><a href="{% url 'Utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-        <li><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-        </ul>
-    </nav>
+      <nav>
+  <ul>
+    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+    <li id="menu-inscription"><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-eleve"><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+    <li id="menu-presence"><a href="{% url 'Presence' %}"class="active"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+    <li id="menu-note"><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
+    <li id="menu-bulletin"><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+    <li id="menu-utilisateur"><a href="{% url 'Utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+    <li id="menu-parametre"><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+  </ul>
+</nav>
        
     </div>
 
@@ -60,6 +60,7 @@
         </div>
  <script src="{% static 'js/dropdown.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'js/role-control.js' %}"></script>
 
 </body>
 </html>

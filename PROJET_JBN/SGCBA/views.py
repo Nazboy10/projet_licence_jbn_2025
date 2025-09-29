@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from SGCBA.models import Utilisateur  # Asire modèl ou importé
 
 
-
+#view pour splasScreen lan la
+def splash(request):
+    return render(request, 'splash.html')
 
 #view pour dashboard la
 

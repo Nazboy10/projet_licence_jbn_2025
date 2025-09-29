@@ -10,7 +10,8 @@
     
      <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static '/css/Utilisateurs.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static '/css/u.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/role-control.js' %}"></script>
 </head>
 <body>
 
@@ -20,18 +21,18 @@
     <span>SGCBA</span>
 </div>
 
-       <nav>
-        <ul>
-           <li><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-           <li><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-           <li><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-           <li><a href="{% url 'Presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-           <li><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
-           <li><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-           <li><a href="{% url 'Utilisateurs' %}"class="active"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-        <li><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-        </ul>
-    </nav>
+      <nav>
+  <ul>
+    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+    <li id="menu-inscription"><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-eleve"><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+    <li id="menu-presence"><a href="{% url 'Presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+    <li id="menu-note"><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
+    <li id="menu-bulletin"><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+    <li id="menu-utilisateur"><a href="{% url 'Utilisateurs' %}"class="active"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+    <li id="menu-parametre"><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+  </ul>
+</nav>
        
     </div>
 
@@ -58,6 +59,139 @@
 </div>
  </div>
         </div>
+
+  
+        <div class="container">
+ <!-- Bouton Ajouter sou bò dwat -->
+<div class="d-flex justify-content-end mb-3">
+    <button id="btnShowUserForm" class="btn btn-primary btn-custom">Ajouter Utilisateur</button>
+</div>
+<br>
+<br>
+  <!-- Modal -->
+  <div id="userFormModal" class="modal-overlay">
+    <div class="modal-content">
+      <span id="closeUserModal" class="close">&times;</span>
+      <h4 class="mb-3">Nouvel Utilisateur</h4>
+      <form id="utilisateursForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nom</label>
+            <input type="text" id="nom" class="form-control" placeholder="Nom" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Prénom</label>
+            <input type="text" id="prenom" class="form-control" placeholder="Prénom" required>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Email" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Rôle</label>
+            <select id="role" class="form-select" required>
+              <option>directeur</option>
+              <option>secretaire</option>
+              <option>censeur</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nom d’utilisateur</label>
+            <input type="text" id="username" class="form-control" placeholder="Username" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" id="password" class="form-control" placeholder="Mot de passe" required>
+          </div>
+        </div>
+        <div class="text-end">
+          <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
+          <button type="button" id="cancelUserForm" class="btn btn-secondary btn-custom">Fermer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Modification -->
+<div id="editUserFormModal" class="modal-overlay">
+  <div class="modal-content">
+    <span id="closeEditUserModal" class="close">&times;</span>
+    <h4 class="mb-3">Modifier Utilisateur</h4>
+    <form id="editUserForm">
+      <input type="hidden" id="editUserId">
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nom</label>
+          <input type="text" id="editNom" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Prénom</label>
+          <input type="text" id="editPrenom" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" id="editEmail" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Rôle</label>
+          <select id="editRole" class="form-select" required>
+            <option>directeur</option>
+            <option>secretaire</option>
+            <option>censeur</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nom d’utilisateur</label>
+          <input type="text" id="editUsername" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Actif</label><br>
+          <input type="checkbox" id="editActif">
+        </div>
+      </div>
+
+      <div class="text-end">
+        <button type="submit" class="btn btn-custom btn-ajouter">Mettre à jour</button>
+        <button type="button" id="cancelEditUserForm" class="btn btn-secondary btn-custom">Fermer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+ <table class="table table-bordered table-striped" id="tableUsers">
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Prénom</th>
+      <th>Email</th>
+      <th>Rôle</th>
+      <th>Username</th>
+      <th>Actif</th> <!-- Nouvo kolòn -->
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tableUsersBody">
+    <!-- Done ak JavaScript -->
+   
+  </tbody>
+</table>
+
+</div>
+
+
+<script src="{% static 'js/utilisateurs.js' %}"></script>
  <script src="{% static 'js/dropdown.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 
