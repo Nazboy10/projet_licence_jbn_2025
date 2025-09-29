@@ -91,3 +91,129 @@ class UploadPhotoAPIView(APIView):
             photo_url = request.build_absolute_uri(user.photo.url)
             return Response({"photo_url": photo_url})
         return Response({"error": "Pas de fichier uploadé"}, status=400)
+
+
+
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
+from SGCBA.models import Utilisateur
+from .tokens import custom_token_generator
+
+class ResetPasswordAPIView(APIView):
+    """
+    Voye imel reset password ak token
+    """
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"success": False, "error": "Email requis"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Utilisateur.objects.get(email=email)
+        except Utilisateur.DoesNotExist:
+            return Response({"success": False, "error": "Email non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = custom_token_generator.make_token(user)
+
+        # Lyen frontend pou reset password
+       # api/views.py
+       # api/views.py
+        # api/views.py
+        reset_link = f"http://localhost:8000/reset_password_confirm/{uid}/{token}/"
+
+
+
+        # Imel
+        subject = "Réinitialisation du mot de passe"
+        message = f"Bonjour {user.nom},\n\nCliquez sur ce lien pour réinitialiser votre mot de passe:\n{reset_link}"
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+
+        return Response({"success": True, "message": "Email de réinitialisation envoyé"}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ResetPasswordConfirmAPIView(APIView):
+    """
+    Verifye token epi mete nouvo modpas
+    """
+    def post(self, request, uidb64, token):
+        password = request.data.get('password')
+        password2 = request.data.get('password2')
+
+        if not password or not password2:
+            return Response(
+                {"success": False, "error": "Tous les champs sont requis"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if password != password2:
+            return Response(
+                {"success": False, "error": "Les mots de passe ne correspondent pas"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = Utilisateur.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, Utilisateur.DoesNotExist):
+            return Response(
+                {"success": False, "error": "Lien invalide"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ✅ verifye validite token la
+        if not custom_token_generator.check_token(user, token):
+            return Response(
+                {"success": False, "error": "Lien expiré ou invalide"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ✅ mete nouvo modpas
+        user.set_password(password)
+        user.save()
+        return Response(
+            {"success": True, "message": "Mot de passe changé avec succès"},
+            status=status.HTTP_200_OK
+        )
+
+
+
+
+
+# api/views.py
+from django.shortcuts import render
+
+def reset_password_page(request):
+    return render(request, 'reset_password.html')  # template ou deja genyen
+
+
+def reset_password_confirm_page(request, uidb64, token):
+    return render(request, 'reset_password_confirm.html')
+
+# paj HTML
+def reset_password_confirm_page(request, uidb64, token):
+    return render(request, 'reset_password_confirm.html', {
+        'uidb64': uidb64,
+        'token': token
+    })
+
