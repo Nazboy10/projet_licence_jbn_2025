@@ -239,71 +239,99 @@ body {
     cursor: pointer;
 }
 
+/* css intefas inskripsyon */
+
+/* Bouton Ajouter nan modal la */
+.modal-content .btn-custom.btn-ajouter {
+    background-color: #0d6efd; /* ble Bootstrap */
+    color: #fff;
+}
+
+.modal-content .btn-custom.btn-ajouter:hover {
+    background-color: #0b5ed7; /* ble fonse lè hover */
+}
+
+/* Fòse header tab la ble ak tèks blan */
+#tableEleves thead th {
+    background-color: #0d6efd !important; /* ble fòse */
+    color: #fff !important;               /* tèks blan fòse */
+}
 
 
-/* css pou button ak table la */
-.table-header {
+
+
+.container {
+  margin-top: 30px;
+}
+
+.btn-custom {
+  border-radius: 20px;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(187, 187, 205, 0.919);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 800px;
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+
+/* drop down menu */
+.profile {
     display: flex;
-    justify-content: flex-start;
-    margin-bottom: 12px;
+    align-items: center;
+    position: relative; /* ajoute sa pou dropdown lan ka pozisyone korekteman */
 }
 
-.presence-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
+/* Dropdown hidden by default */
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 60px; /* ajiste selon header ou */
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    min-width: 150px;
+    z-index: 100;
 }
 
-.presence-table th {
-    background: #3E63DD;   /* Menm ble a */
-    color: #fff;
-    text-align: left;
-    padding: 12px 15px;
-    font-weight: 600;
+.profile-dropdown ul {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
 }
 
-.presence-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
+.profile-dropdown ul li {
+    padding: 10px 20px;
+}
+
+.profile-dropdown ul li a {
+    text-decoration: none;
     color: #333;
+    display: block;
 }
-.boutonajouter {
-    padding: 12px 15px;
-    margin-left: 800px;
-    
-}
-.presence-table tr:hover {
-    background: #f4f7ff; /* ti hover limyè ble */
-}
-
-.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s;
-}
-
-.btn-qr {
-    background: #3E63DD;
-    color: #fff;
-}
-
-.btn-qr:hover {
-    background: #2b4cb8;
-}
-
-.btn-add {
-    background: #3E63DD; /* menm ble bouton bulletin nan */
-    color: #fff;
-}
-
-.btn-add:hover {
-    background: #2b4cb8;
-}
-
-

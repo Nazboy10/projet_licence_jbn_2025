@@ -97,7 +97,9 @@ body {
     font-size: 30px;
     color: #ccc; /* Placeholder color for icon */
 }
-
+.textbulletin h2{
+    margin: 0 auto;
+}
 .sidebar .request-button button {
     background-color: var(--primary-blue);
     color: #fff;
@@ -240,70 +242,71 @@ body {
 }
 
 
+/* intefas bulletin */
 
-/* css pou button ak table la */
-.table-header {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 12px;
+.container { 
+  max-width: 900px; 
+  margin: auto; 
+  background: #fff; 
+  padding: 20px; 
+  border-radius: 10px; 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
 }
-
-.presence-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 10px; 
 }
-
-.presence-table th {
-    background: #3E63DD;   /* Menm ble a */
-    color: #fff;
-    text-align: left;
-    padding: 12px 15px;
-    font-weight: 600;
+th, td { 
+  border: 1px solid #2563eb; 
+  padding: 8px; 
+  text-align: left; 
 }
-
-.presence-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    color: #333;
+th { 
+  background: #2563eb;  
 }
-.boutonajouter {
-    padding: 12px 15px;
-    margin-left: 800px;
-    
+button { 
+  padding: 6px 12px; 
+  border: none; 
+  border-radius: 6px; 
+  background: #2563eb; 
+  color: white; 
+  cursor: pointer; 
+  margin: 2px; 
 }
-.presence-table tr:hover {
-    background: #f4f7ff; /* ti hover limyè ble */
+button:hover { 
+   background: #6c2bd9;
 }
-
-.btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s;
+.top-right { 
+  text-align: right; 
+  margin-bottom: 10px; 
 }
-
-.btn-qr {
-    background: #3E63DD;
-    color: #fff;
+#bulletinPage, #formulairePage { 
+  margin-top: 20px; 
 }
-
-.btn-qr:hover {
-    background: #2b4cb8;
+#listeContainer { 
+  margin-top: 10px; 
 }
-
-.btn-add {
-    background: #3E63DD; /* menm ble bouton bulletin nan */
-    color: #fff;
+#logoCachetContainer { 
+  margin-top: 10px; 
 }
-
-.btn-add:hover {
-    background: #2b4cb8;
+#formulairePage { 
+  display: none; 
+  text-align: center; 
 }
-
-
+#formulairePage input { 
+  padding: 6px 10px; 
+  border-radius: 5px; 
+  border: 1px solid #ccc; 
+  width: 300px; 
+  margin-bottom: 10px; 
+}
+#formulaireButtons { 
+  margin-top: 10px; 
+}
+#formulaireButtons button { 
+  margin: 0 5px; 
+}
+@media print { 
+  button, input { display: none !important; } 
+}

@@ -10,7 +10,7 @@
     
      <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static '/css/Presence.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static '/css/Presen.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -58,6 +58,58 @@
 </div>
  </div>
         </div>
+
+<!-- ajou  -->
+
+<div class="table-container">
+    <!-- Bouton Générer QR anlè agoch -->
+    <div class="boutonajouter">
+       <button class="btn btn-add">Ajouter Présence</button>
+    </div>
+    <!-- Bouton Générer QR anlè agoch -->
+   <div class="table-header">
+    <button class="btn btn-qr">Générer QR</button>
+</div>
+
+
+<!-- Options affichage -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <label>Afficher 
+          <select class="form-select d-inline w-auto">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select> 
+          Presence
+        </label>
+      </div>
+    </div>
+  <br>
+    <!-- Tab présence -->
+    <table class="presence-table">
+        <thead>
+            <tr>
+                <th>Code Élève</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Classe</th>
+                <th>Date Présence</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>001</td>
+                <td>Jean</td>
+                <td>Paul</td>
+                <td>Terminale</td>
+                <td>2025-09-29</td>
+        </tbody>
+    </table>
+</div>
+
+
+
  <script src="{% static 'js/dropdown.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/role-control.js' %}"></script>
