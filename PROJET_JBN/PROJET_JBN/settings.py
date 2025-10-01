@@ -90,6 +90,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# //baz de done pa defo pou django
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -97,6 +98,7 @@ DATABASES = {
     }
 }
 
+# baz de done supabase
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -109,6 +111,18 @@ DATABASES = {
 }
 
 
+
+# baz de done wamp server
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
+#         'NAME': 'db_sgcba',              # Non baz done ou te kreye nan phpMyAdmin
+#         'USER': 'root',                         # Default user WampServer
+#         'PASSWORD': '',                         # Pa gen modpas pa default nan Wamp
+#         'HOST': '127.0.0.1',                    # Ou ka itilize localhost tou
+#         'PORT': '3306',                         # Pò default pou MySQL
+#     }
+# }
 
 
 

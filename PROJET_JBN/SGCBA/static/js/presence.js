@@ -77,33 +77,39 @@ form.addEventListener('submit', (e) => {
   formModal.style.display = 'none';
 });
 
+// code qrlet isVisible = false;  // eta QR la
+// function generateQR() {
+//   document.getElementById("qrcode").innerHTML = ""; // efase QR anvan
+//   new QRCode(document.getElementById("qrcode"), {
+//     text: "https://bytechhaiti.com", // chanje sa ak sa ou vle
+//     width: 200,
+//     height: 200,
+//   });
+// }
+// dezyem test
+ let isVisible = false;
+    let qrCode;
 
-//ajou
+    function toggleQR() {
+      const qrDiv = document.getElementById("qrcode");
 
-
-  // Fonksyon pou jenere QR
-  function generateQR() {
-      const qrContainer = document.getElementById("qrcode");
-
-      // Vide QR si deja egziste
-      qrContainer.innerHTML = "";
-
-      // Kreye nouvo QR
-      new QRCode(qrContainer, {
-          text: "https://presence-eleve.school/app",  // chanje sa si w vle
-          width: 150,
-          height: 150,
-          colorDark : "#000000",
-          colorLight : "#ffffff",
-          correctLevel : QRCode.CorrectLevel.H
-      });
-  }
-
-  // Atache bouton nan evènman klik
-  document.addEventListener("DOMContentLoaded", () => {
-      const btnQR = document.querySelector(".btn-qr");
-      if (btnQR) {
-          btnQR.addEventListener("click", generateQR);
+      if (!isVisible) {
+        qrDiv.innerHTML = "";
+        qrCode = new QRCode(qrDiv, {
+          text: "https://bytechhaiti.com",
+          width: 200,
+          height: 200,
+        });
+        qrDiv.classList.add("show");
+        isVisible = true;
+      } else {
+        qrDiv.classList.remove("show");
+        setTimeout(() => {
+          qrDiv.innerHTML = ""; 
+          qrDiv.style.display = "none"; 
+        }, 500); // tann animasyon fini avan efase
+        isVisible = false;
       }
-  });
+    }
+
 
