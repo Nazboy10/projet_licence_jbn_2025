@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect
 from SGCBA.models import Utilisateur  # Asire modèl ou importé
 
-
-#view pour splasScreen lan la
+# view pou splashScreen lan
 def splash(request):
     return render(request, 'splash.html')
 
-#view pour dashboard la
-
+# view pou dashboard la
 def tableau_de_bord(request):
     if 'id' not in request.session:
         return redirect('connexion')  # Si itilizatè pa konekte
@@ -18,29 +16,24 @@ def tableau_de_bord(request):
     }
     return render(request, 'tableau_de_bord.html', context)
 
+# views pou meni yo
+def inscription(request):
+    return render(request, 'inscription.html')
 
+def eleve(request):
+    return render(request, 'dossier_eleves.html')
 
-#vieuws pour Menu an
+def presence(request):
+    return render(request, 'presence.html')
 
+def note(request):
+    return render(request, 'notes.html')
 
+def bulletin(request):
+    return render(request, 'bulletin.html')
 
-def Inscription(request):
-    return render(request, 'Inscriptions.html')
+def utilisateurs(request):
+    return render(request, 'utilisateurs.html')
 
-def Eleve(request):
-    return render(request, 'Dossier_Eleves.html')
-
-def Presence(request):
-    return render(request, 'Presence.html')
-
-def Note(request):
-    return render(request, 'Notes.html')
-
-def Bulletin(request):
-    return render(request, 'Bulletin.html')
-
-def Utilisateurs(request):
-    return render(request, 'Utilisateurs.html')
-
-def Parametre(request):
-    return render(request, 'Parametres.html')
+def parametre(request):
+    return render(request, 'parametres.html')

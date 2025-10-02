@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,32 +7,31 @@
     <title>SGCBA TABLEAU DE BORD</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
     
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static '/css/tabs.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static '/css/tabs.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <div class="sidebar">
        <div class="logo">
-     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
-    <span>SGCBA</span>
-</div>
+           <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+           <span>SGCBA</span>
+       </div>
 
       <nav>
-  <ul>
-    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}" class="active"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-    <li id="menu-eleve"><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-    <li id="menu-presence"><a href="{% url 'Presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-    <li id="menu-note"><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
-    <li id="menu-bulletin"><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-    <li id="menu-utilisateur"><a href="{% url 'Utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-  </ul>
-</nav>
-
-       
+        <ul>
+          <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}" class="active"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+          <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+          <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+          <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+          <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+          <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+          <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+          <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+        </ul>
+      </nav>
     </div>
 
     <div class="main-content">
@@ -44,24 +42,22 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
                 </div>
-               <div class="profile">
-    <i class="fas fa-bell notification-icon"></i>
-     <h6 class="username"><span id="username"></span></h6>
-    <div class="user-avatar" id="profileDropdownToggle">
-        <img src="{% static '/image/pro.png' %}"> 
-    </div>
+                <div class="profile">
+                    <i class="fas fa-bell notification-icon"></i>
+                    <h6 class="username"><span id="username"></span></h6>
+                    <div class="user-avatar" id="profileDropdownToggle">
+                        <img src="{% static '/image/pro.png' %}"> 
+                    </div>
 
-    <!-- Dropdown menu -->
-    <div class="profile-dropdown" id="profileDropdown">
-        <ul>
-            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
-             <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
-        </ul>
-       
-         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
-    </div>
-</div>
-
+                    <!-- Dropdown menu -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <ul>
+                            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+                            <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
+                        </ul>
+                        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -89,44 +85,28 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    <div class="profile-info">
-                                         {% comment %} <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img"> {% endcomment %}
-                                    </div>
-                                </td>
+                                <td><div class="profile-info"></div></td>
                                 <td>0</td>
                                 <td>0</td>
                                 <td>00:00</td>
                                 <td></td>
                             </tr>
                             <tr>
-                                <td>
-                                    <div class="profile-info">
-                                        {% comment %} <img src="https://via.placeholder.com/35/ADD8E6" alt="Angela Lauren">  {% endcomment %}
-                                    </div>
-                                </td>
+                                <td><div class="profile-info"></div></td>
                                 <td>0</td>
                                 <td>0</td>
                                 <td>00:00</td>
                                 <td></td>
                             </tr>
                             <tr>
-                                <td>
-                                    <div class="profile-info">
-                                        {% comment %} <img src="https://via.placeholder.com/35/90EE90" alt="Zack Lee">  {% endcomment %}
-                                    </div>
-                                </td>
+                                <td><div class="profile-info"></div></td>
                                 <td>0</td>
                                 <td>0</td>
                                 <td>00:00</td>
                                 <td></td>
                             </tr>
-                             <tr>
-                                <td>
-                                    <div class="profile-info">
-                                        {% comment %} <img src="https://via.placeholder.com/35/DDA0DD" alt="David Mark"> {% endcomment %}
-                                    </div>
-                                </td>
+                            <tr>
+                                <td><div class="profile-info"></div></td>
                                 <td>0</td>
                                 <td>0</td>
                                 <td>00:00</td>
@@ -139,23 +119,8 @@
                 <div class="card schedule">
                     <div class="card-header">
                         <h2>Dernières activités scolaires</h2>
-                        <div>
-                           
-                        </div>
-                        <div>
-                           
-                        </div>
-                        <div>
-                           
-                        </div>
                     </div>
-                    <div class="calendar">
-                       
-                        
-                      
-                       
-                      
-                    </div>
+                    <div class="calendar"></div>
                 </div>
             </div>
 
@@ -189,31 +154,11 @@
                         </div>
                         <div class="payment-list">
                             <ul>
-                                <li>
-                                    <span><i class="fas fa-circle text-full-blue"></i> Toujours Present</span>
-                                    <span class="student-name"></span>
-                                    {% comment %} <span class="status paid">Payé</span> {% endcomment %}
-                                </li>
-                                <li>
-                                    <span><i class="fas fa-circle text-red"></i> Élèves supprimés(e)</span>
-                                    <span class="student-name"></span>
-                                    {% comment %} <span class="status due">Dû</span> {% endcomment %}
-                                </li>
-                                <li>
-                                    <span><i class="fas fa-circle text-green"></i> Tres Present</span>
-                                    <span class="student-name"></span>
-                                    {% comment %} <span class="status paid">Payé</span> {% endcomment %}
-                                </li>
-                                <li>
-                                    <span><i class="fas fa-circle text-orange"></i> Presence en attente </span>
-                                    <span class="student-name"></span>
-                                    {% comment %} <span class="status pending">En attente</span> {% endcomment %}
-                                </li>
-                                <li>
-                                    <span><i class="fas fa-circle text-info"></i>Peu Present </span>
-                                    <span class="student-name"></span>
-                                    <span class="status refund"></span>
-                                </li>
+                                <li><span><i class="fas fa-circle text-full-blue"></i> Toujours Present</span></li>
+                                <li><span><i class="fas fa-circle text-red"></i> Élèves supprimés(e)</span></li>
+                                <li><span><i class="fas fa-circle text-green"></i> Tres Present</span></li>
+                                <li><span><i class="fas fa-circle text-orange"></i> Presence en attente </span></li>
+                                <li><span><i class="fas fa-circle text-info"></i>Peu Present </span></li>
                             </ul>
                         </div>
                     </div>
@@ -239,72 +184,45 @@
         </div>
     </div>
 
-    {% comment %} rele done utilisateur ki connecter a via local storage {% endcomment %}
+    <!-- Scripts pour gérer l'utilisateur connecté -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+            window.location.href = "/connexion/";
+        } else {
+            document.getElementById("username").textContent = user.username;
+        }
+    });
+    </script>
 
     <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    document.addEventListener("DOMContentLoaded", function() {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) return;
 
-    if (!user) {
-        // Si pa gen session => retounen login
-        window.location.href = "/connexion/";
-    } else {
-        // Affiche username
-        document.getElementById("username").textContent = user.username;
+        document.querySelectorAll("nav ul li").forEach(li => li.style.display = "none");
 
-        // Gère selon role
-        if (user.role === "directeur") {
-            document.getElementById("directeur-section").style.display = "block";
-        } else if (user.role === "secretaire") {
-            document.getElementById("secretaire-section").style.display = "block";
-        } else if (user.role === "censeur") {
-            document.getElementById("censeur-section").style.display = "block";
+        const role = user.role;
+
+        if (role === "directeur") {
+            document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
+        } 
+        else if (role === "secretaire") {
+            document.getElementById("menu-dashboard").style.display = "block";
+            document.getElementById("menu-inscription").style.display = "block";
+            document.getElementById("menu-eleve").style.display = "block";
+            document.getElementById("menu-presence").style.display = "block";
+        } 
+        else if (role === "censeur") {
+            document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
+            document.getElementById("menu-utilisateur").style.display = "none";
+            document.getElementById("menu-parametre").style.display = "none";
         }
-    }
-});
-</script>
-
-     {% comment %} visiblite selon role utilisateur a {% endcomment %}
-      
-     <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Ranmase user nan localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    
-    if (!user) return; // si pa gen user, pa fè anyen
-
-    // Default: kache tout
-    document.querySelectorAll("nav ul li").forEach(li => li.style.display = "none");
-
-    // Wòl itilizatè a
-    const role = user.role; // asire API a retounen yon "role" (directeur, secretaire, censeur)
-
-    if (role === "directeur") {
-        // Directeur ka wè tout
-        document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
-    } 
-    else if (role === "secretaire") {
-        document.getElementById("menu-dashboard").style.display = "block";
-        document.getElementById("menu-inscription").style.display = "block";
-        document.getElementById("menu-eleve").style.display = "block";
-        document.getElementById("menu-presence").style.display = "block";
-    } 
-    else if (role === "censeur") {
-        document.querySelectorAll("nav ul li").forEach(li => li.style.display = "block");
-        // retire utilisateur + parametre
-        document.getElementById("menu-utilisateur").style.display = "none";
-        document.getElementById("menu-parametre").style.display = "none";
-    }
-});
-</script>
-
-    
-
-
+    });
+    </script>
 
     <script src="{% static 'js/dropdown.js' %}"></script>
-<script src="{% static 'js/charts.js' %}"></script>
+    <script src="{% static 'js/charts.js' %}"></script>
 </body>
-   
- 
 </html>
