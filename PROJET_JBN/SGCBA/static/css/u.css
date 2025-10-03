@@ -19,6 +19,13 @@
     box-sizing: border-box;
 }
 
+.valid {
+  color: green;
+}
+.invalid {
+  color: red;
+}
+
 .modal-overlay.active{
     display: flex;
 }

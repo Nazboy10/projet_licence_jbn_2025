@@ -12,10 +12,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ouvrir modal "Ajouter"
     btnShowUserForm.addEventListener("click", () => {
+        clearFieldErrors();
         userFormModal.classList.add("active");
     });
-    closeUserModal.addEventListener("click", () => userFormModal.classList.remove("active"));
-    cancelUserForm.addEventListener("click", () => userFormModal.classList.remove("active"));
+    closeUserModal.addEventListener("click", () => {
+        clearFieldErrors();
+        userFormModal.classList.remove("active");
+    });
+    cancelUserForm.addEventListener("click", () => {
+        clearFieldErrors();
+        userFormModal.classList.remove("active");
+    });
 
     // Submit form "Ajouter"
     form.addEventListener("submit", async function (e) {
@@ -27,9 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const nom = document.getElementById("nom").value.trim();
         const prenom = document.getElementById("prenom").value.trim();
 
+    clearFieldErrors();
+
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/;
         if (!passwordRegex.test(password)) {
-            alert("⚠️ Mot de passe invalide !");
+            showFieldError('password', '⚠️ Mot de passe invalide : au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.');
             return;
         }
 
@@ -37,11 +46,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch("/api/utilisateurs/");
             const utilisateurs = await response.json();
             if (utilisateurs.some(u => u.username === username)) {
-                alert("⚠️ Nom d’utilisateur déjà utilisé !");
+                showFieldError('username', "⚠️ Nom d’utilisateur déjà utilisé !");
                 return;
             }
             if (utilisateurs.some(u => u.email === email)) {
-                alert("⚠️ Email déjà utilisé !");
+                showFieldError('email', "⚠️ Email déjà utilisé !");
                 return;
             }
 
@@ -59,8 +68,32 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("✅ Utilisateur ajouté !");
                 location.reload();
             } else {
-                const err = await postResponse.json();
-                alert("⚠️ Erreur: " + JSON.stringify(err));
+                // afficher les erreurs renvoyées par l'API dans le modal
+                let err = {};
+                try {
+                    err = await postResponse.json();
+                } catch (e) {
+                   document.getElementById('userFormErrors').textContent = '⚠️ Erreur serveur inattendue.';
+                    return;
+                }
+
+                // err peut être {'password': 'message'} ou {'password': ['..']} ou une erreur globale
+                if (typeof err === 'string') {
+                    // message global
+                    alert('⚠️ ' + err);
+                } else if (err) {
+                    for (const key in err) {
+                        const val = err[key];
+                        const message = Array.isArray(val) ? val.join(' ; ') : (typeof val === 'object' ? JSON.stringify(val) : val);
+                        // Map server key to field id
+                        if (key === 'password' || key === 'username' || key === 'email' || key === 'nom' || key === 'prenom') {
+                            showFieldError(key, message);
+                        } else {
+                            // fallback: show as alert
+                            alert(key + ': ' + message);
+                        }
+                    }
+                }
             }
 
         } catch (error) {
@@ -242,4 +275,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         return cookieValue;
     }
+
+    // Helper: afficher erreur sous un champ
+    function showFieldError(field, message) {
+        const el = document.getElementById(`error-${field}`);
+        if (el) el.textContent = message;
+    }
+
+    // Helper: vider toutes les erreurs de champs
+    function clearFieldErrors() {
+        ['password','username','email','nom','prenom'].forEach(f => {
+            const el = document.getElementById(`error-${f}`);
+            if (el) el.textContent = '';
+        });
+        const general = document.getElementById('userFormErrors');
+        if (general) general.innerHTML = '';
+    }
+
+    // Clear field error while typing
+    ['password','username','email','nom','prenom'].forEach(f => {
+        const input = document.getElementById(f);
+        if (input) input.addEventListener('input', () => {
+            const el = document.getElementById(`error-${f}`);
+            if (el) el.textContent = '';
+        });
+    });
 });

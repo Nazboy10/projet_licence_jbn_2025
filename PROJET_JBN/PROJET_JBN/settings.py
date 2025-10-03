@@ -101,12 +101,12 @@ DATABASES = {
 # baz de done supabase
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',                       # <-- non baz done aktyèl ou
-        'USER': 'postgres',                        # default user Supabase
-        'PASSWORD': 'groupejbndatabase2025',             # modpas ou te wè nan Database Settings
-        'HOST': 'db.eglarmhxdjyczafejhfu.supabase.co',  # hostname soti nan connection string
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
+        'NAME': 'db_sgcba',              # Non baz done ou te kreye nan phpMyAdmin
+        'USER': 'root',                         # Default user WampServer
+        'PASSWORD': '',                         # Pa gen modpas pa default nan Wamp
+        'HOST': '127.0.0.1',                    # Ou ka itilize localhost tou
+        'PORT': '3306',                         # Pò default pou MySQL
     }
 }
 

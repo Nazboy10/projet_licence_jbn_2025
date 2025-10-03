@@ -73,7 +73,9 @@
     <div class="modal-content">
       <span id="closeUserModal" class="close">&times;</span>
       <h4 class="mb-3">Nouvel Utilisateur</h4>
-      <form id="utilisateursForm">
+  <!-- Conteneur pour afficher les erreurs de validation renvoyées par l'API -->
+  <div id="userFormErrors" class="mb-2" style="color: #b00020;"></div>
+  <form id="utilisateursForm">
         <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label">Nom</label>
@@ -88,6 +90,7 @@
           <div class="col-md-6">
             <label class="form-label">Email</label>
             <input type="email" id="email" class="form-control" placeholder="Email" required>
+            <div id="error-email" class="field-error" style="color: #b00020; margin-top:4px;"></div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Rôle</label>
@@ -102,10 +105,20 @@
           <div class="col-md-6">
             <label class="form-label">Nom d’utilisateur</label>
             <input type="text" id="username" class="form-control" placeholder="Username" required>
+            <div id="error-username" class="field-error" style="color: #b00020; margin-top:4px;"></div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Mot de passe</label>
             <input type="password" id="password" class="form-control" placeholder="Mot de passe" required>
+            <div id="error-password" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div id="error-nom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+          </div>
+          <div class="col-md-6">
+            <div id="error-prenom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
           </div>
         </div>
         <div class="text-end">
