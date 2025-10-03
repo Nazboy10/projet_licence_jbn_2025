@@ -2,6 +2,8 @@
 from rest_framework import viewsets
 from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
+from .permissions import IsDirecteur
+from rest_framework.permissions import IsAuthenticated
 
 
 class UtilisateurViewSet(viewsets.ModelViewSet):
@@ -11,6 +13,11 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # retire direktè a nan lis la
         return Utilisateur.objects.exclude(role="directeur")
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsDirecteur()]
+        return [IsAuthenticated()]
    
 
 
