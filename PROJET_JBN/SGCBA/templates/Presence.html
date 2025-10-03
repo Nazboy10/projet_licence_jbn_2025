@@ -1,0 +1,184 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
+     <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS Custom -->
+     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static '/css/Pre.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+
+</head>
+<body>
+
+    <div class="sidebar">
+       <div class="logo">
+     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+    <span>SGCBA</span>
+</div>
+
+       <nav>
+  <ul>
+    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+    <li id="menu-inscription"><a href="{% url 'Inscriptions' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-eleve"><a href="{% url 'Eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+    <li id="menu-presence"><a href="{% url 'Presence' %}"class="active"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+    <li id="menu-note"><a href="{% url 'Note' %}"><i class='bx bx-note'></i> Note</a></li>
+    <li id="menu-bulletin"><a href="{% url 'Bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+    <li id="menu-utilisateur"><a href="{% url 'Utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+    <li id="menu-parametre"><a href="{% url 'Parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+  </ul>
+</nav>
+       
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>PRESENCE</h1>
+            <div class="search-profile">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
+                </div>
+               <div class="profile">
+    <i class="fas fa-bell notification-icon"></i>
+    <div class="user-avatar" id="profileDropdownToggle">
+        <img src="{% static '/image/pro.png' %}"> 
+    </div>
+
+    <!-- Dropdown menu -->
+    <div class="profile-dropdown" id="profileDropdown">
+        <ul>
+            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+        </ul>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- bouton jere code qr la -->
+  <!-- <button onclick="generateQR()">Generer QR</button>
+  <div id="qrcode"></div> -->
+
+  <!-- dezyem test -->
+   <h2>Jenere QR Code</h2>
+  
+  <button onclick="toggleQR()">Jenere / Retire QR</button>
+  
+  <div id="qrcode"></div>
+
+  <!-- QRCode.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  
+{% comment %} intefas pwezans an {% endcomment %}
+  <div class="container">
+    {% comment %} <h2 class="text-center mb-4">PRESENCE</h2> {% endcomment %}
+
+    <!-- Bouton Ajouter -->
+    <div class="mb-3 text-end">
+      <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter Presence</button>
+    </div>
+ 
+
+    <!-- Formulaire (modal) -->
+    <div id="formModal" class="modal-overlay">
+      <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h4 class="mb-3">Ajouter une presence</h4>
+        <form id="inscriptionForm">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Code de l'eleve</label>
+              <input type="text" class="form-control" placeholder="Code" required>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Nom</label>
+              <input type="text" class="form-control" placeholder="Nom" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Prénom</label>
+              <input type="text" class="form-control" placeholder="Prénom" required>
+            </div>
+
+             <div class="col-md-4">
+              <label class="form-label">Classe</label>
+              <input type="text" class="form-control" placeholder="Classe" required>
+            </div>
+
+             <div class="col-md-4">
+              <label class="form-label">Date presence</label>
+              <input type="text" class="form-control" placeholder="Date" required>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
+            {% comment %} <button type="submit" class="btn btn-success btn-custom">Ajouter</button> {% endcomment %}
+            <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Options affichage -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <label>Afficher 
+          <select class="form-select d-inline w-auto">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select> 
+          Presence
+        </label>
+      </div>
+    </div>
+  <br>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="tableEleves">
+       <thead class="table-header-blue">
+          <tr>
+            <th>Code</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Classe</th>
+            <th>Date Presence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+
+  <!--lien paj javascrip-->
+ <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> -->
+ <script src="{% static 'js/Presence.js' %}"></script>
+ <script src="{% static 'js/charts.js' %}"></script>
+ <script src="{% static 'js/role-control.js' %}"></script>
+
+</body>
+</html>
