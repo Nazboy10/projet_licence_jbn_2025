@@ -41,6 +41,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     "corsheaders",
+    'app_inscription',
+    "app_eleve",
+    "app_presence",
+    "app_note",
+    "app_bulletin",
+    "app_parametre",
+  
+    
 
 ]
 
@@ -70,7 +78,7 @@ ROOT_URLCONF = 'PROJET_JBN.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],   # ✅ ajoute sa
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,6 +89,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'PROJET_JBN.wsgi.application'
 
@@ -98,7 +107,13 @@ DATABASES = {
     }
 }
 
-# baz de done supabase
+
+
+
+
+
+
+# baz de done wamp server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
@@ -109,20 +124,6 @@ DATABASES = {
         'PORT': '3306',                         # Pò default pou MySQL
     }
 }
-
-
-
-# baz de done wamp server
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
-#         'NAME': 'db_sgcba',              # Non baz done ou te kreye nan phpMyAdmin
-#         'USER': 'root',                         # Default user WampServer
-#         'PASSWORD': '',                         # Pa gen modpas pa default nan Wamp
-#         'HOST': '127.0.0.1',                    # Ou ka itilize localhost tou
-#         'PORT': '3306',                         # Pò default pou MySQL
-#     }
-# }
 
 
 
@@ -176,6 +177,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

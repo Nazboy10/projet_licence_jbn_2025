@@ -23,6 +23,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("SGCBA.urls")),
     path('api/', include('api.urls')),
+    path('inscription/', include('app_inscription.urls')),
+    path("eleve/", include("app_eleve.urls")),
+    path("presence/", include("app_presence.urls")), 
+    path("bulletin/", include("app_bulletin.urls")),
+    path("note/", include("app_note.urls")),
+    path('parametre/', include("app_parametre.urls")),
+
 ]
+
+
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
