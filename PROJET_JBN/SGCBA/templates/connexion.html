@@ -48,40 +48,48 @@
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
   <script>
-    document.getElementById('loginBtn').addEventListener('click', async function() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const csrftoken = '{{ csrf_token }}';
+document.getElementById('loginBtn').addEventListener('click', async function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const csrftoken = '{{ csrf_token }}';
 
-        if(!email || !password){
-            document.getElementById('errorMsg').textContent = 'Email et mot de passe requis';
-            return;
-        }
+    if(!email || !password){
+        document.getElementById('errorMsg').textContent = 'Email et mot de passe requis';
+        return;
+    }
 
-        try {
-            const response = await fetch('/api/login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({ email, password })
-            });
+    try {
+        const response = await fetch('/api/login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if(data.success){
-               // 👉 Isit la ou mete sove user lan nan browser
-                localStorage.setItem("user", JSON.stringify(data.user));
-                window.location.href = '/dashboard/';
-            } else {
-                document.getElementById('errorMsg').textContent = data.error;
+        if(data.success){
+            // ✅ Sove itilizatè a
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            // 🔑 Sove token JWT pou lòt requèt
+            if(data.token){
+                localStorage.setItem("token", data.token);
             }
-        } catch (err) {
-            document.getElementById('errorMsg').textContent = 'Erreur réseau ou serveur';
-            console.error(err);
+
+            // Redireksyon
+            window.location.href = '/dashboard/';
+        } else {
+            document.getElementById('errorMsg').textContent = data.error;
         }
-    });
-  </script>
+    } catch (err) {
+        document.getElementById('errorMsg').textContent = 'Erreur réseau ou serveur';
+        console.error(err);
+    }
+});
+</script>
+
 </body>
 </html>

@@ -10,7 +10,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const cancelEditUserForm = document.getElementById("cancelEditUserForm");
     const editUserForm = document.getElementById("editUserForm");
 
-    // Ouvrir modal "Ajouter"
+    // 🔐 Helper: récupère CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // ⚙️ Helper global fetch (ajoute credentials + csrf + token otomatikman)
+async function djangoFetch(url, options = {}) {
+    const csrftoken = getCookie("csrftoken");
+    const defaults = {
+        credentials: "same-origin", // kenbe session
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+        },
+    };
+    return fetch(url, { ...defaults, ...options });
+}
+
+
+
+    // ----------------------------- //
+    // 📋 GESTION FORMULAIRE AJOUT
+    // ----------------------------- //
     btnShowUserForm.addEventListener("click", () => {
         clearFieldErrors();
         userFormModal.classList.add("active");
@@ -24,90 +58,108 @@ document.addEventListener("DOMContentLoaded", function () {
         userFormModal.classList.remove("active");
     });
 
-    // Submit form "Ajouter"
     form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const username = document.getElementById("username").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const role = document.getElementById("role").value;
-        const password = document.getElementById("password").value;
-        const nom = document.getElementById("nom").value.trim();
-        const prenom = document.getElementById("prenom").value.trim();
+    e.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const role = document.getElementById("role").value;
+    const password = document.getElementById("password").value;
+    const nom = document.getElementById("nom").value.trim();
+    const prenom = document.getElementById("prenom").value.trim();
 
     clearFieldErrors();
 
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/;
-        if (!passwordRegex.test(password)) {
-            showFieldError('password', '⚠️ Mot de passe invalide : au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.');
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        showFieldError('password', '⚠️ Mot de passe invalide : au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.');
+        return;
+    }
+
+    try {
+        // 🔐 Récupération token JWT depuis localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("⚠️ Vous devez être connecté pour ajouter un utilisateur.");
             return;
         }
 
-        try {
-            const response = await fetch("/api/utilisateurs/");
-            const utilisateurs = await response.json();
-            if (utilisateurs.some(u => u.username === username)) {
-                showFieldError('username', "⚠️ Nom d’utilisateur déjà utilisé !");
+        // 🔐 Vérification utilisateurs existants
+        const response = await djangoFetch("/api/utilisateurs/", { method: "GET" });
+        const utilisateurs = await response.json();
+
+        console.log("📦 Réponse API utilisateurs:", utilisateurs);
+
+        let usersList = [];
+        if (Array.isArray(utilisateurs)) {
+            usersList = utilisateurs;
+        } else if (utilisateurs && Array.isArray(utilisateurs.results)) {
+            usersList = utilisateurs.results;
+        } else {
+            alert("⚠️ L’API n’a pas retourné une liste valide.");
+            return;
+        }
+
+        if (usersList.some(u => u.username === username)) {
+            showFieldError('username', "⚠️ Nom d’utilisateur déjà utilisé !");
+            return;
+        }
+        if (usersList.some(u => u.email === email)) {
+            showFieldError('email', "⚠️ Email déjà utilisé !");
+            return;
+        }
+
+        const data = { username, email, role, password, nom, prenom };
+
+        // 🔐 POST avec token JWT
+        const postResponse = await djangoFetch("/api/utilisateurs/", {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+
+        if (postResponse.ok) {
+            alert("✅ Utilisateur ajouté !");
+            location.reload();
+        } else {
+            let err = {};
+            try {
+                err = await postResponse.json();
+            } catch (e) {
+                document.getElementById('userFormErrors').textContent = '⚠️ Erreur serveur inattendue.';
                 return;
             }
-            if (utilisateurs.some(u => u.email === email)) {
-                showFieldError('email', "⚠️ Email déjà utilisé !");
-                return;
-            }
 
-            const data = { username, email, role, password, nom, prenom };
-            const postResponse = await fetch("/api/utilisateurs/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken")
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (postResponse.ok) {
-                alert("✅ Utilisateur ajouté !");
-                location.reload();
-            } else {
-                // afficher les erreurs renvoyées par l'API dans le modal
-                let err = {};
-                try {
-                    err = await postResponse.json();
-                } catch (e) {
-                   document.getElementById('userFormErrors').textContent = '⚠️ Erreur serveur inattendue.';
-                    return;
-                }
-
-                // err peut être {'password': 'message'} ou {'password': ['..']} ou une erreur globale
-                if (typeof err === 'string') {
-                    // message global
-                    alert('⚠️ ' + err);
-                } else if (err) {
-                    for (const key in err) {
-                        const val = err[key];
-                        const message = Array.isArray(val) ? val.join(' ; ') : (typeof val === 'object' ? JSON.stringify(val) : val);
-                        // Map server key to field id
-                        if (key === 'password' || key === 'username' || key === 'email' || key === 'nom' || key === 'prenom') {
-                            showFieldError(key, message);
-                        } else {
-                            // fallback: show as alert
-                            alert(key + ': ' + message);
-                        }
+            if (typeof err === 'string') {
+                alert('⚠️ ' + err);
+            } else if (err) {
+                for (const key in err) {
+                    const val = err[key];
+                    const message = Array.isArray(val) ? val.join(' ; ') : (typeof val === 'object' ? JSON.stringify(val) : val);
+                    if (['password','username','email','nom','prenom'].includes(key)) {
+                        showFieldError(key, message);
+                    } else {
+                        alert(key + ': ' + message);
                     }
                 }
             }
-
-        } catch (error) {
-            alert("🚨 Erreur réseau: " + error);
         }
-    });
 
-    // Charger utilisateurs
+    } catch (error) {
+        alert("🚨 Erreur réseau: " + error);
+    }
+});
+
+
+    // ----------------------------- //
+    // 📋 CHARGER ET GÉRER UTILISATEURS
+    // ----------------------------- //
     async function loadUsers() {
-        const response = await fetch("/api/utilisateurs/");
+        const response = await djangoFetch("/api/utilisateurs/", { method: "GET" });
         const utilisateurs = await response.json();
+        const usersList = Array.isArray(utilisateurs) ? utilisateurs : utilisateurs.results || [];
+
         tableUsersBody.innerHTML = "";
 
-        utilisateurs.forEach(utilisateur => {
+        usersList.forEach(utilisateur => {
             const newRow = tableUsersBody.insertRow();
             [utilisateur.nom, utilisateur.prenom, utilisateur.email, utilisateur.role, utilisateur.username]
                 .forEach(val => {
@@ -115,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     cell.textContent = val;
                 });
 
-            // Actif
             const actifCell = newRow.insertCell();
             actifCell.className = "text-center";
             actifCell.innerHTML = `
@@ -125,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 </label>
             `;
 
-            // Actions
             const actionCell = newRow.insertCell();
             actionCell.className = "text-center";
             actionCell.innerHTML = `
@@ -134,18 +184,15 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
         });
 
-        // Event listener bouton modifier
+        // 🛠 Bouton modifier
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.addEventListener("click", async (e) => {
                 const userId = e.currentTarget.dataset.id;
-                console.log("📝 Edit user ID:", userId); // Debug
-
                 try {
-                    const response = await fetch(`/api/utilisateurs/${userId}/`);
+                    const response = await djangoFetch(`/api/utilisateurs/${userId}/`, { method: "GET" });
                     if (!response.ok) throw new Error("Utilisateur introuvable");
                     const utilisateur = await response.json();
 
-                    // Remplir modal
                     document.getElementById("editUserId").value = utilisateur.id;
                     document.getElementById("editNom").value = utilisateur.nom;
                     document.getElementById("editPrenom").value = utilisateur.prenom;
@@ -154,20 +201,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("editUsername").value = utilisateur.username;
                     document.getElementById("editActif").checked = utilisateur.actif;
 
-                    // Afficher modal
                     editUserModal.classList.add("active");
-
                 } catch (err) {
                     alert("🚨 Erreur: " + err);
                 }
             });
         });
 
-        // Fermer modal edit
         closeEditUserModal.addEventListener("click", () => editUserModal.classList.remove("active"));
         cancelEditUserForm.addEventListener("click", () => editUserModal.classList.remove("active"));
 
-        // Submit form modification
         editUserForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const userId = document.getElementById("editUserId").value;
@@ -181,12 +224,8 @@ document.addEventListener("DOMContentLoaded", function () {
             };
 
             try {
-                const putResponse = await fetch(`/api/utilisateurs/${userId}/`, {
+                const putResponse = await djangoFetch(`/api/utilisateurs/${userId}/`, {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
                     body: JSON.stringify(data)
                 });
 
@@ -203,18 +242,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Event listener delete
+        // 🗑 Supprimer
         document.querySelectorAll(".btn-delete").forEach(btn => {
             btn.addEventListener("click", async (e) => {
                 const userId = e.currentTarget.dataset.id;
                 if (!confirm("⚠️ Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) return;
 
                 try {
-                    const deleteResponse = await fetch(`/api/utilisateurs/${userId}/`, {
-                        method: "DELETE",
-                        headers: {
-                            "X-CSRFToken": getCookie("csrftoken")
-                        }
+                    const deleteResponse = await djangoFetch(`/api/utilisateurs/${userId}/`, {
+                        method: "DELETE"
                     });
 
                     if (deleteResponse.ok) {
@@ -229,19 +265,15 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // Event listener toggle actif
+        // ✅ Toggle actif
         document.querySelectorAll("input[type=checkbox][data-id]").forEach(checkbox => {
             checkbox.addEventListener("change", async (e) => {
                 const userId = e.currentTarget.dataset.id;
                 const newStatus = e.currentTarget.checked;
 
                 try {
-                    const patchResponse = await fetch(`/api/utilisateurs/${userId}/`, {
+                    const patchResponse = await djangoFetch(`/api/utilisateurs/${userId}/`, {
                         method: "PATCH",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": getCookie("csrftoken")
-                        },
                         body: JSON.stringify({ actif: newStatus })
                     });
 
@@ -255,34 +287,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
-
     }
 
     loadUsers();
 
-    // Fonction CSRF
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Helper: afficher erreur sous un champ
+    // Helpers d'erreurs
     function showFieldError(field, message) {
         const el = document.getElementById(`error-${field}`);
         if (el) el.textContent = message;
     }
 
-    // Helper: vider toutes les erreurs de champs
     function clearFieldErrors() {
         ['password','username','email','nom','prenom'].forEach(f => {
             const el = document.getElementById(`error-${f}`);
@@ -292,7 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (general) general.innerHTML = '';
     }
 
-    // Clear field error while typing
     ['password','username','email','nom','prenom'].forEach(f => {
         const input = document.getElementById(f);
         if (input) input.addEventListener('input', () => {

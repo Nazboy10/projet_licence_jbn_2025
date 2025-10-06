@@ -47,10 +47,19 @@ INSTALLED_APPS = [
     "app_note",
     "app_bulletin",
     "app_parametre",
+    'rest_framework.authtoken',
   
     
 
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",   # 👉 mete li an premye

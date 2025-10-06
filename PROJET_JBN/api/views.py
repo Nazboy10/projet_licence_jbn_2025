@@ -4,6 +4,16 @@ from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
 from .permissions import IsDirecteur
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission
+
+
+
+class IsLoggedIn(BasePermission):
+    """
+    Verifye ke itilizatè a gen sesyon aktif
+    """
+    def has_permission(self, request, view):
+        return request.session.get('id') is not None
 
 
 class UtilisateurViewSet(viewsets.ModelViewSet):
@@ -17,7 +27,8 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsDirecteur()]
-        return [IsAuthenticated()]
+        # itilize session olye de IsAuthenticated
+        return [IsLoggedIn()]
    
 
 
@@ -29,7 +40,17 @@ from rest_framework import status
 from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from SGCBA.models import Utilisateur
+from .serializers import UtilisateurSerializer
+
 class LoginAPIView(APIView):
+    """
+    Login via API, retounen done itilizatè + token, kenbe sesyon Django.
+    """
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -50,16 +71,23 @@ class LoginAPIView(APIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # ✅ Verifye mot de pase
+            # ✅ Verifye modpas
             if user.check_password(password):
-                # 👉 Mete done user nan session Django
+                # 👉 Kenbe session Django a
                 request.session['id'] = user.id
                 request.session['username'] = user.username
                 request.session['role'] = user.role
 
+                # 🔑 Kreye oswa jwenn token
+                token = user.generate_token() 
+
                 serializer = UtilisateurSerializer(user)
                 return Response(
-                    {"success": True, "user": serializer.data},
+                    {
+                        "success": True,
+                        "user": serializer.data,
+                        "token": token # Retounen token lan
+                    },
                     status=status.HTTP_200_OK
                 )
             else:
@@ -73,6 +101,7 @@ class LoginAPIView(APIView):
                 {"success": False, "error": "Email non trouvé"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
 
 
 from rest_framework.parsers import MultiPartParser, FormParser
