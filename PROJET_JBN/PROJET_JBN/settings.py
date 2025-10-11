@@ -134,7 +134,17 @@ DATABASES = {
     }
 }
 
-
+# # baz de done supabase
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',                       # <-- non baz done aktyèl ou
+#         'USER': 'postgres',                        # default user Supabase
+#         'PASSWORD': 'groupejbndatabase2025',             # modpas ou te wè nan Database Settings
+#         'HOST': 'db.eglarmhxdjyczafejhfu.supabase.co',  # hostname soti nan connection string
+#         'PORT': '5432',
+#     }
+# }
 
 
 

@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -6,17 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-     <!-- Bootstrap CSS -->
+      <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS Custom -->
      <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'app_inscription/css/inscript.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'js/role-control.js' %}"></script>
-
+        <link rel="stylesheet" href="{% static 'app_inscription/css/inscriptions.css' %}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -43,7 +42,7 @@
 
     <div class="main-content">
         <div class="header">
-            <h1>INSCRIPTION</h1>
+            <h1>INSCRIPTON</h1>
             <div class="search-profile">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
@@ -63,100 +62,117 @@
     </div>
 </div>
  </div>
-        </div>
-
-{% comment %} intefas inskripsyon an {% endcomment %}
-
-  <div class="container">
-    {% comment %} <h2 class="text-center mb-4">INSCRIPTION</h2> {% endcomment %}
-
-    <!-- Bouton Ajouter -->
-    <div class="mb-3 text-end">
-      <button id="btnShowForm" class="btn btn-primary btn-custom">Inscrire</button>
-    </div>
-<!-- Formulaire (modal) -->
-<div id="formModal" class="modal-overlay">
-  <div class="modal-content">
-    <span id="closeModal" class="close">&times;</span>
-    <h4 class="mb-3 text-center">Formulaire Inscription</h4>
-    <form id="inscriptionForm" enctype="multipart/form-data"> ✅ enctype obligatwa pou foto
-    <form id="inscriptionsForm" enctype="multipart/form-data">
-
-      
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Nom</label>
-          <input type="text" class="form-control" placeholder="Nom" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Prénom</label>
-          <input type="text" class="form-control" placeholder="Prénom" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Sexe</label>
-          <select class="form-select">
-            <option>Masculin</option>
-            <option>Féminin</option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Adresse</label>
-          <input type="text" class="form-control" placeholder="Adresse" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Date de naissance</label>
-          <input type="date" class="form-control" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Classe</label>
-          <input type="text" class="form-control" placeholder="Classe" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Téléphone</label>
-          <input type="text" class="form-control" placeholder="Téléphone" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Nom Tuteur</label>
-          <input type="text" class="form-control" placeholder="Nom Tuteur" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Téléphone Tuteur</label>
-          <input type="text" class="form-control" placeholder="Téléphone Tuteur" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" placeholder="Email" required>
-        </div>
-      </div>
-
-      <div class="row mb-3 justify-content-center">
-        <div class="col-md-6">
-          <label class="form-label">Photo élève</label>
-          <input type="file" class="form-control" name="photo" accept="image/*">
-        </div>
-      </div>
-
-      <div class="text-center"> <!-- ✅ Bouton yo mete nan mitan -->
-        <button type="submit" class="btn btn-custom btn-ajouter">Inscrire</button>
-        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
-      </div>
-    </form>
   </div>
-</div>
 
-    <!-- Options affichage -->
+<div class="main-content container mt-4">
+
+  <!-- ✅ Bouton ajouter -->
+  <div class="text-end mb-3">
+    <button id="btnShowForm" class="btn btn-primary">Inscrire</button>
+  </div>
+
+  <!-- ✅ Zone messages Django -->
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+ 
+
+  <!-- ✅ Modal -->
+  <div id="formModal" class="modal-overlay">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h4 class="text-center mb-3" id="formTitle">Formulaire Inscription</h4>
+
+      <form id="inscriptionForm" enctype="multipart/form-data" method="POST" action="{% url 'inscription' %}">
+        {% csrf_token %}
+        <input type="hidden" name="eleve_id" id="eleveId">
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nom</label>
+            <input type="text" name="nom" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Prénom</label>
+            <input type="text" name="prenom" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Sexe</label>
+            <select name="sexe" class="form-select" required>
+              <option value="">Sélectionner</option>
+              <option>Masculin</option>
+              <option>Féminin</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Adresse</label>
+            <input type="text" name="adresse" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Date de naissance</label>
+            <input type="date" name="date_naissance" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Classe</label>
+            <input type="text" name="classe" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Téléphone</label>
+            <input type="text" name="telephone" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nom Tuteur</label>
+            <input type="text" name="nom_tuteur" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Téléphone Tuteur</label>
+            <input type="text" name="tel_tuteur" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Date d’inscription</label>
+            <input type="date" name="date_inscription" class="form-control" value="{{ today|date:'Y-m-d' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Photo élève</label>
+            <input type="file" name="photo" class="form-control" accept="image/*">
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Inscrire</button>
+          <button type="button" id="cancelForm" class="btn btn-secondary">Fermer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Options affichage -->
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div>
         <label>Afficher 
@@ -165,49 +181,126 @@
             <option>25</option>
             <option>50</option>
           </select> 
-          Inscription
+          Dossier Eleve
         </label>
       </div>
     </div>
   <br>
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped" id="tableEleves">
-       <thead class="table-header-blue">
-          <tbody>
-  {% for eleve in eleves %}
-  <tr>
-    <td><img src="{{ eleve.photo.url }}" alt="Photo" width="50"></td>
-    <td>{{ eleve.code_eleve }}</td>
-    <td>{{ eleve.nom }}</td>
-    <td>{{ eleve.prenom }}</td>
-    <td>{{ eleve.sexe }}</td>
-    <td>{{ eleve.adresse }}</td>
-    <td>{{ eleve.date_naissance }}</td>
-    <td>{{ eleve.classe }}</td>
-    <td>{{ eleve.telephone }}</td>
-    <td>{{ eleve.email }}</td>
-    <td>{{ eleve.nom_tuteur }}</td>
-    <td>{{ eleve.tel_tuteur }}</td>
-    <td>
-      <button class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></button>
-      <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-    </td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="13" class="text-center">Aucun élève inscrit</td></tr>
-  {% endfor %}
-</tbody>
 
-      </table>
-    </div>
+  <!-- ✅ Tableau -->
+  <div class="table-responsive mt-4">
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-primary text-center">
+        <tr>
+          <th>Photo</th>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Sexe</th>
+          <th>Adresse</th>
+          <th>Date Naissance</th>
+          <th>Classe</th>
+          <th>Téléphone</th>
+          <th>Email</th>
+          <th>Tuteur</th>
+          <th>Tel Tuteur</th>
+          <th>Date Inscription</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for eleve in eleves %}
+        <tr>
+          <td class="text-center">
+            {% if eleve.photo %}
+              <img src="{{ eleve.photo.url }}" width="50" class="rounded">
+            {% else %}
+              <img src="{% static 'images/default.png' %}" width="50" class="rounded" alt="Aucune photo">
+            {% endif %}
+          </td>
+          <td>{{ eleve.code_eleve }}</td>
+          <td>{{ eleve.nom }}</td>
+          <td>{{ eleve.prenom }}</td>
+          <td>{{ eleve.sexe }}</td>
+          <td>{{ eleve.adresse }}</td>
+          <td>{{ eleve.date_naissance }}</td>
+          <td>{{ eleve.classe }}</td>
+          <td>{{ eleve.telephone }}</td>
+          <td>{{ eleve.email }}</td>
+          <td>{{ eleve.nom_tuteur }}</td>
+          <td>{{ eleve.tel_tuteur }}</td>
+          <td>{{ eleve.date_inscription }}</td>
+          <td class="text-center">
+            <button class="btn btn-warning btn-sm"
+              onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="14" class="text-center">Aucun élève inscrit</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-  
+</div>
+
+<!-- ✅ Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ✅ Modifier élève
+function editEleve(id, nom, prenom, sexe, adresse, date_naissance, classe, telephone, email, nom_tuteur, tel_tuteur) {
+  const modal = document.getElementById("formModal");
+  const form = document.getElementById("inscriptionForm");
+
+  modal.style.display = "block";
+  document.getElementById("formTitle").textContent = "Modifier Élève";
+  document.getElementById("btnSubmit").textContent = "Modifier";
+
+  document.querySelector("#eleveId").value = id;
+  form.nom.value = nom;
+  form.prenom.value = prenom;
+  form.sexe.value = sexe;
+  form.adresse.value = adresse;
+  form.date_naissance.value = date_naissance;
+  form.classe.value = classe;
+  form.telephone.value = telephone;
+  form.email.value = email;
+  form.nom_tuteur.value = nom_tuteur;
+  form.tel_tuteur.value = tel_tuteur;
+
+  // Action URL pou modification
+  form.action = `/inscription/modifier/${id}/`;
+}
+
+// ✅ Bouton fermer
+document.getElementById("cancelForm").addEventListener("click", function() {
+  document.getElementById("formModal").style.display = "none";
+  const form = document.getElementById("inscriptionForm");
+  form.reset();
+  form.action = "{% url 'inscription' %}";
+  document.getElementById("btnSubmit").textContent = "Inscrire";
+  document.getElementById("formTitle").textContent = "Formulaire Inscription";
+});
+
+// ✅ Bouton afficher fòm
+document.getElementById("btnShowForm").addEventListener("click", function() {
+  document.getElementById("formModal").style.display = "block";
+});
+
+// ✅ Bouton X pou fèmen modal
+document.getElementById("closeModal").addEventListener("click", function() {
+  document.getElementById("formModal").style.display = "none";
+});
+</script>
 
   <!-- JS -->
-   <script src="{% static 'app_inscription/js/Inscription.js' %}"></script>
-  <!-- <script src="{% static 'js/Inscription.js' %}"></script> -->
+  <script src="{% static 'app_inscription/js/Inscription.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
-
+  <script src="{% static 'js/role-control.js' %}"></script>
 </body>
 </html>
