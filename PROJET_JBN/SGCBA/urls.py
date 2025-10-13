@@ -16,4 +16,6 @@ urlpatterns = [
     
     path('reset_password/', reset_password_page, name='reset_password'),
     path('reset_password_confirm/<uidb64>/<token>/', reset_password_confirm_page, name='reset_password_confirm'),
+    path('changer-photo/', views.changer_photo, name='changer_photo'),
+
 ]

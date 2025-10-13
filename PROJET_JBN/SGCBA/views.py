@@ -37,3 +37,23 @@ def utilisateurs(request):
 
 def parametre(request):
     return render(request, 'parametres.html')
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from SGCBA.models import Utilisateur
+
+@login_required
+def changer_photo(request):
+    user_id = request.session.get('id')
+    if not user_id:
+        return JsonResponse({'success': False, 'message': 'Utilisateur non connecté'}, status=401)
+
+    user = Utilisateur.objects.get(id=user_id)
+
+    if request.method == 'POST' and request.FILES.get('photo'):
+        user.photo = request.FILES['photo']
+        user.save()
+        return JsonResponse({'success': True, 'photo_url': user.photo.url})
+
+    return JsonResponse({'success': False, 'message': 'Aucune image reçue'})

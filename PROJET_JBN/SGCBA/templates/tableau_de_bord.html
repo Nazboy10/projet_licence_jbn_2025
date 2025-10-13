@@ -46,16 +46,20 @@
                     <i class="fas fa-bell notification-icon"></i>
                     <h6 class="username"><span id="username"></span></h6>
                     <div class="user-avatar" id="profileDropdownToggle">
-                        <img src="{% static '/image/pro.png' %}"> 
-                    </div>
+    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+</div>
+
+
+
+
 
                     <!-- Dropdown menu -->
                     <div class="profile-dropdown" id="profileDropdown">
                         <ul>
                             <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
-                            <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
+                           <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
                         </ul>
-                        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
+                       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
                     </div>
                 </div>
             </div>
@@ -221,6 +225,48 @@
         }
     });
     </script>
+
+   <script>
+function uploadPhoto() {
+    const fileInput = document.getElementById('photoInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    // Récupérer ID itilizatè a soti nan session/localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return alert('Utilisateur non trouvé');
+
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('user_id', user.id);  // voye id itilizatè a
+
+    fetch('/api/upload-photo/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'  // si w ap itilize SessionAuthentication
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.photo_url) {
+            // Mete nouvo foto san reload
+            document.querySelector('#profileDropdownToggle img').src = data.photo_url;
+
+            // Update user object nan localStorage
+            user.photo = data.photo_url;
+            localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            alert(data.error || 'Erreur lors de la mise à jour');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erreur de connexion à l\'API');
+    });
+}
+</script>
+
 
     <script src="{% static 'js/dropdown.js' %}"></script>
     <script src="{% static 'js/charts.js' %}"></script>

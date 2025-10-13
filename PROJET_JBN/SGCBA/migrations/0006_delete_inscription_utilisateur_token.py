@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='Inscription',
-        ),
+        # migrations.DeleteModel(
+        #     name='Inscription',
+        # ),
         migrations.AddField(
             model_name='utilisateur',
             name='token',
