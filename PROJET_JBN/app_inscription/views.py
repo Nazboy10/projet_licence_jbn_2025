@@ -205,16 +205,17 @@ def ajouter_inscription(request):
             "prenom": eleve.prenom,
             "sexe": eleve.sexe,
             "adresse": eleve.adresse,
-            "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
+            "date_naissance": eleve.date_naissance("%Y-%m-%d") if eleve.date_naissance else "",
             "classe": eleve.classe,
             "telephone": eleve.telephone,
             "email": eleve.email,
             "nom_tuteur": eleve.nom_tuteur,
             "tel_tuteur": eleve.tel_tuteur,
-            "date_inscription": eleve.date_inscription.strftime("%Y-%m-%d"),
+            "date_inscription": eleve.date_inscription("%Y-%m-%d"),
             "photo_url": photo_url,
         }
         return JsonResponse(data, status=201)
+    
 
     except Exception as e:
         print("❌ ERREUR DJANGO:", e)
