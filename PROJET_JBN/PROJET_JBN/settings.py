@@ -123,7 +123,6 @@ DATABASES = {
 
 
 
-# baz de done wamp server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -134,7 +133,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 
 
