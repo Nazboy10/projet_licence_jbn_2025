@@ -52,8 +52,8 @@
                <div class="profile">
     <i class="fas fa-bell notification-icon"></i>
     <div class="user-avatar" id="profileDropdownToggle">
-        <img src="{% static '/image/pro.png' %}"> 
-    </div>
+    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+</div>
 
     <!-- Dropdown menu -->
     <div class="profile-dropdown" id="profileDropdown">
@@ -189,7 +189,7 @@
   </div>
 
   <!-- JS -->
-  <script src="{% static 'app_eleve/js/eleves.js' %}"></script>
+  <script src="{% static 'app_eleve/js/eleve.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/role-control.js' %}"></script>
 

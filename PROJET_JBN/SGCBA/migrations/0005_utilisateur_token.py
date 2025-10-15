@@ -10,6 +10,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+<<<<<<< HEAD:PROJET_JBN/SGCBA/migrations/0005_utilisateur_token.py
+=======
+        # migrations.DeleteModel(
+        #     name='Inscription',
+        # ),
+>>>>>>> 1671dfc80e71e61443976d8a3f59211ee6dc2699:PROJET_JBN/SGCBA/migrations/0006_delete_inscription_utilisateur_token.py
         migrations.AddField(
             model_name='utilisateur',
             name='token',
