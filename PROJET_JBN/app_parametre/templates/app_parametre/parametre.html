@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'app_parametre/css/Parametre.css' %}">
+    <link rel="stylesheet" href="{% static 'app_parametre/css/parametre.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -27,13 +27,13 @@
        <nav>
   <ul>
     <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'inscription' %}"class="active"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
     <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
     <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
     <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
     <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
     <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+    <li id="menu-parametre"><a href="{% url 'parametre' %}"class="active"><i class="fa-solid fa-gear"></i> Parametres</a></li>
   </ul>
 </nav>
     </div>
@@ -49,7 +49,7 @@
                <div class="profile">
     <i class="fas fa-bell notification-icon"></i>
     <div class="user-avatar" id="profileDropdownToggle">
-        <img src="{% static '/image/pro.png' %}"> 
+       <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
     </div>
 
     <!-- Dropdown menu -->
@@ -62,7 +62,17 @@
  </div>
         </div>
          
-  
+  <!-- Ajoute sa anba header la -->
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 
 {% comment %} intefas Parametre {% endcomment %}
 
@@ -70,15 +80,12 @@
     <div class="topbar">
       <h1><i class="fas fa-gear"></i> Paramètres système</h1>
       <br/>
-      <div class="actions">
-        <button class="btn secondary" type="button" onclick="resetForm()">Réinitialiser</button>
-        <button class="btn" form="formParam" type="submit">Sauvegarder</button>
-      </div>
+     
    <br/>
       
     <div class="grid">
       <!-- LEFT: form -->
-      <form id="formParam" class="settings" method="post" action="''" enctype="multipart/form-data">
+     <form id="formParam" class="settings" method="post" action="{% url 'parametre' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Généraux -->
@@ -92,18 +99,18 @@
             <div class="field">
               <label for="annee">Année académique active</label>
               <select id="annee" name="annee_academique">
-                <option value="2024-2025">2024-2025</option>
-                <option value="2025-2026" selected>2025-2026</option>
-                <option value="2026-2027">2026-2027</option>
-              </select>
+  <option value="2024-2025" {% if param.annee_academique == "2024-2025" %}selected{% endif %}>2024-2025</option>
+  <option value="2025-2026" {% if param.annee_academique == "2025-2026" %}selected{% endif %}>2025-2026</option>
+  <option value="2026-2027" {% if param.annee_academique == "2026-2027" %}selected{% endif %}>2026-2027</option>
+</select>
             </div>
             <div class="field">
               <label>Trimestre actif</label>
               <div class="radio-group" id="trimestre">
-                <label class="radio"><input type="radio" name="trimestre" value="1" checked> 1er</label>
-                <label class="radio"><input type="radio" name="trimestre" value="2"> 2e</label>
-                <label class="radio"><input type="radio" name="trimestre" value="3"> 3e</label>
-              </div>
+  <label class="radio"><input type="radio" name="trimestre" value="1" {% if param.trimestre == 1 %}checked{% endif %}> 1er</label>
+  <label class="radio"><input type="radio" name="trimestre" value="2" {% if param.trimestre == 2 %}checked{% endif %}> 2e</label>
+  <label class="radio"><input type="radio" name="trimestre" value="3" {% if param.trimestre == 3 %}checked{% endif %}> 3e</label>
+</div>
             </div>
             <div class="field">
               <label for="date_debut">Date début</label>
@@ -130,75 +137,23 @@
         <section class="section">
           <h2><i class="fas fa-graduation-cap"></i> 📚 Académiques</h2>
           <div class="field-row">
-            <div class="field">
-              <label for="bareme">Barème de notes</label>
-              <select id="bareme" name="bareme_notes">
-                <option value="10">/10</option>
-                <option value="20" selected>/20</option>
-                <option value="100">/100</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Coefficient matières activé ?</label>
-              <div>
-                <div id="coeffSwitch" class="switch" role="switch" data-name="coeff_active" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="coeff_active" id="coeff_active" value="0">
-              </div>
-            </div>
-            <div class="field full">
-              <label>
-                <input id="regle_passage" name="regle_passage" type="checkbox" value="1"> Règle de passage automatique ?
-              </label>
-            </div>
+           
+           <div class="field full">
+  <label>
+    <input type="hidden" name="regle_passage" value="0">
+    <input id="regle_passage" name="regle_passage" type="checkbox" value="1" {% if param.regle_passage %}checked{% endif %}>
+    Règle de passage automatique ?
+  </label>
+</div>
           </div>
         </section>
 
-        <!-- Financiers -->
-        <section class="section">
-          <h2><i class="fas fa-money-bill-wave"></i> 💰 Financiers</h2>
-          <div class="field-row">
-            <div class="field">
-              <label for="inscription">Montant inscription</label>
-              <input id="inscription" name="montant_inscription" type="number" min="0" placeholder="1500" value="{{ param.montant_inscription|default:'' }}">
-            </div>
-            <div class="field">
-              <label for="scolarite">Frais scolarité mensuel</label>
-              <input id="scolarite" name="frais_scolarite" type="number" min="0" placeholder="2500" value="{{ param.frais_scolarite|default:'' }}">
-            </div>
-            <div class="field">
-              <label for="devise">Devise utilisée</label>
-              <select id="devise" name="devise">
-                <option value="HTG" selected>HTG</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Activer rappel paiement par SMS</label>
-              <div>
-                <div id="smsSwitch" class="switch on" role="switch" data-name="sms_reminder" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="sms_reminder" id="sms_reminder" value="1">
-              </div>
-            </div>
-          </div>
-        </section>
-
+        
         <!-- Utilisateurs -->
         <section class="section">
           <h2><i class="fas fa-users"></i> 👥 Utilisateurs</h2>
           <div class="field-row">
-            <div class="field">
-              <label>Activer auto-création compte élève</label>
-              <div>
-                <div id="autocreateSwitch" class="switch" role="switch" data-name="auto_create" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="auto_create" id="auto_create" value="0">
-              </div>
-            </div>
+            
             <div class="field">
               <label for="session_duration">Durée session (minutes)</label>
               <input id="session_duration" name="session_duration" type="number" min="1" placeholder="120" value="{{ param.session_duration|default:120 }}">
@@ -227,24 +182,7 @@
               <label for="tel_contact">Numéro téléphone officiel</label>
               <input id="tel_contact" name="tel_contact" type="text" placeholder="+509 3789 0000" value="{{ param.tel_contact|default:'' }}">
             </div>
-            <div class="field">
-              <label>Notifications SMS</label>
-              <div>
-                <div id="notifySmsSwitch" class="switch on" role="switch" data-name="notify_sms" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="notify_sms" id="notify_sms" value="1">
-              </div>
-            </div>
-            <div class="field">
-              <label>Notifications WhatsApp</label>
-              <div>
-                <div id="notifyWaSwitch" class="switch" role="switch" data-name="notify_wa" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="notify_wa" id="notify_wa" value="0">
-              </div>
-            </div>
+           
           </div>
         </section>
 
@@ -261,15 +199,7 @@
                 <input type="hidden" name="backup_auto" id="backup_auto" value="1">
               </div>
             </div>
-            <div class="field">
-              <label>2FA pour admin</label>
-              <div>
-                <div id="twofaSwitch" class="switch" role="switch" data-name="twofa_admin" tabindex="0">
-                  <div class="knob"></div>
-                </div>
-                <input type="hidden" name="twofa_admin" id="twofa_admin" value="0">
-              </div>
-            </div>
+           
             <div class="field full">
               <label>Logs activité activés</label>
               <div>
@@ -291,13 +221,18 @@
       <!-- RIGHT: helper card -->
       <aside class="card">
         <h3>Info rapide</h3>
-        <p class="hint">Ici ou ka ajiste paramèt kle yo pou sistèm lan. Lè w klike <strong>Enregistrer</strong>, chanjman yo ap voye sou backend la (metòd POST).</p>
+       <p class="hint">
+Ici, vous pouvez ajuster les paramètres clés du système. 
+Lorsque vous cliquez sur <strong>Enregistrer</strong>, les modifications seront envoyées au serveur.
+</p>
+
         <hr style="margin:12px 0">
         <h4 style="margin:6px 0">Bonnes pratiques</h4>
         <ul class="hint" style="padding-left:18px">
-          <li>Chanje <em>Année académique</em> sèlman lè new school year kòmanse.</li>
-          <li>Sere logo a an PNG pou pi bon rezilta sou PDF.</li>
-          <li>Active SMS sèlman si w gen integrasyon SMS (gateway).</li>
+          <li>Changez <em>l'année académique</em> uniquement lorsque la nouvelle année scolaire commence.</li>
+          <li>Utilisez un <em>logo</em> de haute qualité pour une meilleure apparence dans les documents.</li>
+
+         
         </ul>
       </aside>
     </div>
@@ -306,7 +241,7 @@
 
        <!-- JS -->
  <script src="{% static 'js/dropdown.js' %}"></script>
- <script src="{% static 'app_parametre/js/Parametre.js' %}"></script>
+ <script src="{% static 'app_parametre/js/parametre.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/role-control.js' %}"></script>
 

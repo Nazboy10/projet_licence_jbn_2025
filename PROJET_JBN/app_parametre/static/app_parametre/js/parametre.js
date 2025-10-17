@@ -70,3 +70,48 @@ function resetForm(){
   });
   logoPreview.innerHTML = '<i class="fas fa-image" style="color:var(--muted)"></i>';
 }
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Fonction pou mete valè switch yo
+    function updateSwitch(switchEl) {
+        const input = document.querySelector(`input[name="${switchEl.dataset.name}"]`);
+        if (switchEl.classList.contains('on')) {
+            input.value = "1";
+        } else {
+            input.value = "0";
+        }
+    }
+
+    // Inisyalize switch yo
+    document.querySelectorAll('.switch').forEach(switchEl => {
+        // Mete bon eta inicial la
+        const input = document.querySelector(`input[name="${switchEl.dataset.name}"]`);
+        if (input && input.value === "1") {
+            switchEl.classList.add('on');
+        }
+        // Klike pou chanje
+        switchEl.addEventListener('click', function () {
+            this.classList.toggle('on');
+            updateSwitch(this);
+        });
+    });
+
+    // Reset form
+    window.resetForm = function () {
+        if (confirm("Voulez-vous réinitialiser le formulaire ?")) {
+            document.getElementById("formParam").reset();
+            // Remettre switches à état initial
+            document.querySelectorAll('.switch').forEach(el => {
+                const input = document.querySelector(`input[name="${el.dataset.name}"]`);
+                if (input && input.value === "1") {
+                    el.classList.add('on');
+                } else {
+                    el.classList.remove('on');
+                }
+            });
+        }
+    };
+});
