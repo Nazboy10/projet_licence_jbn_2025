@@ -179,15 +179,6 @@ class ResetPasswordAPIView(APIView):
 
 
 
-
-
-
-
-
-
-
-
-
 class ResetPasswordConfirmAPIView(APIView):
     """
     Verifye token epi mete nouvo modpas
@@ -234,8 +225,6 @@ class ResetPasswordConfirmAPIView(APIView):
 
 
 
-
-
 # api/views.py
 from django.shortcuts import render
 
@@ -253,3 +242,219 @@ def reset_password_confirm_page(request, uidb64, token):
         'token': token
     })
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # app_api/views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from django.utils.dateparse import parse_date
+import json
+import random
+import string
+from app_inscription.models import Inscription
+from app_parametre.models import Parametre
+import base64
+from django.core.files.base import ContentFile
+
+@csrf_exempt
+def api_ajouter_inscription(request):
+    if request.method != "POST":
+         return JsonResponse({
+            "success": False,
+            "error_code": "method_not_allowed",
+            "error": "Méthode non autorisée"
+        }, status=405)
+    
+    if request.content_type != "application/json":
+        return JsonResponse({
+    "success": False,
+    "error_code": "invalid_content_type",
+    "error": "Content-Type doit être application/json"
+}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except (ValueError, TypeError):
+       return JsonResponse({
+    "success": False,
+    "error_code": "invalid_json",
+    "error": "JSON invalide"
+}, status=400)
+
+    try:
+        # Ektrè done yo
+        nom = data.get("nom", "").strip()
+        prenom = data.get("prenom", "").strip()
+        sexe = data.get("sexe", "").strip()
+        adresse = data.get("adresse", "").strip()
+        date_naissance_str = data.get("date_naissance")
+        classe = data.get("classe", "").strip()
+        telephone = data.get("telephone", "").strip()
+        email = data.get("email", "").strip().lower()
+        nom_tuteur = data.get("nom_tuteur", "").strip()
+        tel_tuteur = data.get("tel_tuteur", "").strip()
+        date_inscription_str = data.get("date_inscription")
+
+        # Validasyon chan obligatwa
+        if not all([nom, prenom, sexe, adresse, classe, telephone]):
+           return JsonResponse({
+    "success": False,
+    "error_code": "missing_fields",
+    "error": "Tous les champs obligatoires doivent être remplis."
+}, status=400)
+
+        # ✅ Verifye email
+        if email and Inscription.objects.filter(email__iexact=email).exists():
+            return JsonResponse({
+    "success": False,
+    "error_code": "email_exists",
+    "error": f"L'email {email} est déjà utilisé."
+}, status=400)
+
+        # ✅ Verifye telephone
+        if Inscription.objects.filter(telephone=telephone).exists():
+            return JsonResponse({
+    "success": False,
+    "error_code": "phone_exists",
+    "error": f"Le téléphone {telephone} est déjà utilisé."
+}, status=400)
+
+        # 🔥 Dat nesans
+        date_naissance = None
+        if date_naissance_str:
+            date_naissance = parse_date(date_naissance_str)
+            if not date_naissance:
+               return JsonResponse({
+    "success": False,
+    "error_code": "invalid_date_naissance",
+    "error": "Format date de naissance invalide. Utilisez AAAA-MM-JJ."
+}, status=400)
+
+        # 🔥 Dat enskripsyon
+        if not date_inscription_str:
+            return JsonResponse({
+    "success": False,
+    "error_code": "missing_date_inscription",
+    "error": "La date d'inscription est requise."
+}, status=400)
+        
+        date_inscription_date = parse_date(date_inscription_str)
+        if not date_inscription_date:
+           return JsonResponse({
+    "success": False,
+    "error_code": "invalid_date_inscription",
+    "error": "Format date d'inscription invalide. Utilisez AAAA-MM-JJ."
+}, status=400)
+
+        # 🔒 Verifye peryod akademik
+        param = Parametre.load()
+        if param.date_debut and param.date_fin:
+            if not (param.date_debut <= date_inscription_date <= param.date_fin):
+               return JsonResponse({
+    "success": False,
+    "error_code": "date_out_of_range",
+    "error": f"La date d'inscription doit être entre {param.date_debut} et {param.date_fin}."
+}, status=400)
+    
+         
+         
+
+        # ⚙️ Genere kòd elèv
+        def generate_code_eleve(nom, prenom, sexe):
+            n = (nom[0] if nom else "X").upper()
+            p = (prenom[0] if prenom else "X").upper()
+            s = (sexe[0] if sexe else "X").upper()
+            while True:
+                letters = ''.join(random.choices(string.ascii_uppercase, k=3))
+                numbers = random.randint(100, 999)
+                prefix = f"{n}{p}{s}{letters}-{numbers}"
+                if not Inscription.objects.filter(code_eleve=prefix).exists():
+                    return prefix
+
+        code_generated = generate_code_eleve(nom, prenom, sexe)
+
+       # 📸 Gestion de la photo (si fournie en base64)
+        photo = None
+        photo_data = data.get("photo")
+        if photo_data:
+            try:
+                # Format attendu: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+                if photo_data.startswith("data:image"):
+                    format, imgstr = photo_data.split(";base64,")
+                    ext = format.split("/")[-1]  # Récupère "jpeg", "png", etc.
+                    photo = ContentFile(base64.b64decode(imgstr), name=f"eleve_{code_generated}.{ext}")
+            except Exception as e:
+                print("❌ Erreur décodage photo:", e)
+
+
+
+        # 💾 Kreye elèv la
+        from django.utils import timezone as tz
+        date_inscription = tz.make_aware(
+            tz.datetime.combine(date_inscription_date, tz.datetime.min.time())
+        )
+
+        eleve = Inscription.objects.create(
+            code_eleve=code_generated,
+            nom=nom,
+            prenom=prenom,
+            sexe=sexe,
+            adresse=adresse,
+            annee_academique=param.annee_academique,
+            date_naissance=date_naissance,
+            classe=classe,
+            telephone=telephone,
+            email=email,
+            nom_tuteur=nom_tuteur,
+            tel_tuteur=tel_tuteur,
+            date_inscription=date_inscription,
+            photo=photo
+        )
+
+        # ✅ Repons siksè
+        return JsonResponse({
+            "success": True,
+            "message": "Inscription réussie",
+            "eleve": {
+                "id": eleve.id,
+                "code_eleve": eleve.code_eleve,
+                "nom": eleve.nom,
+                "prenom": eleve.prenom,
+                "sexe": eleve.sexe,
+                "adresse": eleve.adresse,
+                "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else None,
+                "classe": eleve.classe,
+                "telephone": eleve.telephone,
+                "email": eleve.email,
+                "nom_tuteur": eleve.nom_tuteur,
+                "tel_tuteur": eleve.tel_tuteur,
+                "date_inscription": eleve.date_inscription.strftime("%Y-%m-%d"),
+                "annee_academique": eleve.annee_academique,
+                "photo_url": request.build_absolute_uri(eleve.photo.url) if eleve.photo else None
+            }
+        }, status=201)
+
+    except Exception as e:
+     print("❌ Erreur API inscription mobile:", e)
+    return JsonResponse({
+        "success": False,
+        "error_code": "server_error",
+        "error": "Erreur interne du serveur"
+    }, status=500)

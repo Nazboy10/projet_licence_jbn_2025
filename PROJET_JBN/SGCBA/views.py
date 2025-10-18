@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from SGCBA.models import Utilisateur  # Asire modèl ou importé
-
+from app_inscription.models import Inscription
 # view pou splashScreen lan
 def splash(request):
     return render(request, 'splash.html')
@@ -9,10 +9,14 @@ def splash(request):
 def tableau_de_bord(request):
     if 'id' not in request.session:
         return redirect('connexion')  # Si itilizatè pa konekte
+    
+     # Kalkile kantite enskripsyon total
+    total_inscriptions = Inscription.objects.count()
 
     context = {
         'username': request.session['username'],
-        'role': request.session['role']
+        'role': request.session['role'],
+        'total_inscriptions': total_inscriptions,
     }
     return render(request, 'tableau_de_bord.html', context)
 
