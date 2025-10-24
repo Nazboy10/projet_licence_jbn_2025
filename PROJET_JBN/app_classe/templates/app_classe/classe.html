@@ -1,0 +1,435 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classe</title>
+    <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
+      <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS Custom -->
+     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- <link rel="stylesheet" href="{% static '/css/Dossier_Eleves.css' %}"> -->
+        <link rel="stylesheet" href="{% static 'app_classe/css/classe.css' %}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+
+    <div class="sidebar">
+       <div class="logo">
+     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+    <span>SGCBA</span>
+</div>
+
+       <nav>
+  <ul>
+    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+    <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+    <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+    <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+    <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+     <li id="menu-classe"><a href="{% url 'classe' %}"class="active"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
+    <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+  </ul>
+</nav>
+       
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Classe</h1>
+            <div class="search-profile">
+               <div class="search-bar">
+  <i class="fas fa-search"></i>
+  <form method="get" style="display:inline;">
+    <input 
+      type="text" 
+      name="search" 
+      placeholder="Rechercher une classe..."
+      value="{{ search_query }}"
+      
+    >
+  </form>
+  <script>
+document.querySelector('input[name="search"]').addEventListener('input', function() {
+  clearTimeout(this.searchTimeout);
+  this.searchTimeout = setTimeout(() => {
+    this.form.submit();
+  }, 500); // Soumet 0.5s après la dernière frappe
+});
+</script>
+</div>
+               <div class="profile">
+    <i class="fas fa-bell notification-icon"></i>
+    <div class="user-avatar" id="profileDropdownToggle">
+    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+</div>
+
+    <!-- Dropdown menu -->
+    <div class="profile-dropdown" id="profileDropdown">
+        <ul>
+            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+        </ul>
+    </div>
+</div>
+ </div>
+        </div>
+
+<!-- Messages pour SweetAlert2 -->
+<!-- Messages Django (cachés) -->
+{% if messages %}
+  <div id="django-messages" style="display: none;">
+    {% for message in messages %}
+      <span data-tag="{{ message.tags }}">{{ message|escapejs }}</span>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+
+
+  <div class="container">
+   
+
+    <!-- Bouton Ajouter -->
+    <div class="mb-3 text-end">
+      <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter</button>
+    </div>
+
+    <!-- Formulaire (modal) -->
+   <div id="formModal" class="modal-overlay">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h4 class="mb-3">Gestion Classe</h4>
+
+    <form id="inscriptionForm" method="post" action="">
+      {% csrf_token %}
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nom de la classe</label>
+          <input type="text" name="nom_classe" class="form-control" placeholder="Nom de la classe" required>
+        </div>
+
+       <div class="col-md-6">
+  <label class="form-label">Niveau</label>
+  <select name="niveau" class="form-control" required>
+    <option value="" disabled selected>Choisir le niveau</option>
+    <option value="Fondamental">Fondamental</option>
+    <option value="Secondaire">Secondaire</option>
+  </select>
+</div>
+
+<div class="col-md-4 mt-3">
+  <label class="form-label">Année académique</label>
+  <input type="text" 
+         name="annee_academique" 
+         class="form-control" 
+         value="{{ annee_academique }}" 
+         readonly>
+</div>
+      </div>
+
+      <div class="text-end">
+        <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
+        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Options affichage -->
+   
+  <br>
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="tableEleves">
+       <thead class="table-header-blue">
+          <tr>
+            <th>Code de la classe</th>
+            <th>Nom de la classe</th>
+            <th>Niveau</th>
+           <th>Année académique</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+       <tbody>
+  {% for c in classes %}
+  <tr>
+    <td>{{ c.code_classe }}</td>
+    <td>{{ c.nom_classe }}</td>
+    <td>{{ c.niveau }}</td>
+     <td>{{ c.annee_academique }}</td>
+    <td>
+      <!-- Ou kapab ajoute URL pou modifye/efase aprè -->
+      <button class="btn btn-warning btn-sm btn-edit" data-id="{{ c.id }}">
+    <i class="bi bi-pencil"></i>
+  </button>
+      <button class="btn btn-danger btn-sm btn-delete" data-id="{{ c.id }}">
+  <i class="bi bi-trash"></i>
+</button>
+
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4" class="text-center text-muted">Aucune classe enregistrée</td>
+  </tr>
+  {% endfor %}
+</tbody>
+      </table>
+      <!-- Pagination -->
+{% if classes.has_other_pages %}
+  <nav aria-label="Pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if classes.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ classes.previous_page_number }}">&laquo; Précédent</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo; Précédent</span>
+        </li>
+      {% endif %}
+
+      {% for num in classes.paginator.page_range %}
+        {% if classes.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if classes.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ classes.next_page_number }}">Suivant &raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Suivant &raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+    </div>
+  </div>
+
+  <script>
+  // --- Utilitaires ---
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // --- Disparition automatique des messages ---
+  const alertBox = document.getElementById("message-alert");
+  if (alertBox) {
+    setTimeout(() => {
+      alertBox.classList.remove("show");
+      setTimeout(() => alertBox.remove(), 500);
+    }, 3000);
+  }
+
+  // --- Éléments DOM ---
+  const formModal = document.getElementById('formModal');
+  const closeModal = document.getElementById('closeModal');
+  const cancelForm = document.getElementById('cancelForm');
+  const tableBody = document.querySelector('#tableEleves tbody'); // ✅ Défini ici !
+
+  // --- Réinitialiser le formulaire ---
+  function resetFormToCreate() {
+    const form = document.getElementById('inscriptionForm');
+    form.action = "";
+    document.querySelector('.btn-ajouter').textContent = "Ajouter";
+    form.reset();
+  }
+
+  // --- Gestion du modal ---
+  document.getElementById('btnShowForm').addEventListener('click', () => {
+    resetFormToCreate();
+    formModal.style.display = 'flex';
+  });
+
+  if (closeModal) closeModal.addEventListener('click', () => {
+    formModal.style.display = 'none';
+    resetFormToCreate();
+  });
+
+  if (cancelForm) cancelForm.addEventListener('click', () => {
+    formModal.style.display = 'none';
+    resetFormToCreate();
+  });
+
+  // --- Fermer modal en cliquant en dehors ---
+  window.addEventListener('click', (e) => {
+    if (e.target === formModal) {
+      formModal.style.display = 'none';
+      resetFormToCreate();
+    }
+  });
+
+  // --- SUPPRESSION ---
+  if (tableBody) {
+    tableBody.addEventListener('click', function(e) {
+      // === SUPPRESSION ===
+      const deleteBtn = e.target.closest('.btn-delete');
+      if (deleteBtn) {
+        const id = deleteBtn.getAttribute('data-id');
+        Swal.fire({
+          title: "Confirmer la suppression",
+          text: "Êtes-vous sûr de vouloir supprimer cette classe ?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Oui, supprimer",
+          cancelButtonText: "Annuler"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/classe/supprimer/${id}/`, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  title: "Supprimé !",
+                  text: "La classe a été supprimée avec succès.",
+                  icon: "success",
+                  timer: 2000,
+                  showConfirmButton: false
+                }).then(() => location.reload());
+              } else {
+                Swal.fire("Erreur", data.error || "Une erreur est survenue.", "error");
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              Swal.fire("Erreur", "Impossible de supprimer la classe.", "error");
+            });
+          }
+        });
+        return; // arrêter ici si c'était une suppression
+      }
+
+      // === MODIFICATION ===
+      const editBtn = e.target.closest('.btn-edit');
+      if (editBtn) {
+        const id = editBtn.getAttribute('data-id');
+        fetch(`/classe/modifier/${id}/`, {
+          method: 'GET',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Remplir le formulaire
+          document.querySelector('[name="nom_classe"]').value = data.nom_classe;
+          document.querySelector('[name="niveau"]').value = data.niveau;
+
+          // Mettre à jour le formulaire pour la modification
+          const form = document.getElementById('inscriptionForm');
+          form.action = `/classe/modifier/${id}/`;
+          document.querySelector('.btn-ajouter').textContent = "Modifier";
+
+          // Afficher le modal
+          formModal.style.display = 'flex';
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Erreur", "Impossible de charger les données.", "error");
+        });
+      }
+    });
+  }
+
+  // --- Soumission du formulaire (ajout ou modification) ---
+  document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
+    // On laisse le comportement par défaut (POST HTML classique)
+    // La vue Django redirige → donc pas besoin d’AJAX ici
+    // Si vous voulez éviter le rechargement, on peut passer en AJAX plus tard
+  });
+document.addEventListener('DOMContentLoaded', () => {
+  // --- 1. Affichage des messages Django via SweetAlert2 ---
+  const messagesContainer = document.getElementById('django-messages');
+  if (messagesContainer) {
+    const messageElements = messagesContainer.querySelectorAll('span');
+    messageElements.forEach(el => {
+      const text = el.textContent;
+      const tag = el.dataset.tag || 'success';
+      
+      let icon, title;
+      if (tag === 'error') {
+        icon = 'error';
+        title = 'Erreur !';
+      } else if (tag === 'warning') {
+        icon = 'warning';
+        title = 'Attention !';
+      } else {
+        icon = 'success';
+        title = 'Succès !';
+      }
+
+      Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        timer: 4000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    });
+  }
+});
+
+
+// === Redonner le focus au champ de recherche après rechargement ===
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.querySelector('input[name="search"]');
+  if (searchInput && searchInput.value) {
+    // Donner le focus
+    searchInput.focus();
+    // Placer le curseur à la fin du texte
+    const val = searchInput.value;
+    searchInput.value = '';
+    searchInput.value = val;
+  }
+});
+
+
+</script>
+
+ 
+  <!-- JS -->
+  <script src="{% static 'app_classe/js/classe.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/role-control.js' %}"></script>
+
+
+
+</body>
+</html>

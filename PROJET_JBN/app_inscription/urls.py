@@ -8,6 +8,8 @@ urlpatterns = [
     path('supprimer/<int:id>/', views.supprimer_inscription, name='supprimer_inscription'),
     path('get/<int:id>/', views.get_inscription, name='get_inscription'),  # 🆕 Ajoute sa
     path('rechercher/', views.rechercher_inscription, name='rechercher_inscription'),
+   
+
 ]
 
 

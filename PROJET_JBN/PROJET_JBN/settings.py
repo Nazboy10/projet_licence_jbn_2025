@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "app_bulletin",
     "app_parametre",
     'rest_framework.authtoken',
+    'app_classe',
   
     
 
@@ -123,8 +124,6 @@ DATABASES = {
 
 
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
@@ -135,6 +134,8 @@ DATABASES = {
         'PORT': '3306',                         # Pò default pou MySQL
     }
 }
+
+
 
 
 

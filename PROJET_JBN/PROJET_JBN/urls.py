@@ -29,6 +29,7 @@ urlpatterns = [
     path("bulletin/", include("app_bulletin.urls")),
     path("note/", include("app_note.urls")),
     path('parametre/', include("app_parametre.urls")),
+    path('classe/', include("app_classe.urls")),
 
 ]
 

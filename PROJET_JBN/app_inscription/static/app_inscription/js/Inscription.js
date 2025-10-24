@@ -159,7 +159,9 @@ if (form) {
         if (eleveId) {
           const btn = document.querySelector(`button[data-id='${eleveId}']`);
           const row = btn ? btn.closest("tr") : null;
+          
           if (row) {
+            row.className = "eleve-row";
             row.innerHTML = `
               <td><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
               <td>${data.code_eleve}</td>
@@ -187,6 +189,7 @@ if (form) {
         } else {
           // Ajout
           const newRow = document.createElement("tr");
+          newRow.classList.add("eleve-row");
           newRow.innerHTML = `
             <td><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
             <td>${data.code_eleve}</td>
@@ -211,7 +214,7 @@ if (form) {
             </td>`;
           // prepend pou mete nouvo an tèt lis la
           if (eleveBody) eleveBody.prepend(newRow);
-          alert("✅ Inscription inscrit avec succès !");
+          alert("✅ Eleve inscrit avec succès !");
         }
 
         resetForm();
@@ -230,71 +233,84 @@ if (form) {
 
 
 
+// ✅ Pagination client-side (5 lignes par page)
+// let currentPage = 1;
+// const rowsPerPage = 5;
+// let allRows = [];
 
-// Kenbe yon kopi orijinal tab la lè paj la chaje
-document.addEventListener("DOMContentLoaded", function () {
-    const tbody = document.querySelector("tbody");
-    if (tbody) {
-        window.originalRows = tbody.innerHTML;
-    }
-});
-// Recherche sans recharger la page
-document.getElementById("searchInput").addEventListener("input", function () {
-    const query = this.value.trim();
-    const tbody = document.querySelector("tbody");
-    if (!tbody) return;
+// // Initialiser au chargement
+// document.addEventListener("DOMContentLoaded", function () {
+//   const tbody = document.querySelector("#tableEleves tbody");
+//   if (!tbody) return;
 
-    // Si query vide oubyen 1 karaktè, afiche tout elèv yo (ki deja la)
-    if (query.length < 2) {
-        // Pa rechèje! Nou pral kenbe yon kopi orijinal la
-        if (window.originalRows) {
-            tbody.innerHTML = window.originalRows;
-        }
-        return;
-    }
+//   // Sauvegarder uniquement les vraies lignes (pas le message "aucun élève")
+//   allRows = Array.from(tbody.querySelectorAll("tr.eleve-row"));
+//   renderPage(1);
+// });
 
-    // Recherche AJAX
-    fetch(`/inscription/rechercher/?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.eleves && data.eleves.length > 0) {
-                let rows = "";
-                data.eleves.forEach(e => {
-                    // Echapé valè yo pou evite pwoblèm JS (apostrophe, etc.)
-                    const safe = (str) => (str || "").replace(/'/g, "&#39;");
-                    rows += `
-                    <tr>
-                        <td class="text-center">
-                            <img src="${e.photo_url || '/static/images/default.png'}" width="50" class="rounded">
-                        </td>
-                        <td>${safe(e.code_eleve)}</td>
-                        <td>${safe(e.nom)}</td>
-                        <td>${safe(e.prenom)}</td>
-                        <td>${safe(e.sexe)}</td>
-                        <td>${safe(e.adresse)}</td>
-                        <td>${e.date_naissance || ''}</td>
-                        <td>${safe(e.classe)}</td>
-                        <td>${safe(e.telephone)}</td>
-                        <td>${safe(e.email)}</td>
-                        <td>${safe(e.nom_tuteur)}</td>
-                        <td>${safe(e.tel_tuteur)}</td>
-                        <td>${e.date_inscription || ''}</td>
-                        <td class="text-center">
-                            <button class="btn btn-warning btn-sm" onclick="loadAndEdit('${e.id}')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="confirmDelete('${e.id}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-                });
-                tbody.innerHTML = rows;
-            } else {
-                tbody.innerHTML = `<tr><td colspan="14" class="text-center">Aucun élève trouvé</td></tr>`;
-            }
-        })
-        .catch(err => {
-            console.error("Erreur recherche:", err);
-        });
-});
+// // Afficher une page
+// function renderPage(page) {
+//   const tbody = document.querySelector("#tableEleves tbody");
+//   if (!tbody) return;
+
+//   const start = (page - 1) * rowsPerPage;
+//   const end = start + rowsPerPage;
+//   const pageRows = allRows.slice(start, end);
+
+//   // Vider le tbody
+//   tbody.innerHTML = "";
+
+//   if (pageRows.length === 0) {
+//     tbody.innerHTML = `<tr id="no-data"><td colspan="9" class="text-center">Aucun élève trouvé</td></tr>`;
+//   } else {
+//     pageRows.forEach(row => {
+//       const clone = row.cloneNode(true);
+//       tbody.appendChild(clone);
+//     });
+//   }
+
+//   // Mettre à jour pagination
+//   currentPage = page;
+//   const totalPages = Math.ceil(allRows.length / rowsPerPage) || 1;
+//   document.getElementById("btnPrev").disabled = page === 1;
+//   document.getElementById("btnNext").disabled = page >= totalPages;
+//   document.getElementById("pageInfo").textContent = `Page ${page} / ${totalPages}`;
+// }
+
+// // Recherche côté client (sans AJAX)
+// document.getElementById("searchInput")?.addEventListener("input", function () {
+//   const query = this.value.trim().toLowerCase();
+//   const tbody = document.querySelector("#tableEleves tbody");
+//   if (!tbody) return;
+
+//   if (query.length < 2) {
+//     // Restaurer toutes les lignes
+//     const parser = new DOMParser();
+//     const doc = parser.parseFromString(document.documentElement.outerHTML, "text/html");
+//     allRows = Array.from(doc.querySelectorAll("#tableEleves tbody tr.eleve-row"));
+//     renderPage(1);
+//     return;
+//   }
+
+//   // Filtrer les lignes
+//   const filtered = [];
+//   allRows.forEach(row => {
+//     const text = row.textContent.toLowerCase();
+//     if (text.includes(query)) {
+//       filtered.push(row);
+//     }
+//   });
+
+//   allRows = filtered;
+//   renderPage(1);
+// });
+
+// // Boutons pagination
+// document.getElementById("btnPrev")?.addEventListener("click", () => {
+//   if (currentPage > 1) renderPage(currentPage - 1);
+// });
+
+// document.getElementById("btnNext")?.addEventListener("click", () => {
+//   const totalPages = Math.ceil(allRows.length / rowsPerPage);
+//   if (currentPage < totalPages) renderPage(currentPage + 1);
+// });

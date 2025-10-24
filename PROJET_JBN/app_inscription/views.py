@@ -318,3 +318,6 @@ def rechercher_inscription(request):
         })
 
     return JsonResponse({"eleves": results}, safe=False)
+
+
+
