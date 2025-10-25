@@ -9,11 +9,13 @@ import string
 from django.views.decorators.http import require_http_methods
 from app_parametre.models import Parametre
 from app_parametre.models import Parametre
-
+from app_classe.models import Classe
 # pou inscriptionyon elev
 from datetime import date, timedelta
 
 def inscription(request):
+   # ✅ Bon
+    classes = Classe.objects.all().order_by('nom_classe')
     today = date.today()
     # Elèv dwe gen pou pi piti 10 an → nes pi vit 10 an avan jodi a
     MIN_AGE = 11
@@ -33,6 +35,7 @@ def inscription(request):
         "today": today,
         "max_birth_date": max_birth_date,  # <-- nouvo valè
         "annee_academique": param.annee_academique,
+        'classes': classes,
     })
 # 📌 Pèmèt chaje done yon elèv nan modal "modifier"
 from django.views.decorators.csrf import csrf_exempt

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link rel="stylesheet" href="{% static 'app_inscription/css/inscription.css' %}">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -111,7 +112,7 @@
           <div class="col-md-6">
             <label class="form-label">Sexe</label>
             <select name="sexe" class="form-select" required>
-              <option value="">Sélectionner</option>
+              <option value=""disabled>Sélectionner</option>
               <option>Masculin</option>
               <option>Féminin</option>
             </select>
@@ -130,10 +131,16 @@
             <label class="form-label">Date de naissance</label>
             <input type="date" name="date_naissance" class="form-control" required max="{{ max_birth_date|date:'Y-m-d' }}">
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Classe</label>
-            <input type="text" name="classe" class="form-control" required>
-          </div>
+         <div class="col-md-6">
+  <label class="form-label">Classe</label>
+  <select name="classe" class="form-select" required>
+    <option value="">Sélectionner une classe</option>
+    {% for classe in classes %}
+     <!-- ✅ Bon -->
+<option value="{{ classe.nom_classe }}">{{ classe.nom_classe }}</option>
+    {% endfor %}
+  </select>
+</div>
         </div>
 
         <div class="row mb-3">
@@ -255,10 +262,14 @@
 </div>
 
 <!-- Pagination -->
-<div class="d-flex justify-content-center ">
-  <button id="btnPrev" class="btn btn-outline-secondary me-2" disabled>Précédent</button>
-  <span id="pageInfo" class="align-self-center mx-2">Page 1</span>
-  <button id="btnNext" class="btn btn-outline-secondary ms-2">Suivant</button>
+<div class="d-flex justify-content-center align-items-center mt-3">
+  <div class="btn-group" role="group" aria-label="Pagination">
+    <button id="btnPrev" class="btn btn-light border" disabled>« Précédent</button>
+    <button id="btnPage1" class="btn btn-primary">1</button>
+    <button id="btnPage2" class="btn btn-light border">2</button>
+     <button id="btnPage3" class="btn btn-light border">3</button>
+    <button id="btnNext" class="btn btn-light border">Suivant »</button>
+  </div>
 </div>
 
 
@@ -331,7 +342,26 @@
       });
     }
 
+    function updateActivePageButton(page) {
+  // Mete tout bouton paj yo "light"
+  for (let i = 1; i <= 3; i++) { // si w gen 3 bouton
+    const btn = document.getElementById(`btnPage${i}`);
+    if (btn) {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-light');
+    }
+  }
+
+  // Mete bouton paj aktif la "primary"
+  const activeBtn = document.getElementById(`btnPage${page}`);
+  if (activeBtn) {
+    activeBtn.classList.remove('btn-light');
+    activeBtn.classList.add('btn-primary');
+  }
+}
+
     currentPage = page;
+    updateActivePageButton(page);
     const totalPages = Math.ceil(allRows.length / rowsPerPage) || 1;
     document.getElementById("btnPrev").disabled = page === 1;
     document.getElementById("btnNext").disabled = page >= totalPages;
@@ -455,7 +485,7 @@ document.getElementById("closeModal").addEventListener("click", function() {
 </script>
 
   <!-- JS -->
-  <script src="{% static 'app_inscription/js/Inscription.js' %}"></script>
+  <script src="{% static 'app_inscription/js/ins.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/role-control.js' %}"></script>
 </body>

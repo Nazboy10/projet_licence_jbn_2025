@@ -1,4 +1,42 @@
-// ✅ Inscription.js - Ajout / Modification / Suppression (avec debug)
+// ...existing code...
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('profileDropdownToggle');
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (toggle && dropdown) {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Pa fè click la monte nan document
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+
+        // Confirmation de déconnexion (remplacé par SweetAlert2)
+        const logoutLink = dropdown.querySelector("a");
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                  title: 'Déconnexion',
+                  text: "Êtes-vous sûr de vouloir déconnecter ?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Oui',
+                  cancelButtonText: 'Non'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = this.href;
+                  }
+                });
+            });
+        }
+    }
+});
+// ...existing code...
+
+// ✅ Inscription.js - Ajout / Modification / Suppression (avec SweetAlert2)
 // Ranmase CSRF token
 function getCSRFToken() {
   return document.cookie
@@ -49,19 +87,24 @@ function resetForm() {
 // Récupérer données d'un élève et ouvrir modal pour modifier
 // (fonction globale pou kapab rele depi onclick nan HTML: onclick="loadAndEdit('ID')")
 async function loadAndEdit(id) {
-  if (!id) return alert("ID manquant pou modifier");
+  if (!id) {
+    Swal.fire({icon:'warning', title:'ID manquant', text:'ID manquant pou modifier'});
+    return;
+  }
   try {
     const res = await fetch(`/inscription/get/${id}/`, { method: "GET" });
     const contentType = res.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
       const text = await res.text();
       console.error("Expected JSON from get_inscription but got:", text);
-      return alert("Erreur chargement: réponse non JSON (voir console).");
+      Swal.fire({icon:'error', title:'Erreur', text:'Réponse serveur non JSON. Voir console.'});
+      return;
     }
     const data = await res.json();
     if (!res.ok) {
       console.error("Erreur get_inscription:", data);
-      return alert("Erreur chargé: " + (data.error || "voir console"));
+      Swal.fire({icon:'error', title:'Erreur', text: data.error || 'Erreur chargement (voir console)'});
+      return;
     }
 
     // Remplir form
@@ -83,20 +126,29 @@ async function loadAndEdit(id) {
     form.action = `/inscription/modifier/${data.id}/`;
   } catch (err) {
     console.error("Erreur fetch get_inscription:", err);
-    alert("Erreur lors du chargement des informations (voir console).");
+    Swal.fire({icon:'error', title:'Erreur', text:'Erreur lors du chargement des informations (voir console).'});
   }
 }
 
 // Confirmation suppression
 async function confirmDelete(id) {
-  if (!confirm("⚠️ Eske w vle efase elèv sa a ?")) return;
+  const result = await Swal.fire({
+    title: 'Supprimer élève',
+    text: '⚠️ Eske w vle efase elèv sa a ?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler'
+  });
+
+  if (!result.isConfirmed) return;
+
   try {
     const res = await fetch(`/inscription/supprimer/${id}/`, {
       method: "POST",
       headers: { "X-CSRFToken": getCSRFToken() },
     });
 
-    // Try parse JSON, else show text
     const ct = res.headers.get("content-type") || "";
     let data;
     if (ct.includes("application/json")) {
@@ -111,14 +163,14 @@ async function confirmDelete(id) {
       const btn = document.querySelector(`button[data-id='${id}']`);
       const row = btn ? btn.closest("tr") : null;
       if (row) row.remove();
-      alert("✅ " + (data.message || "Suppression réussie"));
+      Swal.fire({icon:'success', title:'Supprimé', text: data.message || 'Suppression réussie', timer:1500, showConfirmButton:false});
     } else {
-      alert("❌ " + (data.error || "Erreur suppression (voir console)"));
       console.error("Suppression error:", data);
+      Swal.fire({icon:'error', title:'Erreur', text: data.error || 'Erreur suppression (voir console)'});
     }
   } catch (err) {
     console.error("Fetch delete error:", err);
-    alert("❌ Une erreur est survenue côté client (voir console).");
+    Swal.fire({icon:'error', title:'Erreur', text:'Une erreur est survenue côté client (voir console).'});
   }
 }
 
@@ -145,12 +197,9 @@ if (form) {
       if (contentType.includes("application/json")) {
         data = await response.json();
       } else {
-        // Sèvè a retounen HTML (redirect oswa page) -> enprime li pou debug
         const text = await response.text();
         console.error("Response non-JSON from submit:", text);
-        // Si sèvè te fè redirect oswa renvwaye HTML, nou ka swa al refresh, swa montre mesaj.
-        // Ann eseye detekte si sa se yon page complète (kòmantè pou dev).
-        alert("Warning: serveur renvoie HTML. Vérifiez console. Si l'inscription est bien créée, rafraîchissez la page.");
+        Swal.fire({icon:'warning', title:'Réponse serveur', text:'Serveur renvoie HTML. Vérifiez console.'});
         return;
       }
 
@@ -163,154 +212,63 @@ if (form) {
           if (row) {
             row.className = "eleve-row";
             row.innerHTML = `
-              <td><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
+              <td class="text-center"><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
               <td>${data.code_eleve}</td>
               <td>${data.nom}</td>
               <td>${data.prenom}</td>
               <td>${data.sexe}</td>
-              <td>${data.adresse}</td>
-              <td>${data.date_naissance || ''}</td>
               <td>${data.classe}</td>
-              <td>${data.telephone}</td>
-              <td>${data.email}</td>
-              <td>${data.nom_tuteur}</td>
-              <td>${data.tel_tuteur}</td>
               <td>${data.date_inscription || ''}</td>
+              <td>${data.annee_academique || ''}</td>
               <td class="text-center">
-                <button class="btn btn-warning btn-sm" data-id="${data.id}" onclick="loadAndEdit('${data.id}')">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" data-id="${data.id}" onclick="confirmDelete('${data.id}')">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <div class="d-flex justify-content-center gap-2">
+                  <button class="btn btn-sm btn-outline-primary" onclick="showDetails('${data.id}')"><i class="bi bi-eye"></i></button>
+                  <button class="btn btn-warning btn-sm" data-id="${data.id}" onclick="editEleve('${data.id}', '${escapeHtml(data.nom)}', '${escapeHtml(data.prenom)}', '${escapeHtml(data.sexe)}', '${escapeHtml(data.adresse)}', '${data.date_naissance || ''}', '${escapeHtml(data.classe)}', '${escapeHtml(data.telephone)}', '${escapeHtml(data.email)}', '${escapeHtml(data.nom_tuteur)}', '${escapeHtml(data.tel_tuteur)}')"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-danger btn-sm" data-id="${data.id}" onclick="confirmDelete('${data.id}')"><i class="bi bi-trash"></i></button>
+                </div>
               </td>`;
           }
-          alert("✅ Inscription modifié avec succès !");
+          Swal.fire({icon:'success', title:'Modifié', text:'Inscription modifié avec succès', timer:1500, showConfirmButton:false});
         } else {
           // Ajout
           const newRow = document.createElement("tr");
           newRow.classList.add("eleve-row");
           newRow.innerHTML = `
-            <td><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
+            <td class="text-center"><img src="${data.photo_url || '/static/images/default.png'}" width="50" class="rounded"></td>
             <td>${data.code_eleve}</td>
             <td>${data.nom}</td>
             <td>${data.prenom}</td>
             <td>${data.sexe}</td>
-            <td>${data.adresse}</td>
-            <td>${data.date_naissance || ''}</td>
             <td>${data.classe}</td>
-            <td>${data.telephone}</td>
-            <td>${data.email}</td>
-            <td>${data.nom_tuteur}</td>
-            <td>${data.tel_tuteur}</td>
             <td>${data.date_inscription || ''}</td>
+            <td>${data.annee_academique || ''}</td>
             <td class="text-center">
-              <button class="btn btn-warning btn-sm" data-id="${data.id}" onclick="loadAndEdit('${data.id}')">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-danger btn-sm" data-id="${data.id}" onclick="confirmDelete('${data.id}')">
-                <i class="bi bi-trash"></i>
-              </button>
+              <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-sm btn-outline-primary" onclick="showDetails('${data.id}')"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-warning btn-sm" data-id="${data.id}" onclick="editEleve('${data.id}', '${escapeHtml(data.nom)}', '${escapeHtml(data.prenom)}', '${escapeHtml(data.sexe)}', '${escapeHtml(data.adresse)}', '${data.date_naissance || ''}', '${escapeHtml(data.classe)}', '${escapeHtml(data.telephone)}', '${escapeHtml(data.email)}', '${escapeHtml(data.nom_tuteur)}', '${escapeHtml(data.tel_tuteur)}')"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-danger btn-sm" data-id="${data.id}" onclick="confirmDelete('${data.id}')"><i class="bi bi-trash"></i></button>
+              </div>
             </td>`;
-          // prepend pou mete nouvo an tèt lis la
           if (eleveBody) eleveBody.prepend(newRow);
-          alert("✅ Eleve inscrit avec succès !");
+          Swal.fire({icon:'success', title:'Ajouté', text:'Élève inscrit avec succès', timer:1500, showConfirmButton:false});
         }
 
         resetForm();
         modal.style.display = "none";
       } else {
-        // Response 4xx/5xx avèk JSON
         console.error("Server error response:", data);
-        alert("❌ " + (data.error || "Erreur côté serveur (voir console)"));
+        Swal.fire({icon:'error', title:'Erreur', text: data.error || 'Erreur côté serveur (voir console)'});
       }
     } catch (err) {
       console.error("Fetch submit error:", err);
-      alert("❌ Une erreur est survenue côté client ! (voir console)");
+      Swal.fire({icon:'error', title:'Erreur', text:'Une erreur est survenue côté client (voir console).'});
     }
   });
 }
 
-
-
-// ✅ Pagination client-side (5 lignes par page)
-// let currentPage = 1;
-// const rowsPerPage = 5;
-// let allRows = [];
-
-// // Initialiser au chargement
-// document.addEventListener("DOMContentLoaded", function () {
-//   const tbody = document.querySelector("#tableEleves tbody");
-//   if (!tbody) return;
-
-//   // Sauvegarder uniquement les vraies lignes (pas le message "aucun élève")
-//   allRows = Array.from(tbody.querySelectorAll("tr.eleve-row"));
-//   renderPage(1);
-// });
-
-// // Afficher une page
-// function renderPage(page) {
-//   const tbody = document.querySelector("#tableEleves tbody");
-//   if (!tbody) return;
-
-//   const start = (page - 1) * rowsPerPage;
-//   const end = start + rowsPerPage;
-//   const pageRows = allRows.slice(start, end);
-
-//   // Vider le tbody
-//   tbody.innerHTML = "";
-
-//   if (pageRows.length === 0) {
-//     tbody.innerHTML = `<tr id="no-data"><td colspan="9" class="text-center">Aucun élève trouvé</td></tr>`;
-//   } else {
-//     pageRows.forEach(row => {
-//       const clone = row.cloneNode(true);
-//       tbody.appendChild(clone);
-//     });
-//   }
-
-//   // Mettre à jour pagination
-//   currentPage = page;
-//   const totalPages = Math.ceil(allRows.length / rowsPerPage) || 1;
-//   document.getElementById("btnPrev").disabled = page === 1;
-//   document.getElementById("btnNext").disabled = page >= totalPages;
-//   document.getElementById("pageInfo").textContent = `Page ${page} / ${totalPages}`;
-// }
-
-// // Recherche côté client (sans AJAX)
-// document.getElementById("searchInput")?.addEventListener("input", function () {
-//   const query = this.value.trim().toLowerCase();
-//   const tbody = document.querySelector("#tableEleves tbody");
-//   if (!tbody) return;
-
-//   if (query.length < 2) {
-//     // Restaurer toutes les lignes
-//     const parser = new DOMParser();
-//     const doc = parser.parseFromString(document.documentElement.outerHTML, "text/html");
-//     allRows = Array.from(doc.querySelectorAll("#tableEleves tbody tr.eleve-row"));
-//     renderPage(1);
-//     return;
-//   }
-
-//   // Filtrer les lignes
-//   const filtered = [];
-//   allRows.forEach(row => {
-//     const text = row.textContent.toLowerCase();
-//     if (text.includes(query)) {
-//       filtered.push(row);
-//     }
-//   });
-
-//   allRows = filtered;
-//   renderPage(1);
-// });
-
-// // Boutons pagination
-// document.getElementById("btnPrev")?.addEventListener("click", () => {
-//   if (currentPage > 1) renderPage(currentPage - 1);
-// });
-
-// document.getElementById("btnNext")?.addEventListener("click", () => {
-//   const totalPages = Math.ceil(allRows.length / rowsPerPage);
-//   if (currentPage < totalPages) renderPage(currentPage + 1);
-// });
+// util helper : échapper simple pour insertion dans attribut onclick
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,' ');
+}
+// ...existing code...
