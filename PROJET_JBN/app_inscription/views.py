@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
@@ -12,15 +12,19 @@ from app_parametre.models import Parametre
 from app_classe.models import Classe
 # pou inscriptionyon elev
 from datetime import date, timedelta
+from app_journal.utils import log_action  # Importe fonksyon tracabilite a
 
 def inscription(request):
+     # Verifye si itilizatè a konekte (selon sesyon ou)
+    if not request.session.get('id'):
+        return redirect('connexion')  # oswa return HttpResponseForbidden("Aksè refize")
    # ✅ Bon
     classes = Classe.objects.all().order_by('nom_classe')
     today = date.today()
     # Elèv dwe gen pou pi piti 10 an → nes pi vit 10 an avan jodi a
     MIN_AGE = 11
     max_birth_date = today.replace(year=today.year - MIN_AGE)
-    
+    role = request.session.get('role', None)
     # Ajuste pou ane bisextil (si 29 fevri)
     try:
         max_birth_date = today.replace(year=today.year - MIN_AGE)
@@ -36,6 +40,7 @@ def inscription(request):
         "max_birth_date": max_birth_date,  # <-- nouvo valè
         "annee_academique": param.annee_academique,
         'classes': classes,
+        'role': role,
     })
 # 📌 Pèmèt chaje done yon elèv nan modal "modifier"
 from django.views.decorators.csrf import csrf_exempt
@@ -275,6 +280,16 @@ def ajouter_inscription(request):
             "date_inscription": eleve.date_inscription.strftime("%Y-%m-%d") if eleve.date_inscription else "",
             "photo_url": photo_url,
         }
+         
+        log_action(
+        request=request,
+        action='ajoute',
+        objet_type='Inscription',
+        objet_id=eleve.id,
+        description=f"Inskripsyon pou {eleve.nom} {eleve.prenom} te ajoute pa {request.session.get('username')}."
+    )
+
+
         return JsonResponse(data, status=201)
 
     except Exception as e:

@@ -237,21 +237,24 @@
          
           <td>{{ eleve.date_inscription }}</td>
           <td>{{ annee_academique }}</td>
-          <td class="text-center">
-            <div class="d-flex justify-content-center gap-2">
-           <button class="btn btn-sm btn-outline-primary" onclick="showDetails('{{ eleve.id }}')">
-  <i class="bi bi-eye"></i>
-</button>
+         <td class="text-center">
+  <div class="d-flex justify-content-center gap-2">
+    <button class="btn btn-sm btn-outline-primary" onclick="showDetails('{{ eleve.id }}')">
+      <i class="bi bi-eye"></i>
+    </button>
 
-            <button class="btn btn-warning btn-sm"
-              onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
-              <i class="bi bi-trash"></i>
-            </button>
-             </div>
-          </td>
+    
+    <button class="btn btn-warning btn-sm"
+      onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
+      <i class="bi bi-pencil"></i>
+    </button>
+    {% if role == 'directeur' %}
+    <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
+      <i class="bi bi-trash"></i>
+    </button>
+    {% endif %}
+  </div>
+</td>
         </tr>
         {% empty %}
         <tr><td colspan="9" class="text-center">Aucun élève inscrit</td></tr>

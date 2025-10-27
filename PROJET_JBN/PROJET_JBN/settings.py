@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "app_parametre",
     'rest_framework.authtoken',
     'app_classe',
+    'app_journal',
   
     
 
@@ -134,6 +135,7 @@ DATABASES = {
         'PORT': '3306',                         # Pò default pou MySQL
     }
 }
+
 
 
 

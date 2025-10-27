@@ -1,0 +1,44 @@
+<!-- app_journal/templates/journal.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jounal Aktivite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Jounal Aktivite</h2>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Aksyon</th>
+              <th>Objet</th>
+              <th>ID</th>
+              <th>Itilizatè</th>
+              <th>Wòl</th>
+              <th>Dat</th>
+              <th>Deskripsyon</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td>{{ log.action }}</td>
+              <td>{{ log.objet_type }}</td>
+              <td>{{ log.objet_id }}</td>
+              <td>{{ log.utilisateur_username }}</td>
+              <td>{{ log.utilisateur_role }}</td>
+              <td>{{ log.date_action }}</td>
+              <td>{{ log.description }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center">Pa gen aktivite</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+</body>
+</html>

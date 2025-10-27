@@ -30,6 +30,7 @@ urlpatterns = [
     path("note/", include("app_note.urls")),
     path('parametre/', include("app_parametre.urls")),
     path('classe/', include("app_classe.urls")),
+    path('', include('app_journal.urls')),
 
 ]
 
