@@ -173,10 +173,11 @@ document.querySelector('input[name="search"]').addEventListener('input', functio
       <button class="btn btn-warning btn-sm btn-edit" data-id="{{ c.id }}">
     <i class="bi bi-pencil"></i>
   </button>
+   {% if role == 'directeur' %}
       <button class="btn btn-danger btn-sm btn-delete" data-id="{{ c.id }}">
   <i class="bi bi-trash"></i>
 </button>
-
+{% endif %}
     </td>
   </tr>
   {% empty %}

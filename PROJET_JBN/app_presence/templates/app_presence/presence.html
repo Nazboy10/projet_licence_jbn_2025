@@ -1,21 +1,22 @@
-
+<!-- app_presence/templates/app_presence/presence.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
+    <title>Presence</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
      <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css    " rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css    " rel="stylesheet">
   <!-- CSS Custom -->
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'app_presence/css/presence.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css    ' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css    ">
+    <link rel="stylesheet" href="{% static 'app_presence/css/pre.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js    "></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    
 
 </head>
@@ -49,15 +50,29 @@
             <div class="search-profile">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
+                   <input id="searchPresence" type="text" placeholder="Rechercher...">
+
                 </div>
                <div class="profile">
-    <i class="fas fa-bell notification-icon"></i>
+    <!-- Cloche avec badge -->
+    <div class="position-relative d-inline-block me-3">
+        <i class="fas fa-bell notification-icon" id="notificationBell" style="cursor:pointer;"></i>
+        <span id="notificationBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display:none; font-size:0.7em;">0</span>
+    </div>
+
+    <!-- Avatar utilisateur -->
     <div class="user-avatar" id="profileDropdownToggle">
        <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
     </div>
 
-    <!-- Dropdown menu -->
+    <!-- Dropdown des notifications -->
+    <div class="notification-dropdown" id="notificationDropdown" style="display:none;">
+        <ul id="notificationList">
+            <li>Aucune notification</li>
+        </ul>
+    </div>
+
+    <!-- Dropdown menu profil -->
     <div class="profile-dropdown" id="profileDropdown">
         <ul>
             <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
@@ -67,20 +82,48 @@
 </div>
 </div>
 
-<!-- bouton jere code qr la -->
-  <!-- <button onclick="generateQR()">Generer QR</button>
-  <div id="qrcode"></div> -->
 
-  <!-- dezyem test -->
-   <h2>Jenere QR Code</h2>
-  
-  <button onclick="toggleQR()">Jenere / Retire QR</button>
-  
-  <div id="qrcode"></div>
 
-  <!-- QRCode.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  
+
+
+<!-- Bouton pour ouvrir la modale -->
+<button id="openQRModalBtn" class="btn btn-info">Générer QR de Présence</button>
+
+<!-- Modale pour choisir la classe -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="qrModalLabel">Choisir la classe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <select id="classeSelect" class="form-select">
+          <option value="">Sélectionnez une classe...</option>
+          {% for classe in classes %}
+            <option value="{{ classe.id }}">{{ classe.nom_classe }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button id="generateQRBtn" class="btn btn-primary">Générer QR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Conteneur pour afficher le QR généré -->
+<div id="qrcode-container" class="mt-3 text-center" style="display:none;">
+  <h4>QR pour la classe : <span id="selectedClassName"></span></h4>
+  <div id="qrcode-display"></div>
+  <button id="printQRBtn" class="btn btn-success mt-2">Imprimer QR</button>
+</div>
+
+
+
+
+
   
 {% comment %} intefas pwezans an {% endcomment %}
   <div class="container">
@@ -97,40 +140,41 @@
       <div class="modal-content">
         <span id="closeModal" class="close">&times;</span>
         <h4 class="mb-3">Ajouter une presence</h4>
-        <form id="inscriptionForm">
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label class="form-label">Code de l'eleve</label>
-              <input type="text" class="form-control" placeholder="Code" required>
-            </div>
-            
-            <div class="col-md-4">
-              <label class="form-label">Nom</label>
-              <input type="text" class="form-control" placeholder="Nom" required>
-            </div>
+       <form id="presenceForm">  <!-- ✅ Nouvo ID pou form la -->
+  {% csrf_token %} <!-- ✅ CSRF token -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Code de l'eleve</label>
+      <input type="text" name="code_eleve" id="code_eleve" class="form-control" placeholder="Code" required> <!-- ✅ Ajoute 'name' -->
+    </div>
+    
+    <div class="col-md-4">
+      <label class="form-label">Nom</label>
+      <input type="text" name="nom" id="nom_eleve" class="form-control" placeholder="Nom" readonly>  <!-- ✅ Ajoute 'name' -->
+    </div>
 
-            <div class="col-md-4">
-              <label class="form-label">Prénom</label>
-              <input type="text" class="form-control" placeholder="Prénom" required>
-            </div>
+    <div class="col-md-4">
+      <label class="form-label">Prénom</label>
+      <input type="text" name="prenom" id="prenom_eleve" class="form-control" placeholder="Prénom" readonly>  <!-- ✅ Ajoute 'name' -->
+    </div>
 
-             <div class="col-md-4">
-              <label class="form-label">Classe</label>
-              <input type="text" class="form-control" placeholder="Classe" required>
-            </div>
+     <div class="col-md-4">
+      <label class="form-label">Classe</label>
+      <input type="text" name="classe" id="classe_eleve" class="form-control" placeholder="Classe" readonly>  <!-- ✅ Ajoute 'name' -->
+    </div>
 
-             <div class="col-md-4">
-              <label class="form-label">Date presence</label>
-              <input type="text" class="form-control" placeholder="Date" required>
-            </div>
-          </div>
+     <div class="col-md-4">
+      <label class="form-label">Date presence</label>
+      <input type="date" name="date_presence" id="date_presence" class="form-control" required> <!-- ✅ Ajoute 'name' -->
+    </div>
+  </div>
 
-          <div class="text-end">
-            <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
-            {% comment %} <button type="submit" class="btn btn-success btn-custom">Ajouter</button> {% endcomment %}
-            <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
-          </div>
-        </form>
+  <div class="text-end">
+    <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
+    {% comment %} <button type="submit" class="btn btn-success btn-custom">Ajouter</button> {% endcomment %}
+    <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
+  </div>
+</form>
       </div>
     </div>
 
@@ -158,28 +202,130 @@
             <th>Nom</th>
             <th>Prénom</th>
             <th>Classe</th>
+             <th>Statut</th>
             <th>Date Presence</th>
           </tr>
         </thead>
         <tbody>
+          {% for p in presences %}
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            </td>
+            <td>{{ p.eleve.code_eleve }}</td>
+            <td>{{ p.eleve.nom }}</td>
+            <td>{{ p.eleve.prenom }}</td>
+           <td>
+  {% if p.klas %}
+    {{ p.klas.nom_classe }}
+  {% else %}
+    N/A
+  {% endif %}
+</td>
+ <td>{{ p.statut }}</td>
+            <td>{{ p.date }}</td>
           </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+
+
+
+
   
 
   <!--lien paj javascrip-->
- <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> -->
- <script src="{% static 'app_presence/js/Presence.js' %}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 2. QRCode.js (nécessaire pour générer le QR) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Script Custom -->
+ <script src="{% static 'app_presence/js/presence.js' %}"></script>
  <script src="{% static 'js/charts.js' %}"></script>
  <script src="{% static 'js/role-control.js' %}"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🟢 Script chargé');
+
+    const openQRModalBtn = document.getElementById('openQRModalBtn');
+    const qrModalElement = document.getElementById('qrModal');
+    const generateQRBtn = document.getElementById('generateQRBtn');
+    const classeSelect = document.getElementById('classeSelect');
+    const qrContainer = document.getElementById('qrcode-container');
+    const selectedClassName = document.getElementById('selectedClassName');
+    const qrDisplay = document.getElementById('qrcode-display');
+    const printQRBtn = document.getElementById('printQRBtn');
+
+    // Vérifier que Bootstrap Modal est disponible
+    if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap n\'est pas chargé !');
+        return;
+    }
+
+    const qrModal = new bootstrap.Modal(qrModalElement);
+
+    // Ouvrir la modale
+    openQRModalBtn.addEventListener('click', () => {
+        console.log('🔵 Bouton "Générer QR" cliqué');
+        qrModal.show();
+    });
+
+    // Générer le QR
+    generateQRBtn.addEventListener('click', async () => {
+        const classeId = classeSelect.value;
+        console.log('🔵 Classe sélectionnée:', classeId);
+
+        if (!classeId) {
+            alert('Veuillez sélectionner une classe.');
+            return;
+        }
+
+        try {
+            qrModal.hide();
+            console.log('⏳ Requête en cours...');
+
+            const response = await fetch(`/presence/generate-qr-permanent/${classeId}/`, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            const data = await response.json();
+            console.log('📦 Réponse reçue:', data);
+
+            if (data.success) {
+                selectedClassName.textContent = data.classe_nom;
+                qrDisplay.innerHTML = '';
+                qrContainer.style.display = 'block';
+
+                // Vérifier que QRCode est disponible
+                if (typeof QRCode === 'undefined') {
+                    console.error('❌ QRCode.js n\'est pas chargé !');
+                    alert('Erreur : QRCode.js non chargé');
+                    return;
+                }
+
+                console.log('✅ Génération du QR Code');
+                new QRCode(qrDisplay, {
+                    text: data.qr_url,
+                    width: 250,
+                    height: 250
+                });
+
+                printQRBtn.onclick = () => window.print();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            alert('Erreur réseau ou serveur.');
+        }
+    });
+});
+</script>
+
+
 
 </body>
 </html>

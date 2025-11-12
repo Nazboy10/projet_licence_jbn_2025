@@ -5,7 +5,7 @@ from .serializers import UtilisateurSerializer
 from .permissions import IsDirecteur
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import BasePermission
-
+from app_journal.utils import log_action
 
 
 class IsLoggedIn(BasePermission):
@@ -29,7 +29,66 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
             return [IsDirecteur()]
         # itilize session olye de IsAuthenticated
         return [IsLoggedIn()]
-   
+    
+
+    # ✅ Nouvo metòd create avèk tracabilite
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()  # ✅ Kenbe enstans itilizatè a
+
+        # ✅ Kenbe aksyon an
+        log_action(
+            request=request,
+            action='ajoute',
+            objet_type='Utilisateur',
+            objet_id=user.id,
+            description=f"Itilizatè ID {user.id} ({user.username}) te ajoute pa {request.session.get('username')}."
+        )
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # ✅ Nouvo metòd update avèk tracabilite
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        # ✅ Kenbe valè avan pou deskripsyon
+        old_username = instance.username
+        old_role = instance.role
+        old_actif = instance.actif
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()  # ✅ Kenbe enstans itilizatè a
+
+        # ✅ Kenbe aksyon an
+        log_action(
+            request=request,
+            action='modifye',
+            objet_type='Utilisateur',
+            objet_id=user.id,
+            description=f"Itilizatè ID {user.id} te modifye pa {request.session.get('username')}. Avan: {old_username} ({old_role}), Kounye: {user.username} ({user.role})."
+        )
+
+        return Response(serializer.data)
+
+    # ✅ Nouvo metòd destroy avèk tracabilite
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # ✅ Kenbe aksyon an avan efase
+        log_action(
+            request=request,
+            action='efase',
+            objet_type='Utilisateur',
+            objet_id=instance.id,
+            description=f"Itilizatè ID {instance.id} ({instance.username}) te efase pa {request.session.get('username')}."
+        )
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 #vieuw pou login via api
@@ -458,3 +517,88 @@ def api_ajouter_inscription(request):
         "error_code": "server_error",
         "error": "Erreur interne du serveur"
     }, status=500)
+
+
+
+
+
+
+
+# api/views.py pour eleve connecter
+from django.conf import settings
+from urllib.parse import urljoin
+import json
+import logging
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from app_inscription.models import Inscription
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def login_eleve(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Méthode non autorisée'}, status=405)
+
+    if request.content_type != 'application/json':
+        return JsonResponse({'success': False, 'error': 'Le format doit être JSON'}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'success': False, 'error': 'Données non valides'}, status=400)
+
+    code_eleve = data.get('code_eleve')
+    nom_complet = data.get('nom_complet')
+
+    if not code_eleve or not isinstance(code_eleve, str) or not code_eleve.strip():
+        return JsonResponse({'success': False, 'error': 'Code élève manquant ou invalide'}, status=400)
+
+    if not nom_complet or not isinstance(nom_complet, str) or not nom_complet.strip():
+        return JsonResponse({'success': False, 'error': 'Nom complet manquant'}, status=400)
+
+    nom_complet = nom_complet.strip()
+    parts = nom_complet.split(' ', 1)
+    if len(parts) < 2:
+        return JsonResponse({'success': False, 'error': 'Veuillez entrer votre nom et prénom'}, status=400)
+
+    nom, prenom = parts[0].strip(), parts[1].strip()
+    if not nom or not prenom:
+        return JsonResponse({'success': False, 'error': 'Nom ou prénom vide'}, status=400)
+
+    # ✅ Recherche de l'élève
+    try:
+        eleve = Inscription.objects.get(
+            code_eleve=code_eleve.strip(),
+            nom__iexact=nom,
+            prenom__iexact=prenom,
+            valide=True
+        )
+    except Inscription.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Code ou nom incorrect'}, status=400)
+
+    # ✅ Définir photo_url APRES le try/except
+    photo_url = None
+    if eleve.photo:
+        base_url = request.build_absolute_uri('/')
+        photo_url = urljoin(base_url, eleve.photo.url)
+
+    return JsonResponse({
+        'success': True,
+       'eleve': {
+            'id': eleve.id,
+            'nom': eleve.nom,
+            'prenom': eleve.prenom,
+            'code_eleve': eleve.code_eleve,
+            'sexe': eleve.sexe,
+            'adresse': eleve.adresse,
+            'annee_academique': eleve.annee_academique or "",
+            'date_naissance': eleve.date_naissance,
+            'classe': eleve.classe,
+            'telephone': eleve.telephone,
+            'email': eleve.email or "",
+            'nom_tuteur': eleve.nom_tuteur,
+            'tel_tuteur': eleve.tel_tuteur,
+            'photo_url': photo_url,
+        }
+    })

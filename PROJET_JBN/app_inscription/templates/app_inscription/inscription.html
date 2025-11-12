@@ -73,17 +73,8 @@
     <button id="btnShowForm" class="btn btn-primary">Inscrire</button>
   </div>
 
-  <!-- ✅ Zone messages Django -->
-  {% if messages %}
-  <div class="mb-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
+  
+  
 
  
 
@@ -237,22 +228,30 @@
          
           <td>{{ eleve.date_inscription }}</td>
           <td>{{ annee_academique }}</td>
-         <td class="text-center">
+        <td class="text-center">
   <div class="d-flex justify-content-center gap-2">
     <button class="btn btn-sm btn-outline-primary" onclick="showDetails('{{ eleve.id }}')">
       <i class="bi bi-eye"></i>
     </button>
 
-    
-    <button class="btn btn-warning btn-sm"
-      onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
-      <i class="bi bi-pencil"></i>
-    </button>
-    {% if role == 'directeur' %}
-    <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
-      <i class="bi bi-trash"></i>
-    </button>
-    {% endif %}
+    {% if eleve.valide %}
+      <!-- ✅ Bouton Modifier -->
+      <button class="btn btn-warning btn-sm"
+        onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
+        <i class="bi bi-pencil"></i>
+      </button>
+
+      {% if role == 'directeur' %}
+        <!-- ✅ Bouton Supprimer -->
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
+          <i class="bi bi-trash"></i>
+        </button>
+      {% endif %}
+   {% else %}
+  <button class="btn btn-success btn-sm btn-valider" data-id="{{ eleve.id }}">
+    <i class="bi bi-check-circle"></i> Valider
+  </button>
+{% endif %}
   </div>
 </td>
         </tr>
@@ -344,7 +343,8 @@
         tbody.appendChild(clone);
       });
     }
-
+    
+     setupValiderButtons();
     function updateActivePageButton(page) {
   // Mete tout bouton paj yo "light"
   for (let i = 1; i <= 3; i++) { // si w gen 3 bouton
@@ -364,12 +364,18 @@
 }
 
     currentPage = page;
+
+    // ✅ Met à jour l'URL avec le numéro de page
+    const url = new URL(window.location);
+    url.searchParams.set('page', page);
+    window.history.replaceState({}, '', url);
+
     updateActivePageButton(page);
     const totalPages = Math.ceil(allRows.length / rowsPerPage) || 1;
     document.getElementById("btnPrev").disabled = page === 1;
     document.getElementById("btnNext").disabled = page >= totalPages;
     document.getElementById("pageInfo").textContent = `Page ${page} / ${totalPages}`;
-  }
+}
 
   // Recherche
   document.getElementById("searchInput")?.addEventListener("input", function () {
@@ -397,10 +403,12 @@
   // Pagination buttons
   document.getElementById("btnPrev")?.addEventListener("click", () => {
     if (currentPage > 1) renderPage(currentPage - 1);
+    
   });
   document.getElementById("btnNext")?.addEventListener("click", () => {
     const totalPages = Math.ceil(allRows.length / rowsPerPage);
     if (currentPage < totalPages) renderPage(currentPage + 1);
+    
   });
 
   // Initialiser au chargement
@@ -408,7 +416,11 @@
     const tbody = document.querySelector("#tableEleves tbody");
     if (tbody) {
       allRows = Array.from(tbody.querySelectorAll("tr.eleve-row"));
-      renderPage(1);
+      // ✅ Lis la page depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedPage = parseInt(urlParams.get('page')) || 1;
+
+        renderPage(savedPage);
     }
   });
 </script>
@@ -488,8 +500,64 @@ document.getElementById("closeModal").addEventListener("click", function() {
 </script>
 
   <!-- JS -->
-  <script src="{% static 'app_inscription/js/ins.js' %}"></script>
+  <script src="{% static 'app_inscription/js/i.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/role-control.js' %}"></script>
+
+ <script>
+    // ✅ Fonction pour gérer le bouton "Valider"
+    function setupValiderButtons() {
+        document.querySelectorAll('.btn-valider').forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const btn = this;
+
+                fetch(`/inscription/valider/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),  // Assure-toi que cette fonction est accessible
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Validé !',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                             const url = new URL(window.location);
+    url.searchParams.set('page', currentPage);
+    window.location.href = url; // ✅ Recharge la page pour mise à jour
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: data.error || 'Échec de la validation'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur réseau',
+                        text: 'Veuillez réessayer.'
+                    });
+                });
+            });
+        });
+    }
+
+    // ✅ Appelle la fonction une fois que le DOM est chargé
+    document.addEventListener('DOMContentLoaded', function() {
+        setupValiderButtons();
+    });
+  </script>
+
+
 </body>
 </html>

@@ -9,36 +9,130 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Jounal Aktivite</h2>
+        <h2 class="mb-4">Jounal Aktivite</h2>
 
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Aksyon</th>
-              <th>Objet</th>
-              <th>ID</th>
-              <th>Itilizatè</th>
-              <th>Wòl</th>
-              <th>Dat</th>
-              <th>Deskripsyon</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for log in logs %}
-            <tr>
-              <td>{{ log.action }}</td>
-              <td>{{ log.objet_type }}</td>
-              <td>{{ log.objet_id }}</td>
-              <td>{{ log.utilisateur_username }}</td>
-              <td>{{ log.utilisateur_role }}</td>
-              <td>{{ log.date_action }}</td>
-              <td>{{ log.description }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7" class="text-center">Pa gen aktivite</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <!-- Filtre epi Rechèch -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <select class="form-select" id="filterAction">
+                    <option value="">Tout Aksyon</option>
+                    <option value="ajoute">Ajoute</option>
+                    <option value="modifye">Modifye</option>
+                    <option value="efase">Efase</option>
+                    <option value="konekte">Konekte</option>
+                    <option value="dekonekte">Dekonekte</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filterRole">
+                    <option value="">Tout Wòl</option>
+                    <option value="directeur">Directeur</option>
+                    <option value="secretaire">Secretaire</option>
+                    <option value="censeur">Censeur</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="searchInput" placeholder="Rechèch...">
+            </div>
+        </div>
+
+        <!-- Tablo -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Aksyon</th>
+                        <th>Objet</th>
+                        <th>ID</th>
+                        <th>Itilizatè</th>
+                        <th>Wòl</th>
+                        <th>Dat</th>
+                        <th>Deskripsyon</th>
+                    </tr>
+                </thead>
+                <tbody id="journalTableBody">
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.objet_type }}</td>
+                        <td>{{ log.objet_id }}</td>
+                        <td>{{ log.utilisateur_username }}</td>
+                        <td>{{ log.utilisateur_role }}</td>
+                        <td>{{ log.date_action }}</td>
+                        <td>{{ log.description }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center">Pa gen aktivite</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pajinasyon -->
+        <nav aria-label="Pajinasyon jounal">
+            <ul class="pagination justify-content-center">
+                {% if logs.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ logs.previous_page_number }}">Prev</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ logs.number }}</span>
+                </li>
+
+                {% if logs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ logs.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ logs.paginator.num_pages }}">{{ logs.paginator.num_pages }}</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
+
+    <script>
+        // ✅ Filtre epi Rechèch kote kliyan (JavaScript)
+        document.addEventListener("DOMContentLoaded", function () {
+            const tableBody = document.getElementById("journalTableBody");
+            const rows = tableBody.getElementsByTagName("tr");
+            const searchInput = document.getElementById("searchInput");
+            const filterAction = document.getElementById("filterAction");
+            const filterRole = document.getElementById("filterRole");
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const actionFilter = filterAction.value;
+                const roleFilter = filterRole.value;
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const cells = row.getElementsByTagName("td");
+                    const description = cells[6].textContent.toLowerCase();
+                    const action = cells[0].textContent;
+                    const role = cells[4].textContent;
+
+                    const matchesSearch = description.includes(searchTerm);
+                    const matchesAction = actionFilter === "" || action === actionFilter;
+                    const matchesRole = roleFilter === "" || role === roleFilter;
+
+                    if (matchesSearch && matchesAction && matchesRole) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            }
+
+            searchInput.addEventListener("input", filterTable);
+            filterAction.addEventListener("change", filterTable);
+            filterRole.addEventListener("change", filterTable);
+        });
+    </script>
 </body>
 </html>

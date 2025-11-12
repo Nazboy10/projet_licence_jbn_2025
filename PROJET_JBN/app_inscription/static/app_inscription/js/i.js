@@ -174,6 +174,10 @@ async function confirmDelete(id) {
   }
 }
 
+
+
+
+
 // Soumission formulaire (ajout / modif)
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -253,6 +257,8 @@ if (form) {
           Swal.fire({icon:'success', title:'Ajouté', text:'Élève inscrit avec succès', timer:1500, showConfirmButton:false});
         }
 
+      
+
         resetForm();
         modal.style.display = "none";
       } else {
@@ -264,6 +270,7 @@ if (form) {
       Swal.fire({icon:'error', title:'Erreur', text:'Une erreur est survenue côté client (voir console).'});
     }
   });
+  
 }
 
 // util helper : échapper simple pour insertion dans attribut onclick
@@ -272,3 +279,5 @@ function escapeHtml(str) {
   return String(str).replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,' ');
 }
 // ...existing code...
+
+

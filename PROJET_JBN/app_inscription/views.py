@@ -136,6 +136,15 @@ def modifier_inscription(request, id):
             "tel_tuteur": eleve.tel_tuteur,
             "photo_url": eleve.photo.url if eleve.photo and hasattr(eleve.photo, "url") else "",
         }
+
+        log_action(
+        request=request,
+        action='modifye',
+        objet_type='Inscription',
+        objet_id=eleve.id,
+        description=f"Inskripsyon pou {eleve.nom} {eleve.prenom} te ajoute pa {request.session.get('username')}."
+    )
+
         return JsonResponse(data, status=200)
 
     except Exception as e:
@@ -151,6 +160,15 @@ def supprimer_inscription(request, id):
     try:
         eleve = get_object_or_404(Inscription, id=id)
         eleve.delete()
+       
+        log_action(
+        request=request,
+        action='efase',
+        objet_type='Inscription',
+        objet_id=eleve.id,
+        description=f"Inskripsyon pou {eleve.nom} {eleve.prenom} te ajoute pa {request.session.get('username')}."
+    )
+
         return JsonResponse({"message": "Inscription supprimée avec succès"}, status=200)
     except Exception as e:
         print("❌ Erreur lors de la suppression :", e)
@@ -256,7 +274,8 @@ def ajouter_inscription(request):
             nom_tuteur=nom_tuteur,
             tel_tuteur=tel_tuteur,
             photo=photo,
-            date_inscription=date_inscription
+            date_inscription=date_inscription,
+            valide=False,
             
         )
 
@@ -279,6 +298,7 @@ def ajouter_inscription(request):
             "tel_tuteur": eleve.tel_tuteur,
             "date_inscription": eleve.date_inscription.strftime("%Y-%m-%d") if eleve.date_inscription else "",
             "photo_url": photo_url,
+            
         }
          
         log_action(
@@ -338,4 +358,45 @@ def rechercher_inscription(request):
     return JsonResponse({"eleves": results}, safe=False)
 
 
+# pour valide inscription et envoyer email
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
+def valider_inscription(request, id):
+    if request.method == "POST":
+        eleve = get_object_or_404(Inscription, id=id)
+
+        # Si déjà validé
+        if eleve.valide:
+            return JsonResponse({'success': False, 'error': 'Déjà validé.'})
+
+        # Valider
+        eleve.valide = True
+        eleve.save()
+
+        # ✅ Envoyer l'email
+        sujet = "Votre inscription a été validée"
+        message = f"""
+        Bonjour {eleve.prenom} {eleve.nom},
+
+        Votre inscription a été validée avec succès.
+
+        Votre code élève est : {eleve.code_eleve}
+
+        Utilisez ce code pour vous connecter dans l'application mobile.
+
+        Merci !
+        """
+        destinataire = [eleve.email]
+
+        try:
+            send_mail(sujet, message, settings.DEFAULT_FROM_EMAIL, destinataire)
+        except Exception as e:
+            print(f"Erreur d'envoi d'email: {e}")
+            return JsonResponse({'success': False, 'error': 'Erreur envoi email.'})
+
+        return JsonResponse({'success': True, 'message': 'Validé et email envoyé.'})
+
+    return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})

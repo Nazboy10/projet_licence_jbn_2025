@@ -69,6 +69,39 @@
 </div>
 
  <h2>La liste des utilisateurs</h2>
+
+ <!-- ✅ Bouton pou jwenn jounal sèlman si direktris -->
+{% if role == 'directeur' %}
+<div class="d-flex justify-content-end mb-3">
+   <a href="/journal/" class="btn-journal">Jounal des activites</a>
+</div>
+{% endif %}
+<style>
+  /* utilisateurs.html - CSS pou bouton Jounal */
+.btn-journal {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg, #6e8efb, #5f5dda);
+    border: none;
+    border-radius: 50px; /* Fè bouton an ron */
+    box-shadow: 0 0 10px rgba(101, 131, 231, 0.5); /* Efè lumiè (glow) */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-journal:hover {
+    transform: scale(1.05); /* Piti agrandisman lè mouse sou li */
+    box-shadow: 0 0 25px rgba(110, 142, 251, 0.7); /* Pi fonse efè glow lè mouse sou li */
+}
+
+.btn-journal:active {
+    transform: scale(0.98); /* Piti reyidikasyon lè klike */
+}
+</style>
   <!-- Modal -->
   <div id="userFormModal" class="modal-overlay">
     <div class="modal-content">

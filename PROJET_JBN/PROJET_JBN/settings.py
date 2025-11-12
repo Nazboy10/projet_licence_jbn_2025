@@ -1,3 +1,6 @@
+
+
+
 """
 Django settings for PROJET_JBN project.
 
@@ -28,7 +31,7 @@ DEBUG = True
 
 
 # Aprè
-ALLOWED_HOSTS = ['192.168.143.79', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['192.168.108.79', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -137,6 +140,67 @@ DATABASES = {
 }
 
 
+
+
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'collegebellangelot5@gmail.com'
+EMAIL_HOST_PASSWORD = 'muxmfgjygejxibvn'  # app password Gmail
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.2/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_URL = 'static/'
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
