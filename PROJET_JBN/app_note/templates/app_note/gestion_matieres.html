@@ -1,0 +1,16 @@
+<!-- Interface minimaliste, pas dans le menu -->
+<h2>Gestion des matières (Directeur uniquement)</h2>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="nom" placeholder="Nouvelle matière" required>
+  <button type="submit">Ajouter</button>
+</form>
+
+<ul>
+{% for m in matieres %}
+  <li>{{ m.nom }}</li>
+{% empty %}
+  <li>Aucune matière</li>
+{% endfor %}
+</ul>
+<a href="{% url 'tableau_de_bord' %}">Retour</a>

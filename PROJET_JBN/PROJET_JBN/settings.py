@@ -31,7 +31,7 @@ DEBUG = True
 
 
 # Aprè
-ALLOWED_HOSTS = ['192.168.108.79', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['192.168.43.2', '127.0.0.1', 'localhost']
 
 
 # Application definition
