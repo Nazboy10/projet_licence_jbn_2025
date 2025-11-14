@@ -166,3 +166,37 @@ def api_enregistrer_bulletin(request):
         return JsonResponse({'erreur': 'Élève non trouvé'}, status=404)
     except Exception as e:
         return JsonResponse({'erreur': 'Erreur serveur'}, status=500)
+
+
+
+
+
+
+
+
+
+
+@require_http_methods(["GET"])
+def api_liste_eleves_pour_bulletin(request):
+    # ✅ Sèl chanjman: "note" → "notes" (avèk "s")
+    eleves_avec_notes = Eleve.objects.filter(
+        notes__isnull=False,  # ← ICI: "notes", pa "note"
+        actif=True
+    ).distinct().values(
+        'code_eleve',
+        'nom',
+        'prenom',
+        'classe'
+    )
+
+    liste = [
+        {
+            'code': e['code_eleve'],
+            'nom': e['nom'],
+            'prenom': e['prenom'],
+            'classe': e['classe'] or 'Non spécifiée'
+        }
+        for e in eleves_avec_notes
+    ]
+
+    return JsonResponse(liste, safe=False)
