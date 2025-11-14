@@ -199,4 +199,42 @@ document.getElementById('btnEnregistrerBulletin')?.addEventListener('click', asy
         btnAfficherFormulaire.style.display = 'inline-block';
     });
 
+
+
+
+   // === NOUVO: Chaje lis eleve ki kapab gen bulletin ===
+async function chargerListeElevesPourBulletin() {
+    try {
+        const res = await fetch('/bulletin/api/liste_eleves/');
+        if (!res.ok) throw new Error('Erreur serveur');
+        const eleves = await res.json();
+
+        const tbody = document.querySelector("#listeBulletin tbody");
+        if (eleves.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5">Aucun élève avec des notes</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = eleves.map(e => `
+            <tr>
+                <td>${e.code}</td>
+                <td>${e.nom}</td>
+                <td>${e.prenom}</td>
+                <td>${e.classe}</td>
+                <td><button class="btnRechercher">Afficher</button></td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error("Erreur chargement liste élèves:", err);
+        document.querySelector("#listeBulletin tbody").innerHTML = 
+            `<tr><td colspan="5">❌ Erreur de connexion</td></tr>`;
+    }
+}
+
+
+chargerListeElevesPourBulletin();
+
+
+
+
 });

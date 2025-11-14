@@ -206,11 +206,11 @@ def scan_presence_permanent(request, token):
         fin = now.replace(hour=8, minute=30, second=0, microsecond=0).time()
 
         if not (debut <= heure_actuelle <= fin):
-             print(f"❌ Hors période autorisée. Heure actuelle: {heure_actuelle}")
-             return JsonResponse({
-                 'success': False,
-                 'error': f'Scan non autorisé en dehors de la période. Heure actuelle: {heure_actuelle.strftime("%H:%M:%S")}'
-            }, status=200)
+              print(f"❌ Hors période autorisée. Heure actuelle: {heure_actuelle}")
+              return JsonResponse({
+                  'success': False,
+                  'error': f'Scan non autorisé en dehors de la période. Heure actuelle: {heure_actuelle.strftime("%H:%M:%S")}'
+             }, status=200)
 
         print(f"✅ Période autorisée. Heure actuelle: {heure_actuelle}")
 
