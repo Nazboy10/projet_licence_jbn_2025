@@ -14,18 +14,27 @@ document.addEventListener('DOMContentLoaded', () => {
             dropdown.style.display = 'none';
         });
 
-        // Confirmation de déconnexion
+           // Confirmation de déconnexion (remplacé par SweetAlert2)
         const logoutLink = dropdown.querySelector("a");
         if (logoutLink) {
             logoutLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                const confirmLogout = confirm("Êtes-vous sûr  de vouloir déconnecter ?");
-                if (confirmLogout) {
+                Swal.fire({
+                  title: 'Déconnexion',
+                  text: "Êtes-vous sûr de vouloir déconnecter ?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Oui',
+                  cancelButtonText: 'Non'
+                }).then((result) => {
+                  if (result.isConfirmed) {
                     window.location.href = this.href;
-                }
+                  }
+                });
             });
         }
     }
+
 
 
     // Elements pou presans

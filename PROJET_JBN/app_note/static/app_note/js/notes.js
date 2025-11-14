@@ -19,20 +19,27 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
         });
 
-        // Confirmation déconnexion
+           // Confirmation de déconnexion (remplacé par SweetAlert2)
         const logoutLink = dropdown.querySelector("a");
         if (logoutLink) {
             logoutLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                const confirmLogout = confirm("Êtes-vous sûr  de vouloir déconnecter ?");
-                if (confirmLogout) {
+                Swal.fire({
+                  title: 'Déconnexion',
+                  text: "Êtes-vous sûr de vouloir déconnecter ?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Oui',
+                  cancelButtonText: 'Non'
+                }).then((result) => {
+                  if (result.isConfirmed) {
                     window.location.href = this.href;
-                }
+                  }
+                });
             });
         }
     }
 
-    
     // === Modal gestion notes ===
     const btnShowForm = document.getElementById('btnShowForm');
     const formModal = document.getElementById('formModal');
