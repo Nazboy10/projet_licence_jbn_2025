@@ -14,12 +14,12 @@
       <div class="sign-in-form">
         <h2 class="title">Connexion</h2>
 
-        <div class="social-icons">
+        {% comment %} <div class="social-icons">
           <a href="#" class="icon"><i class="fab fa-google"></i></a>
           <a href="#" class="icon"><i class="fab fa-facebook-f"></i></a>
           <a href="#" class="icon"><i class="fab fa-github"></i></a>
           <a href="#" class="icon"><i class="fab fa-linkedin-in"></i></a>
-        </div>
+        </div> {% endcomment %}
 
         <span></span><br>
         <label>Email</label>
@@ -30,7 +30,13 @@
 
         <div id="errorMsg" style="color:red; margin-top:10px;"></div>
 
-       <a href="/reset_password/">Mot de passe oublié ?</a>
+       {% if pw_reset_enabled %}
+  <a href="/reset_password/">Mot de passe oublié ?</a>
+{% else %}
+  <p style="color: #6c757d; font-size: 0.875rem; margin-top: 10px;">
+    La réinitialisation de mot de passe est désactivée. Veuillez contacter le directeur.
+  </p>
+{% endif %}
         <button id="loginBtn" class="btn">Connecter</button>
       </div>
     </div>

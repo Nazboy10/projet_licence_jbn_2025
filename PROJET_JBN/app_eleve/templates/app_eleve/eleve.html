@@ -156,21 +156,15 @@
     <!-- Table -->
 <div class="table-responsive">
   <table class="table table-bordered table-striped" id="tableEleves">
-   <thead class="table-header-blue">
+    <thead class="table-header-blue">
       <tr>
         <th>Photo</th>
         <th>Code</th>
         <th>Nom</th>
         <th>Prénom</th>
-        <th>Sexe</th>
-        <th>Adresse</th>
         <th>Classe</th>
         <th>Téléphone</th>
-        <th>Nom Tuteur</th>
-        <th>Téléphone Tuteur</th>
-        <th>Année Académique</th>
-        <th>Date Naissance</th>
-        <th>Email</th>
+        <th>Statut</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -178,34 +172,51 @@
       {% for e in eleves %}
       <tr>
         <td>
-    {% if e.photo %}
-      <img src="{{ e.photo.url }}" alt="Photo {{ e.nom }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
-    {% else %}
-      <img src="{% static 'image/pro.png' %}" alt="Photo par défaut" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
-    {% endif %}
-  </td>
+          {% if e.photo %}
+            <img src="{{ e.photo.url }}" alt="Photo {{ e.nom }}" width="40" height="40" style="object-fit: cover; border-radius: 50%;">
+          {% else %}
+            <img src="{% static 'image/pro.png' %}" alt="Par défaut" width="40" height="40" style="object-fit: cover; border-radius: 50%;">
+          {% endif %}
+        </td>
         <td>{{ e.code_eleve }}</td>
         <td>{{ e.nom }}</td>
         <td>{{ e.prenom }}</td>
-        <td>{{ e.sexe }}</td>
-        <td>{{ e.adresse }}</td>
         <td>{{ e.classe }}</td>
         <td>{{ e.telephone }}</td>
-        <td>{{ e.nom_tuteur }}</td>
-        <td>{{ e.telephone_tuteur }}</td>
-        <td>{{ e.annee_academique|default:"N/A" }}</td>
-        <td>{{ e.date_naissance|date:"d/m/Y"|default:"N/A" }}</td>
-        <td>{{ e.email|default:"N/A" }}</td>
         <td>
+          {% if e.actif %}
+            <span class="badge bg-success">Actif</span>
+          {% else %}
+            <span class="badge bg-danger">Inactif</span>
+          {% endif %}
+        </td>
+        <td class="text-center">
 
-          
-          <button class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></button>
-         
+        <!-- ✏️ Modifier -->
+<button class="btn btn-sm btn-warning" title="Modifier" onclick="chargerModifier({{ e.id }})">
+  <i class="bi bi-pencil"></i>
+</button>
+
+          <!-- 👁️ Icône pour voir les détails -->
+          <button class="btn btn-sm btn-outline-primary" title="Voir détails" onclick="voirDetails({{ e.id }})">
+            <i class="bi bi-eye"></i>
+          </button>
+
+          <!-- 🔁 Activer/Désactiver -->
+          {% if e.actif %}
+            <button class="btn btn-sm btn-outline-danger" onclick="toggleActif({{ e.id }}, false)" title="Désactiver">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          {% else %}
+            <button class="btn btn-sm btn-outline-success" onclick="toggleActif({{ e.id }}, true)" title="Activer">
+              <i class="bi bi-check-circle"></i>
+            </button>
+          {% endif %}
         </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="10" class="text-center">Aucun élève enregistré.</td>
+        <td colspan="8" class="text-center">Aucun élève enregistré.</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -213,11 +224,266 @@
 </div>
   </div>
 
+    
+
+   <!-- Modal Modifier Élève -->
+<div id="modalModifier" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="max-width: 700px; width: 90%;">
+    <span id="closeModifier" class="close">&times;</span>
+    <h4 class="mb-3">Modifier l'élève</h4>
+    <form id="formModifier">
+      <input type="hidden" id="eleveId" name="id">
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nom</label>
+          <input type="text" id="modNom" name="nom" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Prénom</label>
+          <input type="text" id="modPrenom" name="prenom" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">Sexe</label>
+          <select id="modSexe" name="sexe" class="form-select" required>
+            <option value="Masculin">Masculin</option>
+            <option value="Féminin">Féminin</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Adresse</label>
+          <input type="text" id="modAdresse" name="adresse" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Date de naissance</label>
+          <input type="date" id="modDateNaiss" name="date_naissance" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Classe</label>
+          <input type="text" id="modClasse" name="classe" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Téléphone</label>
+          <input type="text" id="modTelephone" name="telephone" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" id="modEmail" name="email" class="form-control">
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nom Tuteur</label>
+          <input type="text" id="modNomTuteur" name="nom_tuteur" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Téléphone Tuteur</label>
+          <input type="text" id="modTelTuteur" name="telephone_tuteur" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="text-end">
+        <button type="submit" class="btn btn-warning">Enregistrer</button>
+        <button type="button" id="cancelModifier" class="btn btn-secondary">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+
+  <!-- Modal Détails Élève -->
+<div id="modalDetails" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="max-width: 600px; width: 90%;">
+    <span id="closeDetails" class="close">&times;</span>
+    <h4>Détails de l'élève</h4>
+    <div id="detailsContent"></div>
+    <div class="text-end mt-3">
+      <button id="closeDetailsBtn" class="btn btn-secondary">Fermer</button>
+    </div>
+  </div>
+</div>
+
   <!-- JS -->
   <script src="{% static 'app_eleve/js/eleve.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/role-control.js' %}"></script>
 
+
+<script>
+
+function getCSRFToken() {
+  return document.cookie.split(";")
+    .find(c => c.trim().startsWith("csrftoken="))
+    ?.split("=")[1];
+}
+
+// ✅ Fonction toggleActif (GLOBALE → accessible depuis onclick)
+function toggleActif(id, actif) {
+  const action = actif ? 'activer' : 'désactiver';
+  Swal.fire({
+    title: `Confirmer ${action} ?`,
+    text: "L'élève sera " + (actif ? "réactivé" : "désactivé") + ".",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Annuler'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/eleve/toggle-actif/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCSRFToken(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ actif: actif })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          Swal.fire("Erreur", "Impossible de modifier le statut.", "error");
+        }
+      })
+      .catch(err => {
+        console.error("Erreur réseau:", err);
+        Swal.fire("Erreur", "Problème de connexion au serveur.", "error");
+      });
+    }
+  });
+}
+
+
+function voirDetails(id) {
+  fetch(`/eleve/details/${id}/`)
+    .then(response => response.json())
+    .then(e => {
+      let content = `
+        <div class="row">
+          <div class="col-4 text-center">
+            <img src="${e.photo_url || '{% static 'image/pro.png' %}'}" width="100" class="rounded-circle">
+          </div>
+          <div class="col-8">
+            <p><strong>Code :</strong> ${e.code_eleve}</p>
+            <p><strong>Nom :</strong> ${e.nom} ${e.prenom}</p>
+            <p><strong>Sexe :</strong> ${e.sexe || '—'}</p>
+            <p><strong>Adresse :</strong> ${e.adresse || '—'}</p>
+            <p><strong>Classe :</strong> ${e.classe}</p>
+            <p><strong>Téléphone :</strong> ${e.telephone || '—'}</p>
+            <p><strong>Nom Tuteur :</strong> ${e.nom_tuteur || '—'}</p>
+            <p><strong>Tél. Tuteur :</strong> ${e.telephone_tuteur || '—'}</p>
+            <p><strong>Email :</strong> ${e.email || '—'}</p>
+            <p><strong>Date naissance :</strong> ${e.date_naissance || '—'}</p>
+            <p><strong>Année académique :</strong> ${e.annee_academique || '—'}</p>
+            <p><strong>Statut :</strong> ${e.actif ? '<span class="badge bg-success">Actif</span>' : '<span class="badge bg-danger">Inactif</span>'}</p>
+          </div>
+        </div>
+      `;
+      document.getElementById('detailsContent').innerHTML = content;
+      document.getElementById('modalDetails').style.display = 'flex';
+    })
+    .catch(err => {
+      Swal.fire("Erreur", "Impossible de charger les détails.", "error");
+    });
+}
+
+// Fermer la modale
+document.getElementById('closeDetails')?.addEventListener('click', () => {
+  document.getElementById('modalDetails').style.display = 'none';
+});
+document.getElementById('closeDetailsBtn')?.addEventListener('click', () => {
+  document.getElementById('modalDetails').style.display = 'none';
+});
+
+
+
+ // Charger les données dans le formulaire de modification
+function chargerModifier(id) {
+  fetch(`/eleve/details/${id}/`)
+    .then(response => response.json())
+    .then(e => {
+      document.getElementById('eleveId').value = e.id;
+      document.getElementById('modNom').value = e.nom;
+      document.getElementById('modPrenom').value = e.prenom;
+      document.getElementById('modSexe').value = e.sexe || 'Masculin';
+      document.getElementById('modAdresse').value = e.adresse || '';
+      document.getElementById('modClasse').value = e.classe || '';
+      document.getElementById('modTelephone').value = e.telephone || '';
+      document.getElementById('modEmail').value = e.email || '';
+      document.getElementById('modNomTuteur').value = e.nom_tuteur || '';
+     document.getElementById('modTelTuteur').value = e.telephone_tuteur || '';
+      document.getElementById('modDateNaiss').value = e.date_naissance_raw || ''; // on va l’ajuster dans la vue
+
+      document.getElementById('modalModifier').style.display = 'flex';
+    })
+    .catch(err => {
+      Swal.fire("Erreur", "Impossible de charger les données pour modification.", "error");
+    });
+}
+
+// Gérer la soumission du formulaire de modification
+document.getElementById('formModifier')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const id = document.getElementById('eleveId').value;
+  const formData = new FormData(this);
+
+  fetch(`/eleve/modifier/${id}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCSRFToken(),
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire("Succès", "Élève mis à jour avec succès !", "success");
+      document.getElementById('modalModifier').style.display = 'none';
+      location.reload(); // ou mettre à jour dynamiquement
+    } else {
+      Swal.fire("Erreur", data.error || "Erreur lors de la modification.", "error");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    Swal.fire("Erreur", "Problème de connexion au serveur.", "error");
+  });
+});
+
+// Fermer la modale de modification
+document.getElementById('closeModifier')?.addEventListener('click', () => {
+  document.getElementById('modalModifier').style.display = 'none';
+});
+document.getElementById('cancelModifier')?.addEventListener('click', () => {
+  document.getElementById('modalModifier').style.display = 'none';
+});
+
+
+
+
+
+
+
+
+
+
+
+</script>
 
 
 </body>

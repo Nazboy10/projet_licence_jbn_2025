@@ -4,6 +4,28 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Pou wè erè detaye sou Render
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'django.db.backends': {  # pou wè erè baz done
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
 # ===========================
 # SECURITY / DEBUG
 # ===========================
@@ -12,15 +34,14 @@ SECRET_KEY = os.environ.get(
     "django-insecure-s1c^#g2mvb9sk#*7s@0)vr&d_3lt0r3fzxqg)1cq9-v0m@d7ke"
 )
 
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
+    'projet-licence-jbn-2025.onrender.com',
     '.onrender.com',  # tout subdomains Render
     'localhost',
-    '127.0.0.1'
-    'projet-licence-jbn-2025.onrender.com',
+    '127.0.0.1',
 ]
-
 
 # ===========================
 # APPLICATIONS
@@ -35,10 +56,10 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
-    
+
+    'corsheaders',
     'SGCBA',
     'api',
-    'corsheaders',
     'app_inscription',
     'app_eleve',
     'app_presence',
@@ -59,11 +80,10 @@ REST_FRAMEWORK = {
 # MIDDLEWARE
 # ===========================
 MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",   # ← obligatwa pou static files sou Render
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # ← OBLIGATWA POU RENDER
 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -101,13 +121,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'PROJET_JBN.wsgi.application'
 
 # ===========================
-# DATABASE (RENDER + SUPABASE)
+# DATABASE
 # ===========================
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True,
+        ssl_require=False
     )
 }
 
@@ -156,5 +176,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'collegebellangelot5@gmail.com'
-EMAIL_HOST_PASSWORD = 'eyqywjsfzmccbqja'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

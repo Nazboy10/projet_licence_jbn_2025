@@ -199,20 +199,20 @@ def scan_presence_permanent(request, token):
     if request.method == "POST":
         # ✅ Vérifie l'heure
         now = timezone.now()
-        heure_actuelle = now.time()
+        # heure_actuelle = now.time()
 
-         # Définir les heures autorisées (8h00 à 8h30)
-        debut = now.replace(hour=8, minute=0, second=0, microsecond=0).time()
-        fin = now.replace(hour=8, minute=30, second=0, microsecond=0).time()
+        #  # Définir les heures autorisées (8h00 à 8h30)
+        # debut = now.replace(hour=8, minute=0, second=0, microsecond=0).time()
+        # fin = now.replace(hour=8, minute=30, second=0, microsecond=0).time()
 
-        if not (debut <= heure_actuelle <= fin):
-              print(f"❌ Hors période autorisée. Heure actuelle: {heure_actuelle}")
-              return JsonResponse({
-                  'success': False,
-                  'error': f'Scan non autorisé en dehors de la période. Heure actuelle: {heure_actuelle.strftime("%H:%M:%S")}'
-             }, status=200)
+        # if not (debut <= heure_actuelle <= fin):
+        #       print(f"❌ Hors période autorisée. Heure actuelle: {heure_actuelle}")
+        #       return JsonResponse({
+        #           'success': False,
+        #           'error': f'Scan non autorisé en dehors de la période. Heure actuelle: {heure_actuelle.strftime("%H:%M:%S")}'
+        #      }, status=200)
 
-        print(f"✅ Période autorisée. Heure actuelle: {heure_actuelle}")
+        # print(f"✅ Période autorisée. Heure actuelle: {heure_actuelle}")
 
         try:
             # Récupérer le QR permanent

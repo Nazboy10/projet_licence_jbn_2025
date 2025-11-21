@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #3E63DD;
+    --light-blue: #EBF1F7;
+    --text-dark: #333;
+    --text-light: #666;
+    --border-color: #E0E0E0;
+    --card-bg: #fff;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+    --info-color: #2196F3;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #F8F8F8;
+    display: flex;
+    min-height: 100vh;
+    color: var(--text-dark);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary-blue);
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.sidebar .logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .logo i {
+    margin-right: 10px;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.sidebar nav ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar nav ul li a:hover,
+.sidebar nav ul li a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar nav ul li a i {
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.sidebar .request-button {
+    background-color: #fff;
+    color: var(--primary-blue);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: auto; /* Pushes it to the bottom */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.sidebar .request-button i {
+    margin-bottom: 10px;
+    font-size: 30px;
+    color: #ccc; /* Placeholder color for icon */
+}
+
+.sidebar .request-button button {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .request-button button:hover {
+    background-color: #2a4fac;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.header .search-profile {
+    display: flex;
+    align-items: center;
+}
+
+.header .search-bar {
+    position: relative;
+    margin-right: 20px;
+}
+
+.header .search-bar input {
+    border: 1px solid var(--border-color);
+    padding: 10px 15px 10px 40px;
+    border-radius: 8px;
+    width: 300px;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.header .search-bar i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.header .profile {
+    display: flex;
+    align-items: center;
+}
+
+.header .profile .notification-icon {
+    font-size: 22px;
+    color: var(--text-light);
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.header .profile .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc; /* Placeholder */
+    overflow: hidden;
+}
+
+.header .profile .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* css pou logo a*/
+.sidebar .logo {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* espas ant logo ak tèks */
+}
+
+.sidebar .logo .logo-img {
+    width: 60px;  /* gwosè logo a tankou yon icône */
+    height: 60px;
+    object-fit: contain;
+}
+
+
+/* Dropdown hidden by default */
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 60px; /* ajiste selon header ou */
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    min-width: 150px;
+    z-index: 100;
+}
+
+.profile-dropdown ul {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.profile-dropdown ul li {
+    padding: 10px 20px;
+}
+
+.profile-dropdown ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.profile-dropdown ul li:hover {
+    background-color: #f2f2f2;
+    cursor: pointer;
+}
+
+
+/* intefas bulletin */
+
+.container { 
+  max-width: 900px; 
+  margin: auto; 
+  background: #fff; 
+  padding: 20px; 
+  border-radius: 10px; 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+}
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 10px; 
+}
+th, td { 
+  border: 1px solid #2563eb; 
+  padding: 8px; 
+  text-align: left; 
+}
+th { 
+  background: #2563eb;  
+}
+button { 
+  padding: 6px 12px; 
+  border: none; 
+  border-radius: 6px; 
+  background: #2563eb; 
+  color: white; 
+  cursor: pointer; 
+  margin: 2px; 
+}
+button:hover { 
+   background: #6c2bd9;
+}
+.top-right { 
+  text-align: right; 
+  margin-bottom: 10px; 
+}
+#bulletinPage, #formulairePage { 
+  margin-top: 20px; 
+}
+#listeContainer { 
+  margin-top: 10px; 
+}
+#logoCachetContainer { 
+  margin-top: 10px; 
+}
+#formulairePage { 
+  display: none; 
+  text-align: center; 
+}
+#formulairePage input { 
+  padding: 6px 10px; 
+  border-radius: 5px; 
+  border: 1px solid #ccc; 
+  width: 300px; 
+  margin-bottom: 10px; 
+}
+#formulaireButtons { 
+  margin-top: 10px; 
+}
+#formulaireButtons button { 
+  margin: 0 5px; 
+}
+@media print { 
+  button, input { display: none !important; } 
+}

@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: linear-gradient(to right, #ffffff, #ffffff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.i {
+  border-radius: 10px;
+}
+
+.container {
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgb(175, 186, 233);
+  position: relative;
+  width: 800px;
+  max-width: 100%;
+  min-height: 480px;
+  display: flex;
+}
+
+.signin-signup {
+  width: 50%;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sign-in-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.icon {
+  height: 40px;
+  width: 40px;
+  background: #f1f1f1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  text-decoration: none;
+  color: #333;
+}
+
+input {
+  margin: 10px 0;
+  padding: 12px;
+  border: none;
+  background: #eee;
+  border-radius: 4px;
+}
+
+#loginBtn {
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  background-color: #3E63DD;
+  color: white;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#loginBtn:hover {
+  background-color: #ffffff;
+  color: #3E63DD;
+  border: #3E63DD 2px solid;
+}
+
+#loginBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#errorMsg {
+  margin-top: 10px;
+  color: red;
+  font-weight: 500;
+}
+
+.overlay-container {
+  width: 50%;
+  background: linear-gradient(to right, #3E63DD, #3E63DD);
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+}
+
+.overlay-panel {
+  text-align: center;
+}
+
+.overlay-panel h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.overlay-panel p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.ghost {
+  background-color: transparent;
+  border: 2px solid white;
+}
+
+.ghost:hover {
+  background-color: rgba(255,255,255,0.1);
+}

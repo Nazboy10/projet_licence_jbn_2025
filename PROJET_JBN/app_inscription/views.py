@@ -63,6 +63,7 @@ def get_inscription(request, id):
             "email": eleve.email,
             "nom_tuteur": eleve.nom_tuteur,
             "tel_tuteur": eleve.tel_tuteur,
+             "date_inscription": eleve.date_inscription,
             "photo_url": eleve.photo.url if eleve.photo and hasattr(eleve.photo, "url") else "",
         }
         return JsonResponse(data, status=200)
@@ -358,45 +359,98 @@ def rechercher_inscription(request):
     return JsonResponse({"eleves": results}, safe=False)
 
 
-# pour valide inscription et envoyer email
+
+
+
+# app_inscription/views.py
 from django.core.mail import send_mail
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 
 def valider_inscription(request, id):
     if request.method == "POST":
         eleve = get_object_or_404(Inscription, id=id)
 
-        # Si déjà validé
         if eleve.valide:
             return JsonResponse({'success': False, 'error': 'Déjà validé.'})
 
-        # Valider
+        # ✅ Nettoyer l'email (retire espas)
+        if eleve.email:
+            eleve.email = eleve.email.strip().lower()
+        
+        # ✅ Vérifier que l'email existe et est valide
+        if not eleve.email:
+            return JsonResponse({
+                'success': False,
+                'error': 'Email manquant. Validation impossible sans email.'
+            })
+        
+        # ✅ Validation plus stricte de l'email
+        try:
+            validate_email(eleve.email)
+        except ValidationError:
+            return JsonResponse({
+                'success': False,
+                'error': f'Email invalide: {eleve.email}. Veuillez corriger l\'adresse email.'
+            })
+        
+        # ✅ Vérification supplémentaire du format
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, eleve.email):
+            return JsonResponse({
+                'success': False,
+                'error': f'Format d\'email incorrect: {eleve.email}'
+            })
+
+        # Valider l'inscription
         eleve.valide = True
         eleve.save()
 
-        # ✅ Envoyer l'email
+        # Préparer l'email
         sujet = "Votre inscription a été validée"
         message = f"""
-        Bonjour {eleve.prenom} {eleve.nom},
+Bonjour {eleve.prenom} {eleve.nom},
 
-        Votre inscription a été validée avec succès.
+Votre inscription a été validée avec succès.
 
-        Votre code élève est : {eleve.code_eleve}
+Votre code élève est : {eleve.code_eleve}
 
-        Utilisez ce code pour vous connecter dans l'application mobile.
+Utilisez ce code pour vous connecter dans l'application mobile.
 
-        Merci !
-        """
-        destinataire = [eleve.email]
+Merci !
+        """.strip()
 
         try:
-            send_mail(sujet, message, settings.DEFAULT_FROM_EMAIL, destinataire)
+            # ✅ S'assurer que l'email est une liste propre
+            destinataires = [eleve.email.strip()]
+            
+            send_mail(
+                sujet,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                destinataires,
+                fail_silently=False,  # Pour voir l'erreur complète
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'message': f'Validé et email envoyé à {eleve.email}'
+            })
+            
         except Exception as e:
-            print(f"Erreur d'envoi d'email: {e}")
-            return JsonResponse({'success': False, 'error': 'Erreur envoi email.'})
-
-        return JsonResponse({'success': True, 'message': 'Validé et email envoyé.'})
+            # ✅ Log détaillé de l'erreur
+            print(f"Erreur d'envoi d'email détaillée:")
+            print(f"  - Email destinataire: '{eleve.email}'")
+            print(f"  - Type d'erreur: {type(e).__name__}")
+            print(f"  - Message: {str(e)}")
+            
+            return JsonResponse({
+                'success': False,
+                'error': f'Échec de l\'envoi de l\'email: {str(e)}'
+            })
 
     return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})
