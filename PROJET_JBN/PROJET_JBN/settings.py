@@ -5,26 +5,26 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Pou wè erè detaye sou Render
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'django.db.backends': {  # pou wè erè baz done
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#         'django.db.backends': {  # pou wè erè baz done
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#     },
+# }
 
 # ===========================
 # SECURITY / DEBUG
@@ -128,13 +128,30 @@ WSGI_APPLICATION = 'PROJET_JBN.wsgi.application'
 # ===========================
 # DATABASE
 # ===========================
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=False
-    )
-}
+# ===========================
+# DATABASE
+# ===========================
+if os.environ.get("DATABASE_URL"):
+    # 🟢 MODE PRODUCTION (Render + Supabase)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=False
+        )
+    }
+else:
+    # 🟡 MODE LOCAL (WampServer MySQL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',   # Nou itilize MySQL
+            'NAME': 'db_sgcba',              # Non baz done ou te kreye nan phpMyAdmin
+            'USER': 'root',                         # Default user WampServer
+            'PASSWORD': '',                         # Pa gen modpas pa default nan Wamp
+            'HOST': '127.0.0.1',                    # Ou ka itilize localhost tou
+            'PORT': '3306',                         # Pò default pou MySQL
+        }
+    }
 
 # ===========================
 # MEDIA FILES

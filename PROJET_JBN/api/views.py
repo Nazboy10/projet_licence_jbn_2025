@@ -105,10 +105,9 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
-
 class LoginAPIView(APIView):
     """
-    Login via API, retounen done itilizatè + token, kenbe sesyon Django.
+    Login via API, retounen done itilizatè + token, verifye si deja konekte.
     """
     def post(self, request):
         email = request.data.get('email')
@@ -123,30 +122,32 @@ class LoginAPIView(APIView):
         try:
             user = Utilisateur.objects.get(email=email)
 
-            # 🔒 Tcheke si itilizatè a aktif
             if not user.actif:
                 return Response(
                     {"success": False, "error": "Utilisateur désactivé. Contactez l’administration."},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # ✅ Verifye modpas
             if user.check_password(password):
-                # 👉 Kenbe session Django a
+
+                # ✅ Si itilizatè a deja gen token, li deja konekte
+                if user.token:
+                    return Response(
+                        {"success": False, "error": "Utilisateur déjà connecté"},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+
+                # Kreye token pou premye fwa
+                token = user.generate_token()
+
+                # Kenbe session Django
                 request.session['id'] = user.id
                 request.session['username'] = user.username
                 request.session['role'] = user.role
 
-                # 🔑 Kreye oswa jwenn token
-                token = user.generate_token() 
-
                 serializer = UtilisateurSerializer(user)
                 return Response(
-                    {
-                        "success": True,
-                        "user": serializer.data,
-                        "token": token # Retounen token lan
-                    },
+                    {"success": True, "user": serializer.data, "token": token},
                     status=status.HTTP_200_OK
                 )
             else:
@@ -160,6 +161,7 @@ class LoginAPIView(APIView):
                 {"success": False, "error": "Email non trouvé"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
 
 
 
