@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path , include
 from django.conf import settings
 from django.conf.urls.static import static
+from api.views import logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +32,7 @@ urlpatterns = [
     path('parametre/', include("app_parametre.urls")),
     path('classe/', include("app_classe.urls")),
     path('', include('app_journal.urls')),
+     path('logout/', logout_view, name="logout"),
 
 ]
 

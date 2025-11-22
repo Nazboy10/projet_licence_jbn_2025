@@ -71,7 +71,8 @@ document.getElementById('loginBtn').addEventListener('click', async function() {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            credentials: 'same-origin'
         });
 
         const data = await response.json();

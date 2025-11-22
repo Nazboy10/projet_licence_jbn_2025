@@ -13,14 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Confirmation de déconnexion
-        const logoutLink = dropdown.querySelector("a");
+       const logoutLink = dropdown.querySelector("a");
         if (logoutLink) {
             logoutLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                const confirmLogout = confirm("Êtes-vous sûr de vouloir déconnecter ?");
-                if (confirmLogout) {
+                Swal.fire({
+                  title: 'Déconnexion',
+                  text: "Êtes-vous sûr de  vouloir déconnecter ?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Oui',
+                  cancelButtonText: 'Non'
+                }).then((result) => {
+                  if (result.isConfirmed) {
                     window.location.href = this.href;
-                }
+                  }
+                });
             });
         }
     }

@@ -12,7 +12,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 20px;
 }
 
 .i {
@@ -23,13 +24,14 @@ body {
   background-color: #fff;
   border-radius: 20px;
   box-shadow: 0 15px 30px rgb(175, 186, 233);
-  position: relative;
   width: 800px;
   max-width: 100%;
   min-height: 480px;
   display: flex;
+  overflow: hidden;
 }
 
+/* Seksyon login */
 .signin-signup {
   width: 50%;
   padding: 50px;
@@ -47,24 +49,6 @@ body {
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 20px;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
-}
-
-.icon {
-  height: 40px;
-  width: 40px;
-  background: #f1f1f1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  text-decoration: none;
-  color: #333;
 }
 
 input {
@@ -104,12 +88,10 @@ input {
   font-weight: 500;
 }
 
+/* Seksyon imaj */
 .overlay-container {
   width: 50%;
   background: linear-gradient(to right, #3E63DD, #3E63DD);
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -120,21 +102,55 @@ input {
   text-align: center;
 }
 
-.overlay-panel h2 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+/* --------------- 📱 MODE RESPONSIVE (TELEFÒN) ------------------- */
+
+@media (max-width: 768px) {
+
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    flex-direction: column;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .signin-signup {
+    width: 100%;
+    padding: 30px 20px;
+  }
+
+  .overlay-container {
+    width: 100%;
+    padding: 20px;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .overlay-panel img {
+    width: 150px;
+    height: auto;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
 }
 
-.overlay-panel p {
-  font-size: 1rem;
-  margin-bottom: 20px;
-}
+@media (max-width: 480px) {
+  .signin-signup {
+    padding: 20px 15px;
+  }
 
-.ghost {
-  background-color: transparent;
-  border: 2px solid white;
-}
+  input {
+    padding: 10px;
+  }
 
-.ghost:hover {
-  background-color: rgba(255,255,255,0.1);
+  #loginBtn {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
 }

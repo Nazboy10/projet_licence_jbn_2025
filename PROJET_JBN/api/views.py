@@ -165,6 +165,43 @@ class LoginAPIView(APIView):
 
 
 
+# deconnecte via api
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from SGCBA.models import Utilisateur
+def logout_view(request):
+    # Méthode 1 : via session['id'] (web)
+    user_id = request.session.get("id")
+    
+    # Méthode 2 : via token dans les headers (mobile/api)
+    auth_header = request.META.get('HTTP_AUTHORIZATION')
+    token = None
+    if auth_header and auth_header.startswith('Token '):
+        token = auth_header.split(' ')[1]
+
+    # Supprimer le token de la base
+    if user_id:
+        try:
+            user = Utilisateur.objects.get(id=user_id)
+            user.token = None
+            user.save()
+        except Utilisateur.DoesNotExist:
+            pass
+    elif token:
+        try:
+            user = Utilisateur.objects.get(token=token)
+            user.token = None
+            user.save()
+        except Utilisateur.DoesNotExist:
+            pass
+
+    logout(request)
+    return redirect('connexion')
+
+
+
+
+
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 
