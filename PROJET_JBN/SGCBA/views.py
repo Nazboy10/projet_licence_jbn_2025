@@ -74,4 +74,4 @@ def changer_photo(request):
 
 
 def utilisateurs(request):
-    return render(request, 'utilisateurs.html')
+    return render(request, 'Utilisateurs.html')
