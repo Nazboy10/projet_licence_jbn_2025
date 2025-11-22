@@ -70,3 +70,8 @@ def changer_photo(request):
         return JsonResponse({'success': True, 'photo_url': user.photo.url})
 
     return JsonResponse({'success': False, 'message': 'Aucune image reçue'})
+
+
+
+def utilisateurs(request):
+    return render(request, 'SGCBA/utilisateurs.html')
