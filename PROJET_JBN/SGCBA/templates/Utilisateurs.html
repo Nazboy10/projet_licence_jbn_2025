@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static '/css/u.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/role-control.js' %}"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -54,7 +55,7 @@
     <!-- Dropdown menu -->
     <div class="profile-dropdown" id="profileDropdown">
         <ul>
-            <li><a href="{% url 'connexion' %}">Déconnecter</a></li>
+            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
         </ul>
     </div>
 </div>
@@ -236,7 +237,38 @@
 </table>
 
 </div>
+<script>
+ let inactivityTimer;
 
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            fetch('/api/logout/', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).finally(() => {
+                // ✅ Remplace alert() par SweetAlert2
+                Swal.fire({
+                    title: 'Session expirée',
+                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    window.location.href = '/connexion/';
+                });
+            });
+        }, 2 * 60 * 1000); // 30 secondes pour test
+    }
+
+    resetInactivityTimer();
+
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    window.addEventListener('scroll', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer);
+</script>
 
 <script src="{% static 'js/utilisateurs.js' %}"></script>
  <script src="{% static 'js/dropdown.js' %}"></script>

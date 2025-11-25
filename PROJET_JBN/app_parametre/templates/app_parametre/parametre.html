@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'app_parametre/css/parametre.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -135,7 +136,7 @@
         </section>
 
         <!-- Académiques -->
-        <section class="section">
+        {% comment %} <section class="section">
           <h2><i class="fas fa-graduation-cap"></i> 📚 Académiques</h2>
           <div class="field-row">
            
@@ -147,7 +148,7 @@
   </label>
 </div>
           </div>
-        </section>
+        </section> {% endcomment %}
 
         
         <!-- Utilisateurs -->
@@ -155,10 +156,10 @@
           <h2><i class="fas fa-users"></i> 👥 Utilisateurs</h2>
           <div class="field-row">
             
-            <div class="field">
+            {% comment %} <div class="field">
               <label for="session_duration">Durée session (minutes)</label>
               <input id="session_duration" name="session_duration" type="number" min="1" placeholder="120" value="{{ param.session_duration|default:120 }}">
-            </div>
+            </div> {% endcomment %}
             <div class="field full">
               <label>Réinitialisation mot de passe par email</label>
               <div>
@@ -188,7 +189,7 @@
         </section>
 
         <!-- Sécurité -->
-        <section class="section">
+        {% comment %} <section class="section">
           <h2><i class="fas fa-shield-alt"></i> 🛡️ Sécurité</h2>
           <div class="field-row">
             <div class="field">
@@ -211,7 +212,7 @@
               </div>
             </div>
           </div>
-        </section>
+        </section> {% endcomment %}
 
         <footer class="form-actions">
           <button type="button" class="btn secondary" onclick="resetForm()">Annuler</button>
@@ -239,7 +240,43 @@ Lorsque vous cliquez sur <strong>Enregistrer</strong>, les modifications seront 
     </div>
   </div>
 
+<script>
 
+
+    let inactivityTimer;
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            fetch('/api/logout/', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).finally(() => {
+                // ✅ Remplace alert() par SweetAlert2
+                Swal.fire({
+                    title: 'Session expirée',
+                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    window.location.href = '/connexion/';
+                });
+            });
+        },2 * 60 * 1000); // 2 minutes d'inactivité
+    }
+
+    resetInactivityTimer();
+
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    window.addEventListener('scroll', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer);
+
+
+
+</script>
        <!-- JS -->
  <script src="{% static 'js/dropdown.js' %}"></script>
  <script src="{% static 'app_parametre/js/pa.js' %}"></script>

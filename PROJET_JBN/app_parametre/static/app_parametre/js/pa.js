@@ -25,36 +25,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+// --- Gestion des switches ---
+document.querySelectorAll('.switch').forEach(switchEl => {
+    const inputName = switchEl.dataset.name;
+    const hiddenInput = document.getElementById(inputName);
 
-    // --- Gestion des switches ---
-    document.querySelectorAll('.switch').forEach(switchEl => {
-        const inputName = switchEl.dataset.name;
-        const hiddenInput = document.getElementById(inputName);
-
-        if (hiddenInput) {
-            // Initialise l'état du switch selon la valeur du champ caché
-            if (hiddenInput.value === '1') {
-                switchEl.classList.add('on');
-            } else {
-                switchEl.classList.remove('on');
-            }
-
-            // Écouteur de clic
-            switchEl.addEventListener('click', () => {
-                switchEl.classList.toggle('on');
-                hiddenInput.value = switchEl.classList.contains('on') ? '1' : '0';
-            });
-
-            // Support clavier (espace ou entrée)
-            switchEl.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    switchEl.click();
-                }
-            });
+    if (hiddenInput) {
+        // Initialise l'état du switch selon la valeur du champ caché
+        if (hiddenInput.value === '1') {
+            switchEl.classList.add('on');
+        } else {
+            switchEl.classList.remove('on');
         }
-    });
 
+        // Écouteur de clic
+        switchEl.addEventListener('click', () => {
+            switchEl.classList.toggle('on');
+            hiddenInput.value = switchEl.classList.contains('on') ? '1' : '0';
+
+            // ✅ Soumettre le formulaire automatiquement
+            const form = document.getElementById('formParam'); // Assure-toi que ton formulaire a cet ID
+            if (form) {
+                form.submit();
+            }
+        });
+
+        // Support clavier (espace ou entrée)
+        switchEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                switchEl.click();
+            }
+        });
+    }
+});
     // --- Prévisualisation du logo ---
     const logoInput = document.getElementById('logoInput');
     const logoPreview = document.getElementById('logoPreview');

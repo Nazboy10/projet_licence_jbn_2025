@@ -141,6 +141,7 @@ class LoginAPIView(APIView):
                 token = user.generate_token()
 
                 # Kenbe session Django
+                
                 request.session['id'] = user.id
                 request.session['username'] = user.username
                 request.session['role'] = user.role
@@ -197,6 +198,47 @@ def logout_view(request):
 
     logout(request)
     return redirect('connexion')
+
+
+
+# deconnexion automatique
+# api/views.py
+
+from django.utils import timezone
+from django.contrib.sessions.models import Session
+from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from SGCBA.models import Utilisateur
+
+@api_view(['POST'])
+def ping_view(request):
+    """
+    Met à jour le dernier moment d'activité de l'utilisateur.
+    """
+    user_id = request.session.get("id")
+    if not user_id:
+        return Response({"error": "Utilisateur non connecté"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = Utilisateur.objects.get(id=user_id)
+        # Tu peux aussi stocker dans la session, ou dans un champ temporaire du modèle
+        request.session['last_activity'] = timezone.now().isoformat()
+        request.session.save()
+        return Response({"success": True})
+    except Utilisateur.DoesNotExist:
+        return Response({"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+
+
+
+
 
 
 

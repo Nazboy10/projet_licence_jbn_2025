@@ -44,13 +44,14 @@ def parametre(request):
 
 
 # views.py
-from django.shortcuts import render
+
 from app_parametre.models import Parametre
 
 def connexion(request):
-    param = Parametre.load()  # Charge les paramètres globaux
+    param = Parametre.load()
+    print("DEBUG: param.pw_reset =", param.pw_reset)
+    print("DEBUG: type =", type(param.pw_reset))
     return render(request, 'connexion.html', {'pw_reset_enabled': param.pw_reset})
-
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse

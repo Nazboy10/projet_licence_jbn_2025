@@ -313,4 +313,12 @@ async function djangoFetch(url, options = {}) {
             if (el) el.textContent = '';
         });
     });
+
+    
+
+
+
+
+
+
 });

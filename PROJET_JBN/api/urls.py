@@ -21,8 +21,10 @@ urlpatterns = [
     path('reset_password/', ResetPasswordAPIView.as_view(), name='api_reset_password'),
     path('reset_password_confirm/<uidb64>/<token>/', ResetPasswordConfirmAPIView.as_view(), name='api_reset_password_confirm'),
     path('api/reset_password_confirm/<uidb64>/<token>/', ResetPasswordConfirmAPIView.as_view(), name='api_reset_password_confirm'),
-     path('reset_password_confirm/<uidb64>/<token>/', reset_password_confirm_page, name='reset_password_confirm_page'),
+    path('reset_password_confirm/<uidb64>/<token>/', reset_password_confirm_page, name='reset_password_confirm_page'),
     path('inscription/', views.api_ajouter_inscription, name='api_ajouter_inscription'),
     path('login/eleve/', views.login_eleve, name='api_login_eleve'),
     path('logout/', logout_view, name="logout"),
+    path('ping/', views.ping_view, name='api_ping'),
+
 ]

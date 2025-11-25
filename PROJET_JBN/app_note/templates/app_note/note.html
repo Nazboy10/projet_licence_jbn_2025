@@ -149,6 +149,43 @@
     </div>
 </div>
 
+<script>
+
+    let inactivityTimer;
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            fetch('/api/logout/', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).finally(() => {
+                // ✅ Remplace alert() par SweetAlert2
+                Swal.fire({
+                    title: 'Session expirée',
+                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    window.location.href = '/connexion/';
+                });
+            });
+        },2 * 60 * 1000); // 2 minutes d'inactivité
+    }
+
+    resetInactivityTimer();
+
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    window.addEventListener('scroll', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer);
+
+
+
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'app_note/js/notes.js' %}"></script>
 <!-- <script>

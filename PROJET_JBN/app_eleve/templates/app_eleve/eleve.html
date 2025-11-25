@@ -476,7 +476,36 @@ document.getElementById('cancelModifier')?.addEventListener('click', () => {
 
 
 
+    let inactivityTimer;
 
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            fetch('/api/logout/', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).finally(() => {
+                // ✅ Remplace alert() par SweetAlert2
+                Swal.fire({
+                    title: 'Session expirée',
+                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(() => {
+                    window.location.href = '/connexion/';
+                });
+            });
+        },2 * 60 * 1000); // 2 minutes d'inactivité
+    }
+
+    resetInactivityTimer();
+
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    window.addEventListener('scroll', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer);
 
 
 

@@ -5,7 +5,7 @@ from api.views import reset_password_page, reset_password_confirm_page
 
 urlpatterns = [
     path("", views.splash, name='splash'),
-    path('connexion/', TemplateView.as_view(template_name="connexion.html"), name="connexion"),
+   path('connexion/', views.connexion, name="connexion"),
     path('dashboard/', views.tableau_de_bord, name='tableau_de_bord'),
     # path('inscription/', views.Inscription, name='inscription'),
     # path('eleve/', views.eleve, name='eleve'),
