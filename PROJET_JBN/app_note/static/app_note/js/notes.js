@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </select>
             </div>
             <div class="col">
-                <input type="number" class="form-control" step="0.01" min="0" max="20" value="${noteValue}" placeholder="Note" required>
+                <input type="number" class="form-control" step="0.01" min="0" max="100" value="${noteValue}" placeholder="Note" required>
             </div>
             <div class="col-auto d-flex align-items-end">
                 <button type="button" class="btn btn-outline-danger btn-sm remove-row">✕</button>
@@ -221,6 +221,8 @@ function chargerNotes() {
                     <td>${el.nom}</td>
                     <td>${el.prenom}</td>
                     <td>${el.classe}</td>
+                   
+                    
                     <td>
                         <button class="btn btn-sm btn-outline-info show-notes" data-notes='${JSON.stringify(el.matieres_notes)}'>
                             👁️ Voir notes
@@ -275,8 +277,18 @@ function chargerNotes() {
         });
 }
 
+
+
+
+
+
+
+
 // Appelle au chargement de la page
 chargerNotes();
+
+
+
 
 
 

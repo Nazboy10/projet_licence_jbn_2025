@@ -1,16 +1,136 @@
-<!-- Interface minimaliste, pas dans le menu -->
-<h2>Gestion des matières (Directeur uniquement)</h2>
-<form method="post">
-  {% csrf_token %}
-  <input type="text" name="nom" placeholder="Nouvelle matière" required>
-  <button type="submit">Ajouter</button>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Matières</title>
+    <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- CSS Custom -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-bottom: none;
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+        .btn-custom:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .list-group-item {
+            border-left: 4px solid #1e3c72;
+            border-radius: 6px !important;
+            margin-bottom: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px 20px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            color: #2a5298;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary fw-bold">
+                <i class="fas fa-book me-2"></i>Gestion des matières
+            </h2>
+            <a href="{% url 'note' %}" class="back-link">
+                <i class="fas fa-arrow-left me-1"></i>Retour au notes
+            </a>
+        </div>
 
-<ul>
-{% for m in matieres %}
-  <li>{{ m.nom }}</li>
-{% empty %}
-  <li>Aucune matière</li>
-{% endfor %}
-</ul>
-<a href="{% url 'tableau_de_bord' %}">Retour</a>
+        {% if role == 'directeur' %}
+        <!-- Formulaire d'ajout -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Ajouter une nouvelle matière</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-md-8">
+                        <input 
+                            type="text" 
+                            name="nom" 
+                            class="form-control form-control-lg" 
+                            placeholder="Ex: Mathématiques, Français, Physique..." 
+                            required
+                            minlength="2">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-custom w-100">
+                            <i class="fas fa-plus me-2"></i>Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Liste des matières -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des matières</h5>
+            </div>
+            <div class="card-body">
+                {% if matieres %}
+                <div class="list-group">
+                    {% for m in matieres %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="fw-medium">{{ m.nom }}</span>
+                        {% if role == 'directeur' %}
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Supprimer cette matière ?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="matiere_id" value="{{ m.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-book-open fa-2x mb-3" style="color: #dee2e6;"></i>
+                    <p class="mb-0">Aucune matière enregistrée</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

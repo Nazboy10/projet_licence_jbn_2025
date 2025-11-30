@@ -7,10 +7,14 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
 from .models import Note, Matiere
 from app_eleve.models import Eleve  # ajuste selon ton app
+from SGCBA.utils import verify_active_session  # Assure-toi que ce chemin est correct
 
 
 def note(request):
     # Optionnel : vérifier le rôle ici ou via middleware
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, "app_note/note.html")
 
 @require_http_methods(["POST"])
@@ -42,6 +46,7 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
 from .models import Note, Matiere
 from app_eleve.models import Eleve
+from app_parametre.models import Parametre
 from SGCBA.models import Utilisateur  # ← ajuste si ton modèle s'appelle autrement
 # app_note/views.py
 
@@ -56,6 +61,19 @@ def enregistrer_notes(request):
 
         user_id = request.session['id']
         saisi_par = get_object_or_404(Utilisateur, id=user_id)
+
+        param = Parametre.load()
+        trimestre_actif = param.trimestre  # ex: 1, 2, 3
+        annee_actuelle = param.annee_academique  # ex: "2025-2026"
+
+        PERIODE_MAP = {
+            1: '1er_trimestre',
+            2: '2eme_trimestre',
+            3: '3eme_trimestre',
+        }
+        periode_actif = PERIODE_MAP.get(trimestre_actif, '1er_trimestre')  # defo: 1er_trimestre
+
+
 
         data = json.loads(request.body)
         code_eleve = data.get('code_eleve')
@@ -79,6 +97,8 @@ def enregistrer_notes(request):
             Note.objects.update_or_create(
                 eleve=eleve,
                 matiere_id=matiere_id,
+                periode=periode_actif,  
+                annee_academique=annee_actuelle,
                 defaults={'valeur': valeur, 'saisi_par': saisi_par}
             )
 
@@ -100,39 +120,53 @@ from django.contrib import messages
 from .models import Matiere
 
 # app_note/views.py
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Matiere
+from SGCBA.utils import verify_active_session
 
 def gestion_matieres(request):
-    # ✅ Vérifie via la session, PAS request.user
-    if 'role' not in request.session:
-        return redirect('connexion')  # ou ta page de login
+    error = verify_active_session(request)
+    if error:
+        return error
 
-    if request.session['role'] != 'directeur':
+    role = request.session.get('role')
+    
+    # Seul le directeur peut ajouter/supprimer
+    if role != 'directeur':
         messages.error(request, "Accès réservé au directeur.")
         return redirect('tableau_de_bord')
 
-    if request.method == 'POST':
-        nom = request.POST.get('nom', '').strip()
-        if nom and not Matiere.objects.filter(nom__iexact=nom).exists():
-            Matiere.objects.create(nom=nom)
-            messages.success(request, f"Matière '{nom}' ajoutée.")
-        else:
-            messages.warning(request, "Matière vide ou déjà existante.")
+    if request.method == "POST":
+        # Ajout
+        if 'nom' in request.POST:
+            nom = request.POST.get('nom', '').strip()
+            if nom and not Matiere.objects.filter(nom__iexact=nom).exists():
+                Matiere.objects.create(nom=nom)
+                messages.success(request, f"La matière '{nom}' a été ajoutée.")
+            else:
+                messages.error(request, "Nom invalide ou matière déjà existante.")
+        
+        # Suppression
+        elif 'matiere_id' in request.POST:
+            matiere_id = request.POST.get('matiere_id')
+            try:
+                matiere = Matiere.objects.get(id=matiere_id)
+                matiere.delete()
+                messages.success(request, f"La matière '{matiere.nom}' a été supprimée.")
+            except Matiere.DoesNotExist:
+                messages.error(request, "Matière non trouvée.")
+
         return redirect('gestion_matieres')
 
     matieres = Matiere.objects.all().order_by('nom')
-    return render(request, 'app_note/gestion_matieres.html', {'matieres': matieres})
+    return render(request, 'app_note/gestion_matieres.html', {
+        'matieres': matieres,
+        'role': role
+    })
 
 
-
-
-
-
-
-# app_note/views.py
+# lister notes avec regroupement par élève et période
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -140,24 +174,24 @@ from .models import Note
 
 @require_http_methods(["GET"])
 def lister_notes(request):
-    # Récupère toutes les notes
     notes = Note.objects.select_related('eleve', 'matiere').all()
-    
-    # Regroupe par élève
-    eleves_notes = {}
+
+    # Regroupement par (élève, période)
+    groupe = {}
     for note in notes:
-        code = note.eleve.code_eleve
-        if code not in eleves_notes:
-            eleves_notes[code] = {
-                'code_eleve': code,
+        key = (note.eleve.code_eleve, note.periode)
+        if key not in groupe:
+            groupe[key] = {
+                'code_eleve': note.eleve.code_eleve,
                 'nom': note.eleve.nom,
                 'prenom': note.eleve.prenom,
-                'classe': note.eleve.classe,
-                'matieres_notes': []  # liste des {matiere: nom, valeur: float}
+                'classe': str(note.eleve.classe) if note.eleve.classe else 'Non spécifiée',
+                'periode': note.periode,  # ✅ On inclut la période ici
+                'matieres_notes': []
             }
-        eleves_notes[code]['matieres_notes'].append({
+        groupe[key]['matieres_notes'].append({
             'matiere': note.matiere.nom,
             'valeur': float(note.valeur)
         })
 
-    return JsonResponse(list(eleves_notes.values()), safe=False)
+    return JsonResponse(list(groupe.values()), safe=False)

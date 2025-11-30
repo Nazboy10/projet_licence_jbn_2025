@@ -9,6 +9,7 @@ import string
 from django.views.decorators.http import require_http_methods
 from app_parametre.models import Parametre
 from app_parametre.models import Parametre
+from SGCBA.utils import verify_active_session
 from app_classe.models import Classe
 # pou inscriptionyon elev
 from datetime import date, timedelta
@@ -16,8 +17,9 @@ from app_journal.utils import log_action  # Importe fonksyon tracabilite a
 
 def inscription(request):
      # Verifye si itilizatè a konekte (selon sesyon ou)
-    if not request.session.get('id'):
-        return redirect('connexion')  # oswa return HttpResponseForbidden("Aksè refize")
+    error = verify_active_session(request)
+    if error:
+        return error  # oswa return HttpResponseForbidden("Aksè refize")
    # ✅ Bon
     classes = Classe.objects.all().order_by('nom_classe')
     today = date.today()
@@ -58,6 +60,7 @@ def get_inscription(request, id):
             "sexe": eleve.sexe,
             "adresse": eleve.adresse,
             "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
+            "lieu_naissance": eleve.lieu_naissance, 
             "classe": eleve.classe,
             "telephone": eleve.telephone,
             "email": eleve.email,
@@ -84,6 +87,7 @@ def modifier_inscription(request, id):
         sexe = request.POST.get("sexe", eleve.sexe).strip()
         adresse = request.POST.get("adresse", eleve.adresse).strip()
         date_naissance = request.POST.get("date_naissance", "")
+        lieu_naissance = request.POST.get("lieu_naissance", "").strip()
         classe = request.POST.get("classe", eleve.classe).strip()
         telephone = request.POST.get("telephone", eleve.telephone).strip()
         email = request.POST.get("email", eleve.email).strip().lower()  # normalize email
@@ -113,6 +117,8 @@ def modifier_inscription(request, id):
         eleve.nom = nom
         eleve.prenom = prenom
         eleve.sexe = sexe
+        eleve.date_naissance = date_naissance
+        eleve.lieu_naissance = lieu_naissance 
         eleve.adresse = adresse
         eleve.classe = classe
         eleve.telephone = telephone
@@ -130,6 +136,7 @@ def modifier_inscription(request, id):
             "sexe": eleve.sexe,
             "adresse": eleve.adresse,
             "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
+             "lieu_naissance": eleve.lieu_naissance,
             "classe": eleve.classe,
             "telephone": eleve.telephone,
             "email": eleve.email,
@@ -206,6 +213,7 @@ def ajouter_inscription(request):
         sexe = request.POST.get("sexe", "").strip()
         adresse = request.POST.get("adresse", "").strip()
         date_naissance = request.POST.get("date_naissance") or None
+        lieu_naissance = request.POST.get("lieu_naissance", "").strip()
         classe = request.POST.get("classe", "").strip()
         telephone = request.POST.get("telephone", "").strip()
         email = request.POST.get("email", "").strip()
@@ -269,6 +277,7 @@ def ajouter_inscription(request):
             adresse=adresse,
             annee_academique=param.annee_academique,
             date_naissance=date_naissance,
+            lieu_naissance=lieu_naissance,
             classe=classe,
             telephone=telephone,
             email=email,
@@ -292,6 +301,7 @@ def ajouter_inscription(request):
             "sexe": eleve.sexe,
             "adresse": eleve.adresse,
             "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
+            "lieu_naissance": eleve.lieu_naissance,
             "classe": eleve.classe,
             "telephone": eleve.telephone,
             "email": eleve.email,

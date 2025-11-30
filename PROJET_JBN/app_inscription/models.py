@@ -5,6 +5,7 @@ class Inscription(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     sexe = models.CharField(max_length=10)
+    lieu_naissance = models.CharField(max_length=100, blank=True, null=True)
     adresse = models.CharField(max_length=255)
     annee_academique = models.CharField(max_length=20, blank=True)
     date_naissance = models.DateField()

@@ -150,6 +150,16 @@
 </div>
         </div>
 
+       <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Lieu de naissance</label>
+            <input type="text" name="lieu_naissance" class="form-control" placeholder="Ex: Port-au-Prince">
+          </div>
+          
+        </div>
+         
+
+
         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Téléphone</label>
@@ -261,10 +271,10 @@
 
     {% if eleve.valide %}
       <!-- ✅ Bouton Modifier -->
-      <button class="btn btn-warning btn-sm"
-        onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
-        <i class="bi bi-pencil"></i>
-      </button>
+     <button class="btn btn-warning btn-sm"
+  onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.lieu_naissance|default:'' }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
+  <i class="bi bi-pencil"></i>
+</button>
 
       {% if role == 'directeur' %}
         <!-- ✅ Bouton Supprimer -->
@@ -322,6 +332,7 @@
             <p class="mb-1"><strong>Prénom :</strong> <span id="detail-prenom" class="text-muted">—</span></p>
             <p class="mb-1"><strong>Sexe :</strong> <span id="detail-sexe" class="text-muted">—</span></p>
             <p class="mb-1"><strong>Naissance :</strong> <span id="detail-date" class="text-muted">—</span></p>
+             <p class="mb-1"><strong>Lieu de Naissance :</strong> <span id="detail-lieu" class="text-muted">—</span></p>
             <p class="mb-1"><strong>Classe :</strong> <span id="detail-classe" class="text-muted">—</span></p>
           </div>
           <div class="col-md-6">
@@ -502,6 +513,7 @@ async function showDetails(id) {
   document.getElementById("detail-prenom").textContent = data.prenom || "—";
   document.getElementById("detail-sexe").textContent = data.sexe || "—";
   document.getElementById("detail-date").textContent = data.date_naissance || "—";
+  document.getElementById("detail-lieu").textContent = data.lieu_naissance || "—";
   document.getElementById("detail-classe").textContent = data.classe || "—";
   document.getElementById("detail-adresse").textContent = data.adresse || "—";
   document.getElementById("detail-tel").textContent = data.telephone || "—";
@@ -516,8 +528,7 @@ async function showDetails(id) {
 </script>
 
 <script>
-// ✅ Modifier élève
-function editEleve(id, nom, prenom, sexe, adresse, date_naissance, classe, telephone, email, nom_tuteur, tel_tuteur) {
+function editEleve(id, nom, prenom, sexe, adresse, date_naissance, lieu_naissance, classe, telephone, email, nom_tuteur, tel_tuteur) {
   const modal = document.getElementById("formModal");
   const form = document.getElementById("inscriptionForm");
 
@@ -530,7 +541,15 @@ function editEleve(id, nom, prenom, sexe, adresse, date_naissance, classe, telep
   form.prenom.value = prenom;
   form.sexe.value = sexe;
   form.adresse.value = adresse;
-  form.date_naissance.value = date_naissance;
+
+  // ✅ Kòrèk pou date_naissance
+  if (date_naissance) {
+    form.date_naissance.value = date_naissance;  // Si gen dat, mete
+  } else {
+    form.date_naissance.value = "";  // Si pa gen dat, vide chpo a
+  }
+
+  form.lieu_naissance.value = lieu_naissance;
   form.classe.value = classe;
   form.telephone.value = telephone;
   form.email.value = email;

@@ -111,7 +111,7 @@ document.querySelector('input[name="search"]').addEventListener('input', functio
     <span id="closeModal" class="close">&times;</span>
     <h4 class="mb-3">Gestion Classe</h4>
 
-    <form id="inscriptionForm" method="post" action="">
+    <form id="inscriptionForm" method="post" >
       {% csrf_token %}
       <div class="row mb-3">
         <div class="col-md-6">
@@ -169,7 +169,12 @@ document.querySelector('input[name="search"]').addEventListener('input', functio
     <td>{{ c.niveau }}</td>
      <td>{{ c.annee_academique }}</td>
     <td>
-      <!-- Ou kapab ajoute URL pou modifye/efase aprè -->
+      
+      {% comment %} modail details {% endcomment %}
+      <button class="btn btn-info btn-sm btn-view-eleves" data-id="{{ c.id }}" title="Voir les élèves">
+    <i class="bi bi-eye"></i>
+  </button>
+
       <button class="btn btn-warning btn-sm btn-edit" data-id="{{ c.id }}">
     <i class="bi bi-pencil"></i>
   </button>
@@ -187,6 +192,49 @@ document.querySelector('input[name="search"]').addEventListener('input', functio
   {% endfor %}
 </tbody>
       </table>
+
+
+
+<!-- Modal "Liste des élèves" -->
+<div id="modalEleves" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="width:600px; max-width:90%;">
+    <span id="closeModalEleves" class="close">&times;</span>
+    <h4>Liste des élèves - <span id="modalClasseNom"></span></h4>
+    <div id="modalElevesList" style="max-height:400px; overflow-y:auto;">
+      <!-- La liste sera chargée ici -->
+    </div>
+    <div class="text-end mt-3">
+      <button id="closeModalBtn" class="btn btn-secondary">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+</style>
+
+
       <!-- Pagination -->
 {% if classes.has_other_pages %}
   <nav aria-label="Pagination" class="mt-4">
@@ -367,12 +415,43 @@ document.querySelector('input[name="search"]').addEventListener('input', functio
     });
   }
 
-  // --- Soumission du formulaire (ajout ou modification) ---
-  document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
-    // On laisse le comportement par défaut (POST HTML classique)
-    // La vue Django redirige → donc pas besoin d’AJAX ici
-    // Si vous voulez éviter le rechargement, on peut passer en AJAX plus tard
-  });
+  // --- Soumission du formulaire (AJAX) ---
+document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // ⚠️ Empêche le rechargement
+
+    const formData = new FormData(this);
+    const btn = this.querySelector('.btn-ajouter');
+    const originalText = btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement...';
+
+    fetch('/classe/ajouter/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Succès !', data.message, 'success').then(() => {
+                location.reload(); // Recharger après succès
+            });
+        } else {
+            Swal.fire('Erreur', data.error, 'error');
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        Swal.fire('Erreur', 'Erreur réseau.', 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+    });
+});
 document.addEventListener('DOMContentLoaded', () => {
   // --- 1. Affichage des messages Django via SweetAlert2 ---
   const messagesContainer = document.getElementById('django-messages');
@@ -405,6 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+    // ✅ FORCER la fermeture du modal au chargement de la page
+    const formModal = document.getElementById('formModal');
+    if (formModal) {
+        formModal.style.display = 'none';
+    }
+
 });
 
 
@@ -457,11 +543,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+// Gestion du clic sur l'œil (voir élèves)
+document.addEventListener('click', function(e) {
+  const viewBtn = e.target.closest('.btn-view-eleves');
+  if (viewBtn) {
+    const classeId = viewBtn.dataset.id;
+    const modal = document.getElementById('modalEleves');
+    const listContainer = document.getElementById('modalElevesList');
+    const nomSpan = document.getElementById('modalClasseNom');
+
+    // Afficher "chargement"
+    listContainer.innerHTML = '<p class="text-center">Chargement...</p>';
+
+    // Appeler l'API
+    fetch(`/classe/api/eleves/${classeId}/`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          nomSpan.textContent = data.classe_nom;
+          
+          if (data.eleves.length === 0) {
+            listContainer.innerHTML = '<p class="text-center text-muted">Aucun élève dans cette classe.</p>';
+          } else {
+            let html = `
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Sexe</th>
+                    <th>Téléphone</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+            data.eleves.forEach(e => {
+              html += `
+                <tr>
+                  <td>${e.code_eleve}</td>
+                  <td>${e.nom}</td>
+                  <td>${e.prenom}</td>
+                  <td>${e.sexe}</td>
+                  <td>${e.telephone || '-'}</td>
+                </tr>
+              `;
+            });
+            html += '</tbody></table>';
+            listContainer.innerHTML = html;
+          }
+
+          // Afficher le modal
+          modal.style.display = 'flex';
+        } else {
+          listContainer.innerHTML = `<p class="text-danger">Erreur : ${data.error}</p>`;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        listContainer.innerHTML = '<p class="text-danger">Erreur de chargement.</p>';
+      });
+  }
+});
+
+// Fermer le modal
+document.getElementById('closeModalEleves').addEventListener('click', () => {
+  document.getElementById('modalEleves').style.display = 'none';
+});
+
+document.getElementById('closeModalBtn').addEventListener('click', () => {
+  document.getElementById('modalEleves').style.display = 'none';
+});
+
+// Fermer en cliquant en dehors
+window.addEventListener('click', (e) => {
+  const modal = document.getElementById('modalEleves');
+  if (e.target === modal) {
+    modal.style.display = 'none';
+  }
+});
+
+
+
+   
+
+
+
+
+
+
+
 </script>
 
  
   <!-- JS -->
-  <script src="{% static 'app_classe/js/classe.js' %}"></script>
+   <script src="{% static 'app_classe/js/classe.js' %}"></script> 
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/role-control.js' %}"></script>
 

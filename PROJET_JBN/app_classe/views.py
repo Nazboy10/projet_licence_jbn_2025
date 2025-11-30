@@ -5,42 +5,17 @@ from django.db.models import Q  # ← Ajout nécessaire pour la recherche
 from .models import Classe
 from app_parametre.models import Parametre
 from app_journal.utils import log_action 
-
+from SGCBA.utils import verify_active_session
+# views.py
 def classe(request):
+    error = verify_active_session(request)
+    if error:
+        return error
+
     role = request.session.get('role', None)
-    if request.method == "POST":
-        nom = request.POST.get("nom_classe", "").strip()
-        niveau = request.POST.get("niveau", "").strip()
-       
-        if not nom or not niveau:
-            messages.error(request, "Veuillez remplir tous les champs requis.")
-        elif Classe.objects.filter(nom_classe__iexact=nom).exists():
-            messages.error(request, f"Une classe nommée « {nom} » existe déjà.")
-        else:
-            klas = Classe.objects.create(nom_classe=nom, niveau=niveau)
 
-               # ✅ Kenbe aksyon an
-            log_action(
-                request=request,
-                action='ajoute',
-                objet_type='Classe',
-                 objet_id=klas.id,
-                description=f"Klas ID {klas.id} ({klas.nom_classe}) te ajoute pa {request.session.get('username')}."
-            )
-
-
-            messages.success(request, "La classe a été ajoutée avec succès !")
-        
-        # Conserver le terme de recherche après soumission
-        search_query = request.GET.get('search', '')
-        if search_query:
-            return redirect(f"{request.path}?search={search_query}")
-        return redirect('classe')
-
-    # 🔍 Récupérer le terme de recherche depuis l'URL (?search=...)
+    # 🔍 Recherche + pagination (inchangé)
     search_query = request.GET.get('search', '').strip()
-
-    # 🔍 Filtrer les classes si un terme est fourni
     classes_list = Classe.objects.all()
     if search_query:
         classes_list = classes_list.filter(
@@ -51,8 +26,6 @@ def classe(request):
         )
 
     classes_list = classes_list.order_by('-id')
-
-    # 📄 Pagination : 5 éléments par page
     paginator = Paginator(classes_list, 5)
     page_number = request.GET.get('page')
     try:
@@ -66,10 +39,55 @@ def classe(request):
     context = {
         'classes': classes,
         'annee_academique': param.annee_academique,
-        'search_query': search_query,  # ← pour pré-remplir le champ de recherche
+        'search_query': search_query,
         'role': role,
     }
     return render(request, "app_classe/classe.html", context)
+
+
+
+
+
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+
+@require_http_methods(["POST"])
+def ajouter_classe_api(request):
+    nom = request.POST.get("nom_classe", "").strip()
+    niveau = request.POST.get("niveau", "").strip()
+    annee_academique = request.POST.get("annee_academique", "").strip()
+
+    if not nom or not niveau:
+        return JsonResponse({"success": False, "error": "Tous les champs sont requis."}, status=400)
+
+    if Classe.objects.filter(nom_classe__iexact=nom).exists():
+        return JsonResponse({"success": False, "error": f"Une classe nommée « {nom} » existe déjà."}, status=400)
+
+    klas = Classe.objects.create(
+        nom_classe=nom,
+        niveau=niveau,
+        annee_academique=annee_academique
+    )
+
+    log_action(
+        request=request,
+        action='ajoute',
+        objet_type='Classe',
+        objet_id=klas.id,
+        description=f"Klas ID {klas.id} ({klas.nom_classe}) te ajoute pa {request.session.get('username')}."
+    )
+
+    return JsonResponse({"success": True, "message": "Classe ajoutée avec succès !"})
+
+
+
+
+
+
+
+
 
 # modification
 from django.http import JsonResponse
@@ -146,3 +164,36 @@ def supprimer_classe(request, id):
         
         
     return JsonResponse({"success": False, "error": "Requête invalide."})
+
+
+
+
+# app_classe/views.py
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from app_eleve.models import Eleve  # ✅ Importer Eleve au lieu de Inscription
+from .models import Classe
+
+def get_eleves_par_classe(request, classe_id):
+    """
+    Renvoie la liste des élèves ACTIFS d'une classe donnée (à partir du modèle Eleve).
+    """
+    try:
+        classe = get_object_or_404(Classe, id=classe_id)
+        # ✅ Filtrer les élèves actifs dont le champ 'classe' correspond à 'nom_classe' de la classe
+        eleves = Eleve.objects.filter(
+            classe=classe.nom_classe,  # Correspondance : Eleve.classe == Classe.nom_classe
+            actif=True                 # Seulement les élèves actifs
+        ).values(
+            'code_eleve', 'nom', 'prenom', 'sexe', 'telephone'
+        )
+        return JsonResponse({
+            'success': True,
+            'classe_nom': classe.nom_classe,
+            'eleves': list(eleves)
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)

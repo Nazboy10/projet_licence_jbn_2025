@@ -7,24 +7,51 @@ from app_eleve.models import Eleve
 from app_note.models import Note
 from .models import Bulletin
 from django.contrib.auth import get_user_model
+from SGCBA.utils import verify_active_session
+
 
 User = get_user_model()
 
 # ✅ 1. Vue principale : affiche le template HTML
 def bulletin(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, "app_bulletin/bulletin.html")
+# app_bulletin/views.py
 
-# ✅ 2. Vue API : génère et sauvegarde le bulletin
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from app_eleve.models import Eleve
+from app_note.models import Note
+from .models import Bulletin
+from SGCBA.models import Utilisateur  # ← IMPORT DIRECT
+from app_parametre.models import Parametre  # ✅ Nouvo
+
+User = Utilisateur
+
+# ... (ta vue bulletin inchangée)
+
 @require_http_methods(["GET"])
 def api_bulletin_eleve(request):
     code = request.GET.get('code')
-    periode = request.GET.get('periode', '1er_trimestre')
+    # ✅ Chache paramèt aktif epi itilize periode ki aktif
+    param = Parametre.load()
+    trimestre_actif = param.trimestre  # ex: 1, 2, 3
+    # ✅ Konvèti trimestre (1, 2, 3) --> periode ('1er_trimestre', '2eme_trimestre', '3eme_trimestre')
+    PERIODE_MAP = {1: '1er_trimestre', 2: '2eme_trimestre', 3: '3eme_trimestre'}
+    periode = PERIODE_MAP.get(trimestre_actif, '1er_trimestre')  # defo: 1er_trimestre
+
+    # ✅ Retire `periode` de request.GET (si ou te itilize l avan)
+    # periode = request.GET.get('periode', '1er_trimestre')  # retire sa
 
     if not code:
         return JsonResponse({'erreur': 'Code élève requis'}, status=400)
 
     try:
         eleve = Eleve.objects.get(code_eleve=code, actif=True)
+        # ✅ Itilize periode ki aktif
         notes_qs = Note.objects.filter(eleve=eleve, periode=periode).select_related('matiere')
 
         if not notes_qs.exists():
@@ -62,7 +89,7 @@ def api_bulletin_eleve(request):
                 user = User.objects.get(id=user_id)
                 Bulletin.objects.get_or_create(
                     eleve=eleve,
-                    periode=periode,
+                    periode=periode,  # ✅ Itilize periode ki aktif
                     defaults={
                         'moyenne': round(moyenne, 2),
                         'mention': mention,
@@ -80,7 +107,7 @@ def api_bulletin_eleve(request):
                 'classe': eleve.classe,
             },
             'notes': notes,
-            'periode': periode,
+            'periode': periode,  # ✅ Retounen periode ki aktif
             'total_pondere': round(total_pondere, 2),
             'moyenne': round(moyenne, 2),
             'mention': mention
@@ -93,38 +120,31 @@ def api_bulletin_eleve(request):
 
 
 
-
-
-
-
 # app_bulletin/views.py
+from app_parametre.models import Parametre  # ✅ Nouvo
 
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_protect
-from app_eleve.models import Eleve
-from app_note.models import Note
-from .models import Bulletin
-from SGCBA.models import Utilisateur  # ← IMPORT DIRECT
 
-User = Utilisateur  # ← PAS get_user_model()
-
-# ... (ta vue bulletin et api_bulletin_eleve inchangées)
-
-@csrf_protect
 @require_http_methods(["POST"])
 def api_enregistrer_bulletin(request):
     import json
     try:
         data = json.loads(request.body)
         code_eleve = data.get('code')
-        periode = data.get('periode', '1er_trimestre')
+        # ✅ Chache paramèt aktif epi itilize periode ki aktif
+        param = Parametre.load()
+        trimestre_actif = param.trimestre  # ex: 1, 2, 3
+        # ✅ Konvèti trimestre (1, 2, 3) --> periode ('1er_trimestre', '2eme_trimestre', '3eme_trimestre')
+        PERIODE_MAP = {1: '1er_trimestre', 2: '2eme_trimestre', 3: '3eme_trimestre'}
+        periode = PERIODE_MAP.get(trimestre_actif, '1er_trimestre')  # defo: 1er_trimestre
+
+        # ✅ Retire `periode` de request.POST (si ou te itilize l avan)
+        # periode = data.get('periode', '1er_trimestre')  # retire sa
 
         if not code_eleve:
             return JsonResponse({'erreur': 'Code élève requis'}, status=400)
 
         eleve = Eleve.objects.get(code_eleve=code_eleve, actif=True)
+        # ✅ Itilize periode ki aktif
         notes_qs = Note.objects.filter(eleve=eleve, periode=periode)
 
         if not notes_qs.exists():
@@ -150,10 +170,10 @@ def api_enregistrer_bulletin(request):
         user_id = request.session.get('id')
         if user_id:
             try:
-                user = User.objects.get(id=user_id)  # ← Utilisateur, pas auth.User
+                user = User.objects.get(id=user_id)
                 bulletin, created = Bulletin.objects.get_or_create(
                     eleve=eleve,
-                    periode=periode,
+                    periode=periode,  # ✅ Itilize periode ki aktif
                     defaults={'moyenne': round(moyenne, 2), 'mention': mention, 'genere_par': user}
                 )
                 return JsonResponse({'success': True, 'message': 'Bulletin enregistré.', 'created': created})
@@ -176,11 +196,26 @@ def api_enregistrer_bulletin(request):
 
 
 
+# app_bulletin/views.py
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from app_eleve.models import Eleve
+from app_note.models import Note
+from .models import Bulletin  # ✅ Nouvo
+from SGCBA.models import Utilisateur
+from app_parametre.models import Parametre
+
+User = Utilisateur
+
+# ... (lòt views) ...
+
 @require_http_methods(["GET"])
 def api_liste_eleves_pour_bulletin(request):
-    # ✅ Sèl chanjman: "note" → "notes" (avèk "s")
-    eleves_avec_notes = Eleve.objects.filter(
-        notes__isnull=False,  # ← ICI: "notes", pa "note"
+    # ✅ Chache tout elèv ki gen yon `Bulletin` (san distingue periode)
+    eleves_avec_bulletin = Eleve.objects.filter(
+        bulletin__isnull=False,  # Elèv ki gen 1+ bulletin
         actif=True
     ).distinct().values(
         'code_eleve',
@@ -189,14 +224,23 @@ def api_liste_eleves_pour_bulletin(request):
         'classe'
     )
 
-    liste = [
-        {
-            'code': e['code_eleve'],
-            'nom': e['nom'],
-            'prenom': e['prenom'],
-            'classe': e['classe'] or 'Non spécifiée'
-        }
-        for e in eleves_avec_notes
-    ]
+    liste = []
+    for e in eleves_avec_bulletin:
+        # ✅ Chache tout `Bulletin` pou chak elèv epi ajoute yo nan lis la
+        bulletins = Bulletin.objects.filter(
+            eleve__code_eleve=e['code_eleve']
+        ).values('periode', 'moyenne', 'mention')  # oubyen sèl bagay ou bezwen
+
+        for bulletin in bulletins:
+            liste.append({
+                'code': e['code_eleve'],
+                'nom': e['nom'],
+                'prenom': e['prenom'],
+                'classe': e['classe'] or 'Non spécifiée',
+                'periode': bulletin['periode'],  # ✅ Nouvo: ajoute periode
+                'moyenne': bulletin['moyenne'],  # ✅ Opsyonal: ajoute moyenne
+                'mention': bulletin['mention'],  # ✅ Opsyonal: ajoute mention
+            })
 
     return JsonResponse(liste, safe=False)
+

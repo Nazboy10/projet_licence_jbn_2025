@@ -3,19 +3,42 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .models import Eleve
+from SGCBA.utils import verify_active_session
 
+# app_eleve/views.py
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.db.models import Q  # ← Pour la recherche
+from .models import Eleve
+from SGCBA.utils import verify_active_session
 
 def eleve(request):
     role = request.session.get('role')
     if role not in ['directeur', 'secretaire', 'censeur']:
         return HttpResponseForbidden("Aksè refize.")
+    
+    error = verify_active_session(request)
+    if error:
+        return error
 
-    # Récupérer tous les élèves
+    # 🔍 Récupérer le terme de recherche
+    search_query = request.GET.get('search', '').strip()
+
+    # 🔍 Filtrer les élèves
     eleves = Eleve.objects.all()
+    if search_query:
+        eleves = eleves.filter(
+            Q(code_eleve__icontains=search_query) |
+            Q(nom__icontains=search_query) |
+            Q(prenom__icontains=search_query) |
+            Q(classe__icontains=search_query)
+        )
 
     context = {
         'eleves': eleves,
         'role': role,
+        'search_query': search_query,  # Pour pré-remplir le champ
     }
     return render(request, 'app_eleve/eleve.html', context)
 
@@ -65,6 +88,7 @@ def eleve_details(request, id):
         "date_naissance": eleve.date_naissance.strftime("%d/%m/%Y") if eleve.date_naissance else None,
         "date_naissance_raw": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
         "annee_academique": eleve.annee_academique,
+        "lieu_naissance": eleve.lieu_naissance,
         "actif": eleve.actif,
         "photo_url": eleve.photo.url if eleve.photo else None,
     }

@@ -6,16 +6,18 @@ from .permissions import IsDirecteur
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import BasePermission
 from app_journal.utils import log_action
-
-
 class IsLoggedIn(BasePermission):
-    """
-    Verifye ke itilizatè a gen sesyon aktif
-    """
     def has_permission(self, request, view):
-        return request.session.get('id') is not None
+        user_id = request.session.get('id')
+        if not user_id:
+            return False
 
-
+        try:
+            user = Utilisateur.objects.get(id=user_id)
+            # ✅ Vérifie que la session actuelle est bien celle enregistrée
+            return user.session_key == request.session.session_key
+        except Utilisateur.DoesNotExist:
+            return False
 class UtilisateurViewSet(viewsets.ModelViewSet):
     queryset = Utilisateur.objects.all()
     serializer_class = UtilisateurSerializer
@@ -92,23 +94,21 @@ class UtilisateurViewSet(viewsets.ModelViewSet):
 
 
 #vieuw pou login via api
+# api/views.py
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
-
+from django.contrib.sessions.models import Session
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from SGCBA.models import Utilisateur
 from .serializers import UtilisateurSerializer
+from django.contrib.sessions.models import Session
 class LoginAPIView(APIView):
-    """
-    Login via API, retounen done itilizatè + token, verifye si deja konekte.
-    """
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -121,41 +121,35 @@ class LoginAPIView(APIView):
 
         try:
             user = Utilisateur.objects.get(email=email)
-
             if not user.actif:
                 return Response(
-                    {"success": False, "error": "Utilisateur désactivé. Contactez l’administration."},
+                    {"success": False, "error": "Utilisateur désactivé."},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            if user.check_password(password):
-
-                # ✅ Si itilizatè a deja gen token, li deja konekte
-                if user.token:
-                    return Response(
-                        {"success": False, "error": "Utilisateur déjà connecté"},
-                        status=status.HTTP_403_FORBIDDEN
-                    )
-
-                # Kreye token pou premye fwa
-                token = user.generate_token()
-
-                # Kenbe session Django
-                
-                request.session['id'] = user.id
-                request.session['username'] = user.username
-                request.session['role'] = user.role
-
-                serializer = UtilisateurSerializer(user)
-                return Response(
-                    {"success": True, "user": serializer.data, "token": token},
-                    status=status.HTTP_200_OK
-                )
-            else:
+            if not user.check_password(password):
                 return Response(
                     {"success": False, "error": "Mot de passe incorrect"},
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+
+            # ✅ 1. D'abord, définir les données dans la session
+            request.session['id'] = user.id
+            request.session['username'] = user.username
+            request.session['role'] = user.role
+
+            # ✅ 2. Ensuite, sauvegarder la session pour générer un session_key valide
+            request.session.save()  # ⚠️ Doit être APRÈS la définition des données
+
+            # ✅ 3. Maintenant, session_key est valide
+            user.session_key = request.session.session_key
+            user.save(update_fields=['session_key'])
+
+            serializer = UtilisateurSerializer(user)
+            return Response(
+                {"success": True, "user": serializer.data},
+                status=status.HTTP_200_OK
+            )
 
         except Utilisateur.DoesNotExist:
             return Response(
@@ -163,36 +157,17 @@ class LoginAPIView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-
-
-
 # deconnecte via api
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from SGCBA.models import Utilisateur
 def logout_view(request):
-    # Méthode 1 : via session['id'] (web)
     user_id = request.session.get("id")
-    
-    # Méthode 2 : via token dans les headers (mobile/api)
-    auth_header = request.META.get('HTTP_AUTHORIZATION')
-    token = None
-    if auth_header and auth_header.startswith('Token '):
-        token = auth_header.split(' ')[1]
-
-    # Supprimer le token de la base
     if user_id:
         try:
             user = Utilisateur.objects.get(id=user_id)
-            user.token = None
-            user.save()
-        except Utilisateur.DoesNotExist:
-            pass
-    elif token:
-        try:
-            user = Utilisateur.objects.get(token=token)
-            user.token = None
-            user.save()
+            user.session_key = None
+            user.save(update_fields=['session_key'])
         except Utilisateur.DoesNotExist:
             pass
 

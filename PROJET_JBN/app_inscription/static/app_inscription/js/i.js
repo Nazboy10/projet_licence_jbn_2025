@@ -118,6 +118,7 @@ async function loadAndEdit(id) {
     form.sexe.value = data.sexe || "";
     form.adresse.value = data.adresse || "";
     form.date_naissance.value = data.date_naissance || "";
+    form.lieu_naissance.value = data.lieu_naissance || "";
     form.classe.value = data.classe || "";
     form.telephone.value = data.telephone || "";
     form.email.value = data.email || "";

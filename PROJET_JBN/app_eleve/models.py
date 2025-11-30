@@ -14,6 +14,7 @@ class Eleve(models.Model):
     annee_academique = models.CharField(max_length=20, blank=True)
     date_naissance = models.DateField(null=True, blank=True)  # Car peut-être vide
     email = models.EmailField(blank=True, null=True)
+    lieu_naissance = models.CharField(max_length=100, blank=True, null=True) 
 
     # ✅ nouvo chan yo
     photo = models.ImageField(upload_to='eleves_photos/', blank=True, null=True)

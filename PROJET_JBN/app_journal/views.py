@@ -3,11 +3,14 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden
 from .models import AuditLog
 from django.core.paginator import Paginator
+from SGCBA.utils import verify_active_session
 
 def journal_activite(request):
     if request.session.get('role') != 'directeur':
         return HttpResponseForbidden("Aksè refize.")
-    
+    error = verify_active_session(request)
+    if error:
+        return error
     logs = AuditLog.objects.all()
 
      # Pajinasyon

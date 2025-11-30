@@ -47,10 +47,16 @@
         <div class="header">
             <h1>DOSSIER ELEVE</h1>
             <div class="search-profile">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
-                </div>
+               <div class="search-bar" style="display: flex; align-items: center; gap: 8px;">
+    <i class="fas fa-search" id="icone" style="color: #6c757d;"></i>
+    <input 
+        type="text" 
+        id="searchInput"
+        placeholder="      Rechercher un élève" 
+        value="{{ search_query }}"
+        style="padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; width: 300px;"
+    >
+</div>
                <div class="profile">
     <i class="fas fa-bell notification-icon"></i>
     <div class="user-avatar" id="profileDropdownToggle">
@@ -324,6 +330,11 @@
   <script src="{% static 'js/role-control.js' %}"></script>
 
 
+
+
+
+
+
 <script>
 
 function getCSRFToken() {
@@ -368,6 +379,39 @@ function toggleActif(id, actif) {
   });
 }
 
+// ✅ fonction rechercher
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchValue = this.value.trim();
+    
+    // Filtrer les lignes du tableau en temps réel
+    const rows = document.querySelectorAll('#tableEleves tbody tr');
+    let found = false;
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (searchValue === '' || text.includes(searchValue.toLowerCase())) {
+            row.style.display = '';
+            found = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Message si aucun résultat
+    const noResult = document.getElementById('noResult');
+    if (searchValue !== '' && !found) {
+        if (!noResult) {
+            const message = document.createElement('tr');
+            message.id = 'noResult';
+            message.innerHTML = `<td colspan="8" class="text-center text-muted">Aucun élève trouvé</td>`;
+            document.querySelector('#tableEleves tbody').appendChild(message);
+        }
+    } else if (noResult) {
+        noResult.remove();
+    }
+});
+
+
 
 function voirDetails(id) {
   fetch(`/eleve/details/${id}/`)
@@ -390,6 +434,8 @@ function voirDetails(id) {
             <p><strong>Email :</strong> ${e.email || '—'}</p>
             <p><strong>Date naissance :</strong> ${e.date_naissance || '—'}</p>
             <p><strong>Année académique :</strong> ${e.annee_academique || '—'}</p>
+             <p><strong>Lieu de Naissance :</strong> ${e.lieu_naissance || '—'}</p>
+
             <p><strong>Statut :</strong> ${e.actif ? '<span class="badge bg-success">Actif</span>' : '<span class="badge bg-danger">Inactif</span>'}</p>
           </div>
         </div>

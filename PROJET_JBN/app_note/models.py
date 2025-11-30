@@ -24,6 +24,7 @@ class Note(models.Model):
         ],
         default='1er_trimestre'
     )
+    annee_academique = models.CharField(max_length=20, default="2025-2026")
     saisi_par = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True)
 
     class Meta:

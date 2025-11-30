@@ -9,4 +9,5 @@ urlpatterns = [
     path("api/enregistrer-notes/", views.enregistrer_notes, name="enregistrer_notes"),
     path("matieres/gestion/", views.gestion_matieres, name="gestion_matieres"),
     path("api/notes/", views.lister_notes, name="lister_notes"),
+     path('matieres/', views.gestion_matieres, name='gestion_matieres'),
 ]

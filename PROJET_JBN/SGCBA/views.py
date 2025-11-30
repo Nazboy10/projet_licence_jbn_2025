@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect
 from SGCBA.models import Utilisateur  # Asire modèl ou importé
 from app_inscription.models import Inscription
+from SGCBA.utils import verify_active_session 
 # view pou splashScreen lan
 def splash(request):
     return render(request, 'splash.html')
 
 # view pou dashboard la
 def tableau_de_bord(request):
-    if 'id' not in request.session:
-        return redirect('connexion')  # Si itilizatè pa konekte
+    error = verify_active_session(request)  # ✅ Vérification
+    if error:
+        return error  # Si itilizatè pa konekte
     
      # Kalkile kantite enskripsyon total
     total_inscriptions = Inscription.objects.count()
@@ -22,24 +24,45 @@ def tableau_de_bord(request):
 
 # views pou meni yo
 def inscription(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'inscription.html')
 
 def eleve(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'dossier_eleves.html')
 
 def presence(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'presence.html')
 
 def note(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'notes.html')
 
 def bulletin(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'bulletin.html')
 
 def utilisateurs(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'utilisateurs.html')
 
 def parametre(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'parametres.html')
 
 
@@ -75,4 +98,7 @@ def changer_photo(request):
 
 
 def utilisateurs(request):
+    error = verify_active_session(request)
+    if error:
+        return error
     return render(request, 'Utilisateurs.html')

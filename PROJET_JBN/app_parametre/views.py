@@ -2,10 +2,15 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Parametre
+from SGCBA.utils import verify_active_session
 
 def parametre_view(request):
     param = Parametre.load()
-
+    
+    error = verify_active_session(request)
+    if error:
+        return error
+    
     if request.method == "POST":
         # Généraux
         param.nom_etablissement = request.POST.get("nom_etablissement", param.nom_etablissement)

@@ -18,6 +18,7 @@ class Utilisateur(models.Model):
     actif = models.BooleanField(default=True) 
     photo = models.ImageField(upload_to="photos_profil/", default="photos_profil/pro.png", blank=True)
     token = models.CharField(max_length=255, blank=True, null=True)
+    session_key = models.CharField(max_length=64, blank=True, null=True) 
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
