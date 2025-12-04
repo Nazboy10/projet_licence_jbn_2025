@@ -91,7 +91,7 @@ def enregistrer_notes(request):
             if not matiere_id or valeur is None:
                 return JsonResponse({'erreur': 'Matière ou note manquante'}, status=400)
 
-            if not (0 <= float(valeur) <= 20):
+            if not (0 <= float(valeur) <= 100):
                 return JsonResponse({'erreur': f'Note invalide : {valeur}'}, status=400)
 
             Note.objects.update_or_create(
@@ -195,3 +195,131 @@ def lister_notes(request):
         })
 
     return JsonResponse(list(groupe.values()), safe=False)
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from .models import Note
+from app_eleve.models import Eleve
+
+@require_http_methods(["DELETE"])
+def supprimer_notes_eleve(request, code_eleve):
+    try:
+        # Vérifier l'authentification via session
+        if 'id' not in request.session:
+            return JsonResponse({'erreur': 'Non authentifié'}, status=401)
+
+        # Charger la période et année académique actives
+        from app_parametre.models import Parametre
+        param = Parametre.load()
+        trimestre_actif = param.trimestre
+        annee_actuelle = param.annee_academique
+
+        PERIODE_MAP = {
+            1: '1er_trimestre',
+            2: '2eme_trimestre',
+            3: '3eme_trimestre',
+        }
+        periode_actif = PERIODE_MAP.get(trimestre_actif, '1er_trimestre')
+
+        # Trouver l'élève
+        eleve = get_object_or_404(Eleve, code_eleve=code_eleve, actif=True)
+
+        # Supprimer toutes les notes de cet élève pour la période + année actives
+        deleted_count, _ = Note.objects.filter(
+            eleve=eleve,
+            periode=periode_actif,
+            annee_academique=annee_actuelle
+        ).delete()
+
+        if deleted_count == 0:
+            return JsonResponse({'message': 'Aucune note à supprimer pour cette période.'}, status=200)
+
+        return JsonResponse({'success': True, 'message': f'{deleted_count} note(s) supprimée(s).'})
+
+    except Exception as e:
+        print("Erreur suppression :", str(e))
+        return JsonResponse({'erreur': 'Erreur serveur.'}, status=500)
+    
+
+
+
+
+
+
+
+
+
+
+
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from .models import Note, Matiere
+from app_eleve.models import Eleve
+from app_parametre.models import Parametre
+from SGCBA.models import Utilisateur
+import json
+
+@require_http_methods(["PUT"])
+def modifier_notes_eleve(request):
+    try:
+        if 'id' not in request.session:
+            return JsonResponse({'erreur': 'Non authentifié'}, status=401)
+
+        user_id = request.session['id']
+        saisi_par = get_object_or_404(Utilisateur, id=user_id)
+
+        param = Parametre.load()
+        trimestre_actif = param.trimestre
+        annee_actuelle = param.annee_academique
+
+        PERIODE_MAP = {
+            1: '1er_trimestre',
+            2: '2eme_trimestre',
+            3: '3eme_trimestre',
+        }
+        periode_actif = PERIODE_MAP.get(trimestre_actif, '1er_trimestre')
+
+        data = json.loads(request.body)
+        code_eleve = data.get('code_eleve')
+        notes_data = data.get('notes', [])
+
+        if not code_eleve or not notes_data:
+            return JsonResponse({'erreur': 'Données manquantes'}, status=400)
+
+        eleve = get_object_or_404(Eleve, code_eleve=code_eleve, actif=True)
+
+        # Supprimer les anciennes notes pour cet élève, période et année
+        Note.objects.filter(
+            eleve=eleve,
+            periode=periode_actif,
+            annee_academique=annee_actuelle
+        ).delete()
+
+        # Ré-insérer les nouvelles notes
+        for item in notes_data:
+            matiere_id = item.get('matiere_id')
+            valeur = item.get('valeur')
+
+            if not matiere_id or valeur is None:
+                return JsonResponse({'erreur': 'Matière ou note manquante'}, status=400)
+
+            if not (0 <= float(valeur) <= 100):
+                return JsonResponse({'erreur': f'Note invalide : {valeur}'}, status=400)
+
+            Note.objects.create(
+                eleve=eleve,
+                matiere_id=matiere_id,
+                periode=periode_actif,
+                annee_academique=annee_actuelle,
+                valeur=valeur,
+                saisi_par=saisi_par
+            )
+
+        return JsonResponse({'success': True, 'message': 'Notes modifiées avec succès.'})
+
+    except Exception as e:
+        print("Erreur modification :", str(e))
+        return JsonResponse({'erreur': 'Erreur serveur.'}, status=500)
