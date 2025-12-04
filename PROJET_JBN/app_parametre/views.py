@@ -41,4 +41,4 @@ def parametre_view(request):
         messages.success(request, "✅ Paramètres enregistrés avec succès !")
         return redirect("parametre")
 
-    return render(request, "app_parametre/Parametre.html", {"param": param})
+    return render(request, "app_parametre/parametre.html", {"param": param})

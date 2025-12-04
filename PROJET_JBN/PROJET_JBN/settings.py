@@ -4,7 +4,7 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Pou wè erè detaye sou Render
+# # Pou wè erè detaye sou Render
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
