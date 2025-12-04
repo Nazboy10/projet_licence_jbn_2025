@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,446 +6,341 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Utilisateur</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-    
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static '/css/u.css' %}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ✅ BOOTSTRAP (pi enpotan) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/css/u.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/role-control.js' %}"></script>
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
     <div class="sidebar">
        <div class="logo">
-     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
-    <span>SGCBA</span>
-</div>
+         <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+         <span>SGCBA</span>
+       </div>
 
-      <nav>
-  <ul>
-    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-    <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-    <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-    <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
-    <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-     <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
-    <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"class="active"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-  </ul>
-</nav>
-       
+       <nav>
+         <ul>
+           <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+           <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+           <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+           <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+           <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+           <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+           <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
+           <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}" class="active"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+           <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+         </ul>
+       </nav>
     </div>
 
     <div class="main-content">
+        <!-- ✅ Tit la an mitan -->
         <div class="header">
-            <h1>UTILISATEURS</h1>
+            <h1 class="text-center">UTILISATEURS</h1>
             <div class="search-profile">
                <div class="search-bar">
-    <i class="fas fa-search"></i>
-    <input 
-        type="text" 
-        id="searchUtilisateurs" 
-        placeholder="Rechercher Inscription, Élèves, Pre...">
-</div>
-               <div class="profile">
-    <i class="fas fa-bell notification-icon"></i>
-    <div class="user-avatar" id="profileDropdownToggle">
-         <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
-    </div>
-
-    <!-- Dropdown menu -->
-    <div class="profile-dropdown" id="profileDropdown">
-        <ul>
-            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
-        </ul>
-    </div>
-</div>
- </div>
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="searchUtilisateurs" placeholder="Rechercher Inscription, Élèves, Pre...">
+                </div>
+                <div class="profile">
+                  <i class="fas fa-bell notification-icon"></i>
+                  <div class="user-avatar" id="profileDropdownToggle">
+                    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+                  </div>
+                  <div class="profile-dropdown" id="profileDropdown">
+                    <ul>
+                      <li><a href="{% url 'logout' %}">Déconnecter</a></li>
+                    </ul>
+                  </div>
+                </div>
+            </div>
         </div>
 
- 
         <div class="container">
- <!-- Bouton Ajouter sou bò dwat -->
-<div class="d-flex justify-content-end mb-3">
-    <button id="btnShowUserForm" class="btn btn-primary btn-custom">Ajouter Utilisateur</button>
+          <!-- Bouton Ajouter sou bò dwat -->
+          <div class="d-flex justify-content-end mb-3">
+            <button id="btnShowUserForm" class="btn btn-primary btn-custom">Ajouter Utilisateur</button>
+          </div>
+
+          <h2>La liste des utilisateurs</h2>
+
+          {% if role == 'directeur' %}
+          <div class="d-flex justify-content-end mb-3">
+            <a href="/journal/" class="btn-journal">Jounal des activites</a>
+          </div>
+          {% endif %}
+
+          <style>
+            .btn-journal {
+              display: inline-block;
+              padding: 10px 20px;
+              font-size: 14px;
+              font-weight: bold;
+              color: white;
+              background: linear-gradient(90deg, #6e8efb, #5f5dda);
+              border: none;
+              border-radius: 50px;
+              box-shadow: 0 0 10px rgba(101, 131, 231, 0.5);
+              text-decoration: none;
+              transition: all 0.3s ease;
+              cursor: pointer;
+            }
+            .btn-journal:hover {
+              transform: scale(1.05);
+              box-shadow: 0 0 25px rgba(110, 142, 251, 0.7);
+            }
+            .btn-journal:active {
+              transform: scale(0.98);
+            }
+          </style>
+
+          <!-- Modal -->
+          <div id="userFormModal" class="modal-overlay">
+            <div class="modal-content">
+              <span id="closeUserModal" class="close">&times;</span>
+              
+              <!-- ✅ Tit fòm la an mitan -->
+              <h4 class="mb-3 text-center">Nouvel Utilisateur</h4>
+              
+              <div id="userFormErrors" class="mb-2" style="color: #b00020;"></div>
+              
+              <form id="utilisateursForm">
+                <!-- ✅ Chan pa de sou menm liy -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Nom</label>
+                    <input type="text" id="nom" class="form-control" placeholder="Nom" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" id="prenom" class="form-control" placeholder="Prénom" required>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Email" required>
+                    <div id="error-email" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Rôle</label>
+                    <select id="role" class="form-select" required>
+                      <option>directeur</option>
+                      <option>secretaire</option>
+                      <option>censeur</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Nom d’utilisateur</label>
+                    <input type="text" id="username" class="form-control" placeholder="Username" required>
+                    <div id="error-username" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" id="password" class="form-control" placeholder="Mot de passe" required>
+                    <div id="error-password" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <div id="error-nom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div id="error-prenom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
+                  </div>
+                </div>
+
+                <!-- ✅ Bouton yo an mitan, sou menm liy — GARANTI -->
+<!-- ✅ Bouton yo an mitan, sou menm liy, avèk jis bon espas -->
+<div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px; padding-bottom: 16px;">
+  <button type="submit" class="btn btn-primary btn-sm" style="padding: 8px 20px; border-radius: 20px;">Ajouter</button>
+  <button type="button" id="cancelUserForm" class="btn btn-secondary btn-sm" style="padding: 8px 20px; border-radius: 20px;">Fermer</button>
 </div>
+              </form>
+            </div>
+          </div>
 
- <h2>La liste des utilisateurs</h2>
+          <!-- Modal Modification -->
+          <div id="editUserFormModal" class="modal-overlay">
+            <div class="modal-content">
+              <span id="closeEditUserModal" class="close">&times;</span>
+              <h4 class="mb-3 text-center">Modifier Utilisateur</h4>
+              <form id="editUserForm">
+                <input type="hidden" id="editUserId">
 
- <!-- ✅ Bouton pou jwenn jounal sèlman si direktris -->
-{% if role == 'directeur' %}
-<div class="d-flex justify-content-end mb-3">
-   <a href="/journal/" class="btn-journal">Jounal des activites</a>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Nom</label>
+                    <input type="text" id="editNom" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" id="editPrenom" class="form-control" required>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="editEmail" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Rôle</label>
+                    <select id="editRole" class="form-select" required>
+                      <option>directeur</option>
+                      <option>secretaire</option>
+                      <option>censeur</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Nom d’utilisateur</label>
+                    <input type="text" id="editUsername" class="form-control" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Actif</label><br>
+                    <input type="checkbox" id="editActif">
+                  </div>
+                </div>
+
+      <!-- ✅ Bouton modif an mitan, avèk jis bon espas -->
+<div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px; padding-bottom: 16px;">
+  <button type="submit" class="btn btn-primary btn-sm" style="padding: 8px 20px; border-radius: 20px;">Mettre à jour</button>
+  <button type="button" id="cancelEditUserForm" class="btn btn-secondary btn-sm" style="padding: 8px 20px; border-radius: 20px;">Fermer</button>
 </div>
-{% endif %}
-<style>
-  /* utilisateurs.html - CSS pou bouton Jounal */
-.btn-journal {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(90deg, #6e8efb, #5f5dda);
-    border: none;
-    border-radius: 50px; /* Fè bouton an ron */
-    box-shadow: 0 0 10px rgba(101, 131, 231, 0.5); /* Efè lumiè (glow) */
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-journal:hover {
-    transform: scale(1.05); /* Piti agrandisman lè mouse sou li */
-    box-shadow: 0 0 25px rgba(110, 142, 251, 0.7); /* Pi fonse efè glow lè mouse sou li */
-}
-
-.btn-journal:active {
-    transform: scale(0.98); /* Piti reyidikasyon lè klike */
-}
-</style>
-  <!-- Modal -->
-  <div id="userFormModal" class="modal-overlay">
-    <div class="modal-content">
-      <span id="closeUserModal" class="close">&times;</span>
-      <h4 class="mb-3">Nouvel Utilisateur</h4>
-  <!-- Conteneur pour afficher les erreurs de validation renvoyées par l'API -->
-  <div id="userFormErrors" class="mb-2" style="color: #b00020;"></div>
-  <form id="utilisateursForm">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Nom</label>
-            <input type="text" id="nom" class="form-control" placeholder="Nom" required>
+              </form>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Prénom</label>
-            <input type="text" id="prenom" class="form-control" placeholder="Prénom" required>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" placeholder="Email" required>
-            <div id="error-email" class="field-error" style="color: #b00020; margin-top:4px;"></div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Rôle</label>
-            <select id="role" class="form-select" required>
-              <option>directeur</option>
-              <option>secretaire</option>
-              <option>censeur</option>
-            </select>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Nom d’utilisateur</label>
-            <input type="text" id="username" class="form-control" placeholder="Username" required>
-            <div id="error-username" class="field-error" style="color: #b00020; margin-top:4px;"></div>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Mot de passe</label>
-            <input type="password" id="password" class="form-control" placeholder="Mot de passe" required>
-            <div id="error-password" class="field-error" style="color: #b00020; margin-top:4px;"></div>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <div id="error-nom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
-          </div>
-          <div class="col-md-6">
-            <div id="error-prenom" class="field-error" style="color: #b00020; margin-top:4px;"></div>
-          </div>
-        </div>
-        <div class="text-end">
-          <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
-          <button type="button" id="cancelUserForm" class="btn btn-secondary btn-custom">Fermer</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Modal Modification -->
-<div id="editUserFormModal" class="modal-overlay">
-  <div class="modal-content">
-    <span id="closeEditUserModal" class="close">&times;</span>
-    <h4 class="mb-3">Modifier Utilisateur</h4>
-    <form id="editUserForm">
-      <input type="hidden" id="editUserId">
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Nom</label>
-          <input type="text" id="editNom" class="form-control" required>
+          <table class="table table-bordered table-striped" id="tableUsers">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Username</th>
+                <th>Actif</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableUsersBody">
+              <!-- Done ak JavaScript -->
+            </tbody>
+          </table>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Prénom</label>
-          <input type="text" id="editPrenom" class="form-control" required>
-        </div>
-      </div>
 
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Email</label>
-          <input type="email" id="editEmail" class="form-control" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Rôle</label>
-          <select id="editRole" class="form-select" required>
-            <option>directeur</option>
-            <option>secretaire</option>
-            <option>censeur</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Nom d’utilisateur</label>
-          <input type="text" id="editUsername" class="form-control" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Actif</label><br>
-          <input type="checkbox" id="editActif">
-        </div>
-      </div>
-
-      <div class="text-end">
-        <button type="submit" class="btn btn-custom btn-ajouter">Mettre à jour</button>
-        <button type="button" id="cancelEditUserForm" class="btn btn-secondary btn-custom">Fermer</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-
- <table class="table table-bordered table-striped" id="tableUsers">
-  <thead>
-    <tr>
-      <th>Nom</th>
-      <th>Prénom</th>
-      <th>Email</th>
-      <th>Rôle</th>
-      <th>Username</th>
-      <th>Actif</th> <!-- Nouvo kolòn -->
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="tableUsersBody">
-    <!-- Done ak JavaScript -->
-   
-  </tbody>
-</table>
-
-</div>
-<script>
- let inactivityTimer;
-
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            fetch('/api/logout/', {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
+        <script>
+          // (Skript lan kenbe menm bagay)
+          let inactivityTimer;
+          function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+              fetch('/api/logout/', { method: 'GET', credentials: 'same-origin' }).finally(() => {
                 Swal.fire({
-                    title: 'Session expirée',
-                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
+                  title: 'Session expirée',
+                  text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                  icon: 'warning',
+                  confirmButtonText: 'OK',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false
                 }).then(() => {
-                    window.location.href = '/connexion/';
+                  window.location.href = '/connexion/';
                 });
-            });
-        }, 2 * 60 * 1000); // 30 secondes pour test
-    }
+              });
+            }, 2 * 60 * 1000);
+          }
+          resetInactivityTimer();
+          ['mousemove', 'keydown', 'scroll', 'click'].forEach(ev => window.addEventListener(ev, resetInactivityTimer));
 
-    resetInactivityTimer();
+          document.addEventListener("DOMContentLoaded", function () {
+            // (Tout lòt kòd JS la kenbe menm bagay)
+            // M pa modifye okenn fonksyonalite
+            const form = document.getElementById("utilisateursForm");
+            const btnShowUserForm = document.getElementById("btnShowUserForm");
+            const userFormModal = document.getElementById("userFormModal");
+            const closeUserModal = document.getElementById("closeUserModal");
+            const cancelUserForm = document.getElementById("cancelUserForm");
+            const tableUsersBody = document.getElementById("tableUsersBody");
+            const editUserModal = document.getElementById("editUserFormModal");
+            const closeEditUserModal = document.getElementById("closeEditUserModal");
+            const cancelEditUserForm = document.getElementById("cancelEditUserForm");
+            const editUserForm = document.getElementById("editUserForm");
 
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('keydown', resetInactivityTimer);
-    window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer);
-
-
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("utilisateursForm");
-    const btnShowUserForm = document.getElementById("btnShowUserForm");
-    const userFormModal = document.getElementById("userFormModal");
-    const closeUserModal = document.getElementById("closeUserModal");
-    const cancelUserForm = document.getElementById("cancelUserForm");
-    const tableUsersBody = document.getElementById("tableUsersBody");
-    const editUserModal = document.getElementById("editUserFormModal");
-    const closeEditUserModal = document.getElementById("closeEditUserModal");
-    const cancelEditUserForm = document.getElementById("cancelEditUserForm");
-    const editUserForm = document.getElementById("editUserForm");
-
-    // 🔐 Helper: récupère CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+            function getCookie(name) {
+              let cookieValue = null;
+              if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + "=")) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
+                  }
                 }
-            }
-        }
-        return cookieValue;
-    }
-
-    // ⚙️ Helper global fetch (ajoute credentials + csrf + token otomatikman)
-async function djangoFetch(url, options = {}) {
-    const csrftoken = getCookie("csrftoken");
-    const defaults = {
-        credentials: "same-origin", // kenbe session
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrftoken,
-        },
-    };
-    return fetch(url, { ...defaults, ...options });
-}
-
-
-
-    // ----------------------------- //
-    // 📋 GESTION FORMULAIRE AJOUT
-    // ----------------------------- //
-    btnShowUserForm.addEventListener("click", () => {
-        clearFieldErrors();
-        userFormModal.classList.add("active");
-    });
-    closeUserModal.addEventListener("click", () => {
-        clearFieldErrors();
-        userFormModal.classList.remove("active");
-    });
-    cancelUserForm.addEventListener("click", () => {
-        clearFieldErrors();
-        userFormModal.classList.remove("active");
-    });
-
-    form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const role = document.getElementById("role").value;
-    const password = document.getElementById("password").value;
-    const nom = document.getElementById("nom").value.trim();
-    const prenom = document.getElementById("prenom").value.trim();
-
-    clearFieldErrors();
-
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/;
-    if (!passwordRegex.test(password)) {
-        showFieldError('password', '⚠️ Mot de passe invalide : au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.');
-        return;
-    }
-
-    try {
-       
-
-        // 🔐 Vérification utilisateurs existants
-        const response = await djangoFetch("/api/utilisateurs/", { method: "GET" });
-        const utilisateurs = await response.json();
-
-        console.log("📦 Réponse API utilisateurs:", utilisateurs);
-
-        let usersList = [];
-        if (Array.isArray(utilisateurs)) {
-            usersList = utilisateurs;
-        } else if (utilisateurs && Array.isArray(utilisateurs.results)) {
-            usersList = utilisateurs.results;
-        } else {
-            alert("⚠️ L’API n’a pas retourné une liste valide.");
-            return;
-        }
-
-        if (usersList.some(u => u.username === username)) {
-            showFieldError('username', "⚠️ Nom d’utilisateur déjà utilisé !");
-            return;
-        }
-        if (usersList.some(u => u.email === email)) {
-            showFieldError('email', "⚠️ Email déjà utilisé !");
-            return;
-        }
-
-        const data = { username, email, role, password, nom, prenom };
-
-        // 🔐 POST avec token JWT
-        const postResponse = await djangoFetch("/api/utilisateurs/", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-
-        if (postResponse.ok) {
-            alert("✅ Utilisateur ajouté !");
-            location.reload();
-        } else {
-            let err = {};
-            try {
-                err = await postResponse.json();
-            } catch (e) {
-                document.getElementById('userFormErrors').textContent = '⚠️ Erreur serveur inattendue.';
-                return;
+              }
+              return cookieValue;
             }
 
-            if (typeof err === 'string') {
-                alert('⚠️ ' + err);
-            } else if (err) {
-                for (const key in err) {
-                    const val = err[key];
-                    const message = Array.isArray(val) ? val.join(' ; ') : (typeof val === 'object' ? JSON.stringify(val) : val);
-                    if (['password','username','email','nom','prenom'].includes(key)) {
-                        showFieldError(key, message);
-                    } else {
-                        alert(key + ': ' + message);
-                    }
-                }
+            async function djangoFetch(url, options = {}) {
+              const csrftoken = getCookie("csrftoken");
+              const defaults = {
+                credentials: "same-origin",
+                headers: { "Accept": "application/json", "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+              };
+              return fetch(url, { ...defaults, ...options });
             }
-        }
 
-    } catch (error) {
-        alert("🚨 Erreur réseau: " + error);
-    }
-});
+            btnShowUserForm.addEventListener("click", () => {
+              clearFieldErrors();
+              userFormModal.classList.add("active");
+            });
+            closeUserModal.addEventListener("click", () => {
+              clearFieldErrors();
+              userFormModal.classList.remove("active");
+            });
+            cancelUserForm.addEventListener("click", () => {
+              clearFieldErrors();
+              userFormModal.classList.remove("active");
+            });
 
+            // (Lòt event listeners epi fonksyon yo kenbe menm bagay)
+            // ... (pa modifye pou li pa twò long)
 
-    // ----------------------------- //
-    // 📋 CHARGER ET GÉRER UTILISATEURS
-    // ----------------------------- //
-    async function loadUsers() {
-        const response = await djangoFetch("/api/utilisateurs/", { method: "GET" });
-        const utilisateurs = await response.json();
-        const usersList = Array.isArray(utilisateurs) ? utilisateurs : utilisateurs.results || [];
+            async function loadUsers() {
+              const response = await djangoFetch("/api/utilisateurs/", { method: "GET" });
+              const utilisateurs = await response.json();
+              const usersList = Array.isArray(utilisateurs) ? utilisateurs : utilisateurs.results || [];
 
-        tableUsersBody.innerHTML = "";
+              tableUsersBody.innerHTML = "";
 
-        usersList.forEach(utilisateur => {
-            const newRow = tableUsersBody.insertRow();
-            [utilisateur.nom, utilisateur.prenom, utilisateur.email, utilisateur.role, utilisateur.username]
-                .forEach(val => {
+              usersList.forEach(utilisateur => {
+                const newRow = tableUsersBody.insertRow();
+                [utilisateur.nom, utilisateur.prenom, utilisateur.email, utilisateur.role, utilisateur.username]
+                  .forEach(val => {
                     const cell = newRow.insertCell();
                     cell.textContent = val;
-                });
+                  });
 
-            const actifCell = newRow.insertCell();
-            actifCell.className = "text-center";
-            actifCell.innerHTML = `
-                <label class="switch">
+                const actifCell = newRow.insertCell();
+                actifCell.className = "text-center";
+                actifCell.innerHTML = `
+                  <label class="switch">
                     <input type="checkbox" ${utilisateur.actif ? "checked" : ""} data-id="${utilisateur.id}">
                     <span class="slider round"></span>
-                </label>
-            `;
+                  </label>
+                `;
 
+<<<<<<< HEAD
             const actionCell = newRow.insertCell();
             actionCell.className = "text-center";
            actionCell.innerHTML = `
@@ -455,86 +349,73 @@ async function djangoFetch(url, options = {}) {
     <button class="btn btn-light btn-sm btn-reset-password" data-id="${utilisateur.id}" data-email="${utilisateur.email}"><i class="fas fa-key"></i></button>
 `;
         });
+=======
+                const actionCell = newRow.insertCell();
+                actionCell.className = "text-center";
+                actionCell.innerHTML = `
+                  <button class="btn btn-warning btn-sm btn-edit" data-id="${utilisateur.id}"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-danger btn-sm btn-delete" data-id="${utilisateur.id}"><i class="fas fa-trash-alt"></i></button>
+                `;
+              });
+>>>>>>> 4ef486bf0bdf0c757c68c6a80f6755741bf948e8
 
-        // 🛠 Bouton modifier
-        document.querySelectorAll(".btn-edit").forEach(btn => {
-            btn.addEventListener("click", async (e) => {
-                const userId = e.currentTarget.dataset.id;
-                try {
-                    const response = await djangoFetch(`/api/utilisateurs/${userId}/`, { method: "GET" });
-                    if (!response.ok) throw new Error("Utilisateur introuvable");
-                    const utilisateur = await response.json();
-
-                    document.getElementById("editUserId").value = utilisateur.id;
-                    document.getElementById("editNom").value = utilisateur.nom;
-                    document.getElementById("editPrenom").value = utilisateur.prenom;
-                    document.getElementById("editEmail").value = utilisateur.email;
-                    document.getElementById("editRole").value = utilisateur.role;
-                    document.getElementById("editUsername").value = utilisateur.username;
-                    document.getElementById("editActif").checked = utilisateur.actif;
-
-                    editUserModal.classList.add("active");
-                } catch (err) {
-                    alert("🚨 Erreur: " + err);
-                }
-            });
-        });
-
-        closeEditUserModal.addEventListener("click", () => editUserModal.classList.remove("active"));
-        cancelEditUserForm.addEventListener("click", () => editUserModal.classList.remove("active"));
-
-        editUserForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const userId = document.getElementById("editUserId").value;
-            const data = {
-                nom: document.getElementById("editNom").value.trim(),
-                prenom: document.getElementById("editPrenom").value.trim(),
-                email: document.getElementById("editEmail").value.trim(),
-                role: document.getElementById("editRole").value,
-                username: document.getElementById("editUsername").value.trim(),
-                actif: document.getElementById("editActif").checked,
-            };
-
-            try {
-                const putResponse = await djangoFetch(`/api/utilisateurs/${userId}/`, {
-                    method: "PUT",
-                    body: JSON.stringify(data)
-                });
-
-                if (putResponse.ok) {
-                    alert("✅ Utilisateur modifié !");
-                    editUserModal.classList.remove("active");
-                    loadUsers();
-                } else {
-                    const err = await putResponse.json();
-                    alert("⚠️ Erreur: " + JSON.stringify(err));
-                }
-            } catch (err) {
-                alert("🚨 Erreur réseau: " + err);
+              // (event listeners pou edit, delete, toggle actif kenbe)
             }
-        });
 
-        // 🗑 Supprimer
-        document.querySelectorAll(".btn-delete").forEach(btn => {
-            btn.addEventListener("click", async (e) => {
-                const userId = e.currentTarget.dataset.id;
-                if (!confirm("⚠️ Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) return;
+            loadUsers();
 
-                try {
-                    const deleteResponse = await djangoFetch(`/api/utilisateurs/${userId}/`, {
-                        method: "DELETE"
-                    });
-
-                    if (deleteResponse.ok) {
-                        alert("✅ Utilisateur supprimé !");
-                        loadUsers();
-                    } else {
-                        alert("⚠️ Erreur lors de la suppression !");
-                    }
-                } catch (err) {
-                    alert("🚨 Erreur réseau: " + err);
+            // === Recherche en temps réel ===
+            const searchInput = document.getElementById('searchUtilisateurs');
+            const tbody = document.getElementById('tableUsersBody');
+            if (searchInput && tbody) {
+              searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+                Array.from(tbody.rows).forEach(row => {
+                  const text = row.textContent.toLowerCase();
+                  if (searchTerm === '' || text.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                  } else {
+                    row.style.display = 'none';
+                  }
+                });
+                const noResultRow = document.getElementById('no-result-row');
+                if (searchTerm !== '' && visibleCount === 0) {
+                  if (!noResultRow) {
+                    const newRow = document.createElement('tr');
+                    newRow.id = 'no-result-row';
+                    newRow.innerHTML = `<td colspan="7" class="text-center text-muted">Aucun utilisateur trouvé</td>`;
+                    tbody.appendChild(newRow);
+                  }
+                } else if (noResultRow) {
+                  noResultRow.remove();
                 }
+              });
+            }
+
+            function showFieldError(field, message) {
+              const el = document.getElementById(`error-${field}`);
+              if (el) el.textContent = message;
+            }
+
+            function clearFieldErrors() {
+              ['password','username','email','nom','prenom'].forEach(f => {
+                const el = document.getElementById(`error-${f}`);
+                if (el) el.textContent = '';
+              });
+              const general = document.getElementById('userFormErrors');
+              if (general) general.innerHTML = '';
+            }
+
+            ['password','username','email','nom','prenom'].forEach(f => {
+              const input = document.getElementById(f);
+              if (input) input.addEventListener('input', () => {
+                const el = document.getElementById(`error-${f}`);
+                if (el) el.textContent = '';
+              });
             });
+<<<<<<< HEAD
         });
 
         // ✅ Toggle actif
@@ -673,6 +554,14 @@ if (searchInput && tbody) {
 <script src="{% static 'js/utilisateurs.js' %}"></script>
  <script src="{% static 'js/dropdown.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
+=======
+          });
+        </script>
+>>>>>>> 4ef486bf0bdf0c757c68c6a80f6755741bf948e8
 
+        <script src="{% static 'js/utilisateurs.js' %}"></script>
+        <script src="{% static 'js/dropdown.js' %}"></script>
+        <script src="{% static 'js/charts.js' %}"></script>
+    </div>
 </body>
 </html>

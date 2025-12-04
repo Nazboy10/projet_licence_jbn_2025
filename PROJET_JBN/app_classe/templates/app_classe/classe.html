@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,41 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classe</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-      <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- CSS Custom -->
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- CSS Custom -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- <link rel="stylesheet" href="{% static '/css/Dossier_Eleves.css' %}"> -->
-        <link rel="stylesheet" href="{% static 'app_classe/css/classe.css' %}">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <link rel="stylesheet" href="{% static 'app_classe/css/classe.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
     <div class="sidebar">
        <div class="logo">
-     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
-    <span>SGCBA</span>
-</div>
+         <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+         <span>SGCBA</span>
+       </div>
 
        <nav>
-  <ul>
-    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-    <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-    <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-    <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
-    <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-     <li id="menu-classe"><a href="{% url 'classe' %}"class="active"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
-    <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-  </ul>
-</nav>
-       
+         <ul>
+           <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+           <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+           <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+           <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+           <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+           <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+           <li id="menu-classe"><a href="{% url 'classe' %}" class="active"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
+           <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+           <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+         </ul>
+       </nav>
     </div>
 
     <div class="main-content">
@@ -49,600 +45,467 @@
             <h1>Classe</h1>
             <div class="search-profile">
                <div class="search-bar">
-  <i class="fas fa-search"></i>
-  <form method="get" style="display:inline;">
-    <input 
-      type="text" 
-      name="search" 
-      placeholder="Rechercher une classe..."
-      value="{{ search_query }}"
-      
-    >
-  </form>
-  <script>
-document.querySelector('input[name="search"]').addEventListener('input', function() {
-  clearTimeout(this.searchTimeout);
-  this.searchTimeout = setTimeout(() => {
-    this.form.submit();
-  }, 500); // Soumet 0.5s après la dernière frappe
-});
-</script>
-</div>
-               <div class="profile">
-    <i class="fas fa-bell notification-icon"></i>
-    <div class="user-avatar" id="profileDropdownToggle">
-    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
-</div>
-
-    <!-- Dropdown menu -->
-    <div class="profile-dropdown" id="profileDropdown">
-        <ul>
-            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
-        </ul>
-    </div>
-</div>
- </div>
+                  <i class="fas fa-search"></i>
+                  <form method="get" style="display:inline;">
+                    <input type="text" name="search" placeholder="Rechercher une classe..." value="{{ search_query }}">
+                  </form>
+                  <script>
+                    document.querySelector('input[name="search"]').addEventListener('input', function() {
+                      clearTimeout(this.searchTimeout);
+                      this.searchTimeout = setTimeout(() => {
+                        this.form.submit();
+                      }, 500);
+                    });
+                  </script>
+                </div>
+                <div class="profile">
+                  <i class="fas fa-bell notification-icon"></i>
+                  <div class="user-avatar" id="profileDropdownToggle">
+                    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+                  </div>
+                  <div class="profile-dropdown" id="profileDropdown">
+                    <ul>
+                      <li><a href="{% url 'logout' %}">Déconnecter</a></li>
+                    </ul>
+                  </div>
+                </div>
+            </div>
         </div>
 
-<!-- Messages pour SweetAlert2 -->
-<!-- Messages Django (cachés) -->
-{% if messages %}
-  <div id="django-messages" style="display: none;">
-    {% for message in messages %}
-      <span data-tag="{{ message.tags }}">{{ message|escapejs }}</span>
-    {% endfor %}
-  </div>
-{% endif %}
-
-
-
-
-  <div class="container">
-   
-
-    <!-- Bouton Ajouter -->
-    <div class="mb-3 text-end">
-      <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter</button>
-    </div>
-
-    <!-- Formulaire (modal) -->
-   <div id="formModal" class="modal-overlay">
-  <div class="modal-content">
-    <span id="closeModal" class="close">&times;</span>
-    <h4 class="mb-3">Gestion Classe</h4>
-
-    <form id="inscriptionForm" method="post" >
-      {% csrf_token %}
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Nom de la classe</label>
-          <input type="text" name="nom_classe" class="form-control" placeholder="Nom de la classe" required>
-        </div>
-
-       <div class="col-md-6">
-  <label class="form-label">Niveau</label>
-  <select name="niveau" class="form-control" required>
-    <option value="" disabled selected>Choisir le niveau</option>
-    <option value="Fondamental">Fondamental</option>
-    <option value="Secondaire">Secondaire</option>
-  </select>
-</div>
-
-<div class="col-md-4 mt-3">
-  <label class="form-label">Année académique</label>
-  <input type="text" 
-         name="annee_academique" 
-         class="form-control" 
-         value="{{ annee_academique }}" 
-         readonly>
-</div>
-      </div>
-
-      <div class="text-end">
-        <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
-        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-    <!-- Options affichage -->
-   
-  <br>
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped" id="tableEleves">
-       <thead class="table-header-blue">
-          <tr>
-            <th>Code de la classe</th>
-            <th>Nom de la classe</th>
-            <th>Niveau</th>
-           <th>Année académique</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-       <tbody>
-  {% for c in classes %}
-  <tr>
-    <td>{{ c.code_classe }}</td>
-    <td>{{ c.nom_classe }}</td>
-    <td>{{ c.niveau }}</td>
-     <td>{{ c.annee_academique }}</td>
-    <td>
-      
-      {% comment %} modail details {% endcomment %}
-      <button class="btn btn-info btn-sm btn-view-eleves" data-id="{{ c.id }}" title="Voir les élèves">
-    <i class="bi bi-eye"></i>
-  </button>
-
-      <button class="btn btn-warning btn-sm btn-edit" data-id="{{ c.id }}">
-    <i class="bi bi-pencil"></i>
-  </button>
-   {% if role == 'directeur' %}
-      <button class="btn btn-danger btn-sm btn-delete" data-id="{{ c.id }}">
-  <i class="bi bi-trash"></i>
-</button>
-{% endif %}
-    </td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td colspan="4" class="text-center text-muted">Aucune classe enregistrée</td>
-  </tr>
-  {% endfor %}
-</tbody>
-      </table>
-
-
-
-<!-- Modal "Liste des élèves" -->
-<div id="modalEleves" class="modal-overlay" style="display:none;">
-  <div class="modal-content" style="width:600px; max-width:90%;">
-    <span id="closeModalEleves" class="close">&times;</span>
-    <h4>Liste des élèves - <span id="modalClasseNom"></span></h4>
-    <div id="modalElevesList" style="max-height:400px; overflow-y:auto;">
-      <!-- La liste sera chargée ici -->
-    </div>
-    <div class="text-end mt-3">
-      <button id="closeModalBtn" class="btn btn-secondary">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<style>
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
-}
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-}
-</style>
-
-
-      <!-- Pagination -->
-{% if classes.has_other_pages %}
-  <nav aria-label="Pagination" class="mt-4">
-    <ul class="pagination justify-content-center">
-      {% if classes.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ classes.previous_page_number }}">&laquo; Précédent</a>
-        </li>
-      {% else %}
-        <li class="page-item disabled">
-          <span class="page-link">&laquo; Précédent</span>
-        </li>
-      {% endif %}
-
-      {% for num in classes.paginator.page_range %}
-        {% if classes.number == num %}
-          <li class="page-item active">
-            <span class="page-link">{{ num }}</span>
-          </li>
-        {% else %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-          </li>
+        {% if messages %}
+          <div id="django-messages" style="display: none;">
+            {% for message in messages %}
+              <span data-tag="{{ message.tags }}">{{ message|escapejs }}</span>
+            {% endfor %}
+          </div>
         {% endif %}
-      {% endfor %}
 
-      {% if classes.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ classes.next_page_number }}">Suivant &raquo;</a>
-        </li>
-      {% else %}
-        <li class="page-item disabled">
-          <span class="page-link">Suivant &raquo;</span>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
-{% endif %}
-    </div>
-  </div>
+        <div class="container">
+          <div class="mb-3 text-end">
+            <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter</button>
+          </div>
 
-  <script>
-  // --- Utilitaires ---
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
+          <!-- ✅ Formulaire (modal) modifye -->
+          <div id="formModal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 700px; width: 95%; margin: 2rem auto; padding: 1.5rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+              <span id="closeModal" class="close" style="font-size: 1.8rem; cursor: pointer; float: right; color: #6c757d;">&times;</span>
+              
+              <!-- Tit an mitan -->
+              <h4 class="mb-4 text-center">Gestion Classe</h4>
 
-  // --- Disparition automatique des messages ---
-  const alertBox = document.getElementById("message-alert");
-  if (alertBox) {
-    setTimeout(() => {
-      alertBox.classList.remove("show");
-      setTimeout(() => alertBox.remove(), 500);
-    }, 3000);
-  }
+              <form id="inscriptionForm" method="post">
+                {% csrf_token %}
 
-  // --- Éléments DOM ---
-  const formModal = document.getElementById('formModal');
-  const closeModal = document.getElementById('closeModal');
-  const cancelForm = document.getElementById('cancelForm');
-  const tableBody = document.querySelector('#tableEleves tbody'); // ✅ Défini ici !
+                <!-- Ligne 1 : Nom + Niveau (2 kolon) -->
+                <div class="row mb-3">
+                  <div class="col-md-6 mb-2 mb-md-0">
+                    <label class="form-label" style="font-weight: 500;">Nom de la classe</label>
+                    <input type="text" name="nom_classe" class="form-control" placeholder="Nom de la classe" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" style="font-weight: 500;">Niveau</label>
+                    <select name="niveau" class="form-control" required>
+                      <option value="" disabled selected>Choisir le niveau</option>
+                      <option value="Fondamental">Fondamental</option>
+                      <option value="Secondaire">Secondaire</option>
+                    </select>
+                  </div>
+                </div>
 
-  // --- Réinitialiser le formulaire ---
-  function resetFormToCreate() {
-    const form = document.getElementById('inscriptionForm');
-    form.action = "";
-    document.querySelector('.btn-ajouter').textContent = "Ajouter";
-    form.reset();
-  }
+                <!-- Année académique anba an mitan -->
+                <div class="text-center mb-4">
+                  <div style="max-width: 300px; margin: 0 auto;">
+                    <label class="form-label" style="font-weight: 500;">Année académique</label>
+                    <input type="text" 
+                           name="annee_academique" 
+                           class="form-control" 
+                           value="{{ annee_academique }}" 
+                           readonly>
+                  </div>
+                </div>
 
-  // --- Gestion du modal ---
-  document.getElementById('btnShowForm').addEventListener('click', () => {
-    resetFormToCreate();
-    formModal.style.display = 'flex';
-  });
+                <!-- Bouton an mitan -->
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary me-2">Ajouter</button>
+                  <button type="button" id="cancelForm" class="btn btn-secondary">Fermer</button>
+                </div>
+              </form>
+            </div>
+          </div>
 
-  if (closeModal) closeModal.addEventListener('click', () => {
-    formModal.style.display = 'none';
-    resetFormToCreate();
-  });
+          <br>
 
-  if (cancelForm) cancelForm.addEventListener('click', () => {
-    formModal.style.display = 'none';
-    resetFormToCreate();
-  });
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="tableEleves">
+              <thead class="table-header-blue">
+                <tr>
+                  <th>Code de la classe</th>
+                  <th>Nom de la classe</th>
+                  <th>Niveau</th>
+                  <th>Année académique</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in classes %}
+                  <tr>
+                    <td>{{ c.code_classe }}</td>
+                    <td>{{ c.nom_classe }}</td>
+                    <td>{{ c.niveau }}</td>
+                    <td>{{ c.annee_academique }}</td>
+                    <td>
+                      <button class="btn btn-info btn-sm btn-view-eleves" data-id="{{ c.id }}" title="Voir les élèves">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button class="btn btn-warning btn-sm btn-edit" data-id="{{ c.id }}">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      {% if role == 'directeur' %}
+                        <button class="btn btn-danger btn-sm btn-delete" data-id="{{ c.id }}">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">Aucune classe enregistrée</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
 
-  // --- Fermer modal en cliquant en dehors ---
-  window.addEventListener('click', (e) => {
-    if (e.target === formModal) {
-      formModal.style.display = 'none';
-      resetFormToCreate();
-    }
-  });
+            <!-- Modal "Liste des élèves" -->
+            <div id="modalEleves" class="modal-overlay" style="display:none;">
+              <div class="modal-content" style="width:600px; max-width:90%;">
+                <span id="closeModalEleves" class="close">&times;</span>
+                <h4>Liste des élèves - <span id="modalClasseNom"></span></h4>
+                <div id="modalElevesList" style="max-height:400px; overflow-y:auto;"></div>
+                <div class="text-end mt-3">
+                  <button id="closeModalBtn" class="btn btn-secondary">Fermer</button>
+                </div>
+              </div>
+            </div>
 
-  // --- SUPPRESSION ---
-  if (tableBody) {
-    tableBody.addEventListener('click', function(e) {
-      // === SUPPRESSION ===
-      const deleteBtn = e.target.closest('.btn-delete');
-      if (deleteBtn) {
-        const id = deleteBtn.getAttribute('data-id');
-        Swal.fire({
-          title: "Confirmer la suppression",
-          text: "Êtes-vous sûr de vouloir supprimer cette classe ?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Oui, supprimer",
-          cancelButtonText: "Annuler"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            fetch(`/classe/supprimer/${id}/`, {
-              method: 'POST',
-              headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            <style>
+              .modal-overlay {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+              }
+              .modal-content {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                position: relative;
+              }
+              .close {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 24px;
+                cursor: pointer;
+              }
+            </style>
+
+            <!-- Pagination -->
+            {% if classes.has_other_pages %}
+              <nav aria-label="Pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  {% if classes.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ classes.previous_page_number }}">&laquo; Précédent</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo; Précédent</span></li>
+                  {% endif %}
+
+                  {% for num in classes.paginator.page_range %}
+                    {% if classes.number == num %}
+                      <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                      <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if classes.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ classes.next_page_number }}">Suivant &raquo;</a></li>
+                  {% else %}
+                    <li class="page-item disabled"><span class="page-link">Suivant &raquo;</span></li>
+                  {% endif %}
+                </ul>
+              </nav>
+            {% endif %}
+          </div>
+        </div>
+
+        <script>
+          // --- Utilitaires ---
+          function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            return cookieValue;
+          }
+
+          // --- Éléments DOM ---
+          const formModal = document.getElementById('formModal');
+          const closeModal = document.getElementById('closeModal');
+          const cancelForm = document.getElementById('cancelForm');
+          const tableBody = document.querySelector('#tableEleves tbody');
+
+          function resetFormToCreate() {
+            const form = document.getElementById('inscriptionForm');
+            form.action = "";
+            document.querySelector('.btn-primary').textContent = "Ajouter";
+            form.reset();
+          }
+
+          document.getElementById('btnShowForm').addEventListener('click', () => {
+            resetFormToCreate();
+            formModal.style.display = 'flex';
+          });
+
+          if (closeModal) closeModal.addEventListener('click', () => {
+            formModal.style.display = 'none';
+            resetFormToCreate();
+          });
+
+          if (cancelForm) cancelForm.addEventListener('click', () => {
+            formModal.style.display = 'none';
+            resetFormToCreate();
+          });
+
+          window.addEventListener('click', (e) => {
+            if (e.target === formModal) {
+              formModal.style.display = 'none';
+              resetFormToCreate();
+            }
+          });
+
+          // --- SUPPRESSION & MODIFICATION ---
+          if (tableBody) {
+            tableBody.addEventListener('click', function(e) {
+              const deleteBtn = e.target.closest('.btn-delete');
+              if (deleteBtn) {
+                const id = deleteBtn.getAttribute('data-id');
+                Swal.fire({
+                  title: "Confirmer la suppression",
+                  text: "Êtes-vous sûr de vouloir supprimer cette classe ?",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#d33",
+                  cancelButtonColor: "#3085d6",
+                  confirmButtonText: "Oui, supprimer",
+                  cancelButtonText: "Annuler"
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    fetch(`/classe/supprimer/${id}/`, {
+                      method: 'POST',
+                      headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                      if (data.success) {
+                        Swal.fire({
+                          title: "Supprimé !",
+                          text: "La classe a été supprimée avec succès.",
+                          icon: "success",
+                          timer: 2000,
+                          showConfirmButton: false
+                        }).then(() => location.reload());
+                      } else {
+                        Swal.fire("Erreur", data.error || "Une erreur est survenue.", "error");
+                      }
+                    })
+                    .catch(err => {
+                      console.error(err);
+                      Swal.fire("Erreur", "Impossible de supprimer la classe.", "error");
+                    });
+                  }
+                });
+                return;
+              }
+
+              const editBtn = e.target.closest('.btn-edit');
+              if (editBtn) {
+                const id = editBtn.getAttribute('data-id');
+                fetch(`/classe/modifier/${id}/`, {
+                  method: 'GET',
+                  headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                })
+                .then(response => response.json())
+                .then(data => {
+                  document.querySelector('[name="nom_classe"]').value = data.nom_classe;
+                  document.querySelector('[name="niveau"]').value = data.niveau;
+                  const form = document.getElementById('inscriptionForm');
+                  form.action = `/classe/modifier/${id}/`;
+                  document.querySelector('.btn-primary').textContent = "Modifier";
+                  formModal.style.display = 'flex';
+                })
+                .catch(err => {
+                  console.error(err);
+                  Swal.fire("Erreur", "Impossible de charger les données.", "error");
+                });
+              }
+            });
+          }
+
+          // --- Soumission AJAX ---
+          document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const btn = this.querySelector('.btn-primary');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Enregistrement...';
+
+            fetch('/classe/ajouter/', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
             })
             .then(response => response.json())
             .then(data => {
-              if (data.success) {
-                Swal.fire({
-                  title: "Supprimé !",
-                  text: "La classe a été supprimée avec succès.",
-                  icon: "success",
-                  timer: 2000,
-                  showConfirmButton: false
-                }).then(() => location.reload());
-              } else {
-                Swal.fire("Erreur", data.error || "Une erreur est survenue.", "error");
-              }
+                if (data.success) {
+                    Swal.fire('Succès !', data.message, 'success').then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Erreur', data.error, 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             })
             .catch(err => {
-              console.error(err);
-              Swal.fire("Erreur", "Impossible de supprimer la classe.", "error");
+                console.error(err);
+                Swal.fire('Erreur', 'Erreur réseau.', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
             });
-          }
-        });
-        return; // arrêter ici si c'était une suppression
-      }
+          });
 
-      // === MODIFICATION ===
-      const editBtn = e.target.closest('.btn-edit');
-      if (editBtn) {
-        const id = editBtn.getAttribute('data-id');
-        fetch(`/classe/modifier/${id}/`, {
-          method: 'GET',
-          headers: { 'X-CSRFToken': getCookie('csrftoken') }
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Remplir le formulaire
-          document.querySelector('[name="nom_classe"]').value = data.nom_classe;
-          document.querySelector('[name="niveau"]').value = data.niveau;
-
-          // Mettre à jour le formulaire pour la modification
-          const form = document.getElementById('inscriptionForm');
-          form.action = `/classe/modifier/${id}/`;
-          document.querySelector('.btn-ajouter').textContent = "Modifier";
-
-          // Afficher le modal
-          formModal.style.display = 'flex';
-        })
-        .catch(err => {
-          console.error(err);
-          Swal.fire("Erreur", "Impossible de charger les données.", "error");
-        });
-      }
-    });
-  }
-
-  // --- Soumission du formulaire (AJAX) ---
-document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // ⚠️ Empêche le rechargement
-
-    const formData = new FormData(this);
-    const btn = this.querySelector('.btn-ajouter');
-    const originalText = btn.textContent;
-
-    btn.disabled = true;
-    btn.textContent = 'Enregistrement...';
-
-    fetch('/classe/ajouter/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire('Succès !', data.message, 'success').then(() => {
-                location.reload(); // Recharger après succès
-            });
-        } else {
-            Swal.fire('Erreur', data.error, 'error');
-            btn.disabled = false;
-            btn.textContent = originalText;
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        Swal.fire('Erreur', 'Erreur réseau.', 'error');
-        btn.disabled = false;
-        btn.textContent = originalText;
-    });
-});
-document.addEventListener('DOMContentLoaded', () => {
-  // --- 1. Affichage des messages Django via SweetAlert2 ---
-  const messagesContainer = document.getElementById('django-messages');
-  if (messagesContainer) {
-    const messageElements = messagesContainer.querySelectorAll('span');
-    messageElements.forEach(el => {
-      const text = el.textContent;
-      const tag = el.dataset.tag || 'success';
-      
-      let icon, title;
-      if (tag === 'error') {
-        icon = 'error';
-        title = 'Erreur !';
-      } else if (tag === 'warning') {
-        icon = 'warning';
-        title = 'Attention !';
-      } else {
-        icon = 'success';
-        title = 'Succès !';
-      }
-
-      Swal.fire({
-        icon: icon,
-        title: title,
-        text: text,
-        timer: 4000,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end'
-      });
-    });
-  }
-
-    // ✅ FORCER la fermeture du modal au chargement de la page
-    const formModal = document.getElementById('formModal');
-    if (formModal) {
-        formModal.style.display = 'none';
-    }
-
-});
-
-
-// === Redonner le focus au champ de recherche après rechargement ===
-document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.querySelector('input[name="search"]');
-  if (searchInput && searchInput.value) {
-    // Donner le focus
-    searchInput.focus();
-    // Placer le curseur à la fin du texte
-    const val = searchInput.value;
-    searchInput.value = '';
-    searchInput.value = val;
-  }
-});
-
-
-
-    let inactivityTimer;
-
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            fetch('/api/logout/', {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
+          // --- Messages & autres ---
+          document.addEventListener('DOMContentLoaded', () => {
+            const messagesContainer = document.getElementById('django-messages');
+            if (messagesContainer) {
+              const messageElements = messagesContainer.querySelectorAll('span');
+              messageElements.forEach(el => {
+                const text = el.textContent;
+                const tag = el.dataset.tag || 'success';
+                let icon = tag === 'error' ? 'error' : tag === 'warning' ? 'warning' : 'success';
+                let title = tag === 'error' ? 'Erreur !' : tag === 'warning' ? 'Attention !' : 'Succès !';
                 Swal.fire({
-                    title: 'Session expirée',
-                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    window.location.href = '/connexion/';
+                  icon: icon,
+                  title: title,
+                  text: text,
+                  timer: 4000,
+                  showConfirmButton: false,
+                  toast: true,
+                  position: 'top-end'
                 });
-            });
-        },2 * 60 * 1000); // 2 minutes d'inactivité
-    }
+              });
+            }
 
-    resetInactivityTimer();
+            const formModal = document.getElementById('formModal');
+            if (formModal) formModal.style.display = 'none';
 
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('keydown', resetInactivityTimer);
-    window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer);
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput && searchInput.value) {
+              searchInput.focus();
+              const val = searchInput.value;
+              searchInput.value = '';
+              searchInput.value = val;
+            }
+          });
 
-
-
-
-
-// Gestion du clic sur l'œil (voir élèves)
-document.addEventListener('click', function(e) {
-  const viewBtn = e.target.closest('.btn-view-eleves');
-  if (viewBtn) {
-    const classeId = viewBtn.dataset.id;
-    const modal = document.getElementById('modalEleves');
-    const listContainer = document.getElementById('modalElevesList');
-    const nomSpan = document.getElementById('modalClasseNom');
-
-    // Afficher "chargement"
-    listContainer.innerHTML = '<p class="text-center">Chargement...</p>';
-
-    // Appeler l'API
-    fetch(`/classe/api/eleves/${classeId}/`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          nomSpan.textContent = data.classe_nom;
-          
-          if (data.eleves.length === 0) {
-            listContainer.innerHTML = '<p class="text-center text-muted">Aucun élève dans cette classe.</p>';
-          } else {
-            let html = `
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Code</th>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Sexe</th>
-                    <th>Téléphone</th>
-                  </tr>
-                </thead>
-                <tbody>
-            `;
-            data.eleves.forEach(e => {
-              html += `
-                <tr>
-                  <td>${e.code_eleve}</td>
-                  <td>${e.nom}</td>
-                  <td>${e.prenom}</td>
-                  <td>${e.sexe}</td>
-                  <td>${e.telephone || '-'}</td>
-                </tr>
-              `;
-            });
-            html += '</tbody></table>';
-            listContainer.innerHTML = html;
+          // --- Inactivité ---
+          let inactivityTimer;
+          function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+              fetch('/api/logout/', { method: 'GET', credentials: 'same-origin' }).finally(() => {
+                Swal.fire({
+                  title: 'Session expirée',
+                  text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                  icon: 'warning',
+                  confirmButtonText: 'OK',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false
+                }).then(() => {
+                  window.location.href = '/connexion/';
+                });
+              });
+            }, 2 * 60 * 1000);
           }
+          resetInactivityTimer();
+          ['mousemove', 'keydown', 'scroll', 'click'].forEach(event => window.addEventListener(event, resetInactivityTimer));
 
-          // Afficher le modal
-          modal.style.display = 'flex';
-        } else {
-          listContainer.innerHTML = `<p class="text-danger">Erreur : ${data.error}</p>`;
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        listContainer.innerHTML = '<p class="text-danger">Erreur de chargement.</p>';
-      });
-  }
-});
+          // --- Modal Élèves ---
+          document.addEventListener('click', function(e) {
+            const viewBtn = e.target.closest('.btn-view-eleves');
+            if (viewBtn) {
+              const classeId = viewBtn.dataset.id;
+              const modal = document.getElementById('modalEleves');
+              const listContainer = document.getElementById('modalElevesList');
+              const nomSpan = document.getElementById('modalClasseNom');
+              listContainer.innerHTML = '<p class="text-center">Chargement...</p>';
+              fetch(`/classe/api/eleves/${classeId}/`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success) {
+                    nomSpan.textContent = data.classe_nom;
+                    if (data.eleves.length === 0) {
+                      listContainer.innerHTML = '<p class="text-center text-muted">Aucun élève dans cette classe.</p>';
+                    } else {
+                      let html = `
+                        <table class="table table-sm">
+                          <thead><tr>
+                            <th>Code</th><th>Nom</th><th>Prénom</th><th>Sexe</th><th>Téléphone</th>
+                          </tr></thead><tbody>`;
+                      data.eleves.forEach(e => {
+                        html += `<tr><td>${e.code_eleve}</td><td>${e.nom}</td><td>${e.prenom}</td><td>${e.sexe}</td><td>${e.telephone || '-'}</td></tr>`;
+                      });
+                      html += '</tbody></table>';
+                      listContainer.innerHTML = html;
+                    }
+                    modal.style.display = 'flex';
+                  } else {
+                    listContainer.innerHTML = `<p class="text-danger">Erreur : ${data.error}</p>`;
+                  }
+                })
+                .catch(err => {
+                  console.error(err);
+                  listContainer.innerHTML = '<p class="text-danger">Erreur de chargement.</p>';
+                });
+            }
+          });
 
-// Fermer le modal
-document.getElementById('closeModalEleves').addEventListener('click', () => {
-  document.getElementById('modalEleves').style.display = 'none';
-});
+          ['closeModalEleves', 'closeModalBtn'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', () => document.getElementById('modalEleves').style.display = 'none');
+          });
 
-document.getElementById('closeModalBtn').addEventListener('click', () => {
-  document.getElementById('modalEleves').style.display = 'none';
-});
+          window.addEventListener('click', (e) => {
+            const modal = document.getElementById('modalEleves');
+            if (e.target === modal) modal.style.display = 'none';
+          });
+        </script>
 
-// Fermer en cliquant en dehors
-window.addEventListener('click', (e) => {
-  const modal = document.getElementById('modalEleves');
-  if (e.target === modal) {
-    modal.style.display = 'none';
-  }
-});
-
-
-
-   
-
-
-
-
-
-
-
-</script>
-
- 
-  <!-- JS -->
-   <script src="{% static 'app_classe/js/classe.js' %}"></script> 
-  <script src="{% static 'js/charts.js' %}"></script>
-  <script src="{% static 'js/role-control.js' %}"></script>
-
-
-
+        <script src="{% static 'app_classe/js/classe.js' %}"></script> 
+        <script src="{% static 'js/charts.js' %}"></script>
+        <script src="{% static 'js/role-control.js' %}"></script>
+    </div>
 </body>
 </html>
