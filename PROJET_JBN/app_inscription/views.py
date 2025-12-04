@@ -86,14 +86,13 @@ def modifier_inscription(request, id):
         prenom = request.POST.get("prenom", eleve.prenom).strip()
         sexe = request.POST.get("sexe", eleve.sexe).strip()
         adresse = request.POST.get("adresse", eleve.adresse).strip()
-        date_naissance = request.POST.get("date_naissance", "")
+        date_naissance_str = request.POST.get("date_naissance", "")
         lieu_naissance = request.POST.get("lieu_naissance", "").strip()
         classe = request.POST.get("classe", eleve.classe).strip()
         telephone = request.POST.get("telephone", eleve.telephone).strip()
         email = request.POST.get("email", eleve.email).strip().lower()  # normalize email
         nom_tuteur = request.POST.get("nom_tuteur", eleve.nom_tuteur).strip()
         tel_tuteur = request.POST.get("tel_tuteur", eleve.tel_tuteur).strip()
-
 
         # ✅ Vérifier si l'email existe déjà pour un autre élève
         if Inscription.objects.filter(email__iexact=email).exclude(id=eleve.id).exists():
@@ -103,21 +102,25 @@ def modifier_inscription(request, id):
         if telephone and Inscription.objects.filter(telephone=telephone).exclude(id=eleve.id).exists():
             return JsonResponse({"error": f"Le numéro de téléphone {telephone} est déjà utilisé par un autre élève."}, status=400)
 
-
         if "photo" in request.FILES:
             eleve.photo = request.FILES["photo"]
 
-        if date_naissance:
+        # ✅ Convertir la date de naissance en objet date, si fournie
+        if date_naissance_str:
+            from datetime import datetime
             try:
-                eleve.date_naissance = datetime.strptime(date_naissance, "%Y-%m-%d").date()
-            except Exception:
-                pass
+                date_naissance_obj = datetime.strptime(date_naissance_str, "%Y-%m-%d").date()
+                eleve.date_naissance = date_naissance_obj  # ✅ Maintenant c'est un objet date
+            except ValueError:
+                # Gérer le cas où la date est mal formatée
+                return JsonResponse({"error": "Format de date de naissance invalide. Utilisez YYYY-MM-DD."}, status=400)
+        else:
+            eleve.date_naissance = None  # ✅ Réinitialiser à None si aucune date fournie
 
         # Mise à jour des autres champs
         eleve.nom = nom
         eleve.prenom = prenom
         eleve.sexe = sexe
-        eleve.date_naissance = date_naissance
         eleve.lieu_naissance = lieu_naissance 
         eleve.adresse = adresse
         eleve.classe = classe
@@ -135,8 +138,8 @@ def modifier_inscription(request, id):
             "prenom": eleve.prenom,
             "sexe": eleve.sexe,
             "adresse": eleve.adresse,
-            "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",
-             "lieu_naissance": eleve.lieu_naissance,
+            "date_naissance": eleve.date_naissance.strftime("%Y-%m-%d") if eleve.date_naissance else "",  # ✅ Maintenant fonctionne
+            "lieu_naissance": eleve.lieu_naissance,
             "classe": eleve.classe,
             "telephone": eleve.telephone,
             "email": eleve.email,
@@ -146,19 +149,18 @@ def modifier_inscription(request, id):
         }
 
         log_action(
-        request=request,
-        action='modifye',
-        objet_type='Inscription',
-        objet_id=eleve.id,
-        description=f"Inskripsyon pou {eleve.nom} {eleve.prenom} te ajoute pa {request.session.get('username')}."
-    )
+            request=request,
+            action='modifye',
+            objet_type='Inscription',
+            objet_id=eleve.id,
+            description=f"Inskripsyon pou {eleve.nom} {eleve.prenom} te ajoute pa {request.session.get('username')}."
+        )
 
         return JsonResponse(data, status=200)
 
     except Exception as e:
         print("❌ Erreur lors de la modification :", e)
         return JsonResponse({"error": "Une erreur est survenue lors de la modification."}, status=400)
-
 
 # pou supprimer yon inskripsyon
 

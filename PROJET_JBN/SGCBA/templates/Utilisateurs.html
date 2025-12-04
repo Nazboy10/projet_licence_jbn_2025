@@ -449,10 +449,11 @@ async function djangoFetch(url, options = {}) {
 
             const actionCell = newRow.insertCell();
             actionCell.className = "text-center";
-            actionCell.innerHTML = `
-                <button class="btn btn-warning btn-sm btn-edit" data-id="${utilisateur.id}"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-sm btn-delete" data-id="${utilisateur.id}"><i class="fas fa-trash-alt"></i></button>
-            `;
+           actionCell.innerHTML = `
+    <button class="btn btn-warning btn-sm btn-edit" data-id="${utilisateur.id}"><i class="fas fa-edit"></i></button>
+    <button class="btn btn-danger btn-sm btn-delete" data-id="${utilisateur.id}"><i class="fas fa-trash-alt"></i></button>
+    <button class="btn btn-light btn-sm btn-reset-password" data-id="${utilisateur.id}" data-email="${utilisateur.email}"><i class="fas fa-key"></i></button>
+`;
         });
 
         // 🛠 Bouton modifier
@@ -558,6 +559,41 @@ async function djangoFetch(url, options = {}) {
                 }
             });
         });
+
+
+     // 🔐 Bouton réinitialiser le mot de passe
+document.querySelectorAll(".btn-reset-password").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+        const userId = e.currentTarget.dataset.id;
+        const userEmail = e.currentTarget.dataset.email;
+
+        if (!confirm(`⚠️ Envoyer un email de réinitialisation à ${userEmail} ?`)) return;
+
+        try {
+            const response = await djangoFetch(`/api/reset_password/`, {
+                method: "POST",
+                body: JSON.stringify({ email: userEmail })
+            });
+
+            if (response.ok) {
+                alert("✅ Email envoyé !");
+            } else {
+                alert("⚠️ Erreur lors de l'envoi de l'email.");
+            }
+        } catch (err) {
+            alert("🚨 Erreur réseau: " + err);
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
     }
 
     loadUsers();
