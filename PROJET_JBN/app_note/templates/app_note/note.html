@@ -79,16 +79,18 @@
 
           
 
-          <!-- Step 1: Code élève -->
-          <div id="step1">
-            <label class="form-label">Code élève</label>
-            <input type="text" id="inputCodeEleve" class="form-control" placeholder="Entrer le code de l'élève">
-            <button id="btnVerifyCode" class="btn btn-primary mt-3">Vérifier et Ajouter</button>
-            <div id="codeError" class="text-danger mt-2" style="display:none;">Élève non trouvé.</div>
-          </div>
+          <!-- Step 1: Code élève (MODIFYE) -->
+<div id="step1" class="text-center mb-4">
+  <label class="form-label" style="font-weight: 500; color: #495057;">Code élève</label>
+  <div class="d-flex justify-content-center mt-2">
+    <input type="text" id="inputCodeEleve" class="form-control" placeholder="Entrer le code de l'élève" style="max-width: 300px;">
+  </div>
+  <button id="btnVerifyCode" class="btn btn-primary mt-3" style="padding: 0.5rem 1.5rem;">Vérifier et Ajouter</button>
+  <div id="codeError" class="text-danger mt-2" style="display:none;">Élève non trouvé.</div>
+</div>
 
           <!-- Step 2: Formulaire note -->
-          <div id="step2" style="display:none;">
+          <div id="step2" style="display:none;text-align: center;">
             <p><strong>Nom:</strong> <span id="nomEleve"></span></p>
             <p><strong>Prénom:</strong> <span id="prenomEleve"></span></p>
             <p><strong>Classe:</strong> <span id="classeEleve"></span></p>
@@ -97,8 +99,10 @@
               <div id="notesFields">
                 <!-- 2 lignes matières/note par défaut générées par JS -->
               </div>
-              <button type="button" id="addNoteRow" class="btn btn-secondary mb-2">Ajouter Matière</button>
-              <button type="submit" class="btn btn-success">Enregistrer</button>
+              <div class="d-flex justify-content-between mt-3">
+  <button type="button" id="addNoteRow" class="btn btn-secondary">Ajouter Matière</button>
+  <button type="submit" class="btn btn-primary">Enregistrer</button>
+</div>
             </form>
 
             <div id="successMessage" class="alert alert-success mt-3">Notes enregistrées avec succès !</div>
@@ -112,7 +116,7 @@
 {% if request.session.role == 'directeur' %}
   <div style="position: fixed; top: 550px; right: 13%; z-index: 9999; font-size: 16px; padding: 10px;">
     <a href="{% url 'gestion_matieres' %}" 
-       style="background: #3e4cc9ff; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+       style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
       🔧 Matières (Directeur)
     </a>
   </div>

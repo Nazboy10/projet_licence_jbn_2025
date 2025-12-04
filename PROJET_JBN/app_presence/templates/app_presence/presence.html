@@ -136,50 +136,55 @@
     </div>
  
 
-    <!-- Formulaire (modal) -->
-    <div id="formModal" class="modal-overlay">
-      <div class="modal-content">
-        <span id="closeModal" class="close">&times;</span>
-        <h4 class="mb-3">Ajouter une presence</h4>
-       <form id="presenceForm">  <!-- ✅ Nouvo ID pou form la -->
-  {% csrf_token %} <!-- ✅ CSRF token -->
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Code de l'eleve</label>
-      <input type="text" name="code_eleve" id="code_eleve" class="form-control" placeholder="Code" required> <!-- ✅ Ajoute 'name' -->
-    </div>
-    
-    <div class="col-md-4">
-      <label class="form-label">Nom</label>
-      <input type="text" name="nom" id="nom_eleve" class="form-control" placeholder="Nom" readonly>  <!-- ✅ Ajoute 'name' -->
+  <!-- Formulaire (modal) - MODIFYE -->
+<div id="formModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 700px; width: 95%; margin: 2rem auto; padding: 1.5rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <span id="closeModal" class="close" style="font-size: 1.8rem; cursor: pointer; float: right; color: #6c757d;">&times;</span>
+    <h4 class="mb-3 text-center">Ajouter une présence</h4>
+
+    <form id="presenceForm">
+      {% csrf_token %}
+
+        <!-- Code Élève (AN MITAN ANLÈ) -->
+    <div class="mb-4 text-center">
+      <label class="form-label" style="font-weight: 500; color: #495057; display: block; margin-bottom: 0.5rem;">Code de l'élève</label>
+      <input type="text" name="code_eleve" id="code_eleve" class="form-control" placeholder="Code" required style="width: 80%; margin: 0 auto; max-width: 300px; border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
     </div>
 
-    <div class="col-md-4">
-      <label class="form-label">Prénom</label>
-      <input type="text" name="prenom" id="prenom_eleve" class="form-control" placeholder="Prénom" readonly>  <!-- ✅ Ajoute 'name' -->
-    </div>
-
-     <div class="col-md-4">
-      <label class="form-label">Classe</label>
-      <input type="text" name="classe" id="classe_eleve" class="form-control" placeholder="Classe" readonly>  <!-- ✅ Ajoute 'name' -->
-    </div>
-
-     <div class="col-md-4">
-      <label class="form-label">Date presence</label>
-      <input type="date" name="date_presence" id="date_presence" class="form-control" required> <!-- ✅ Ajoute 'name' -->
-    </div>
-  </div>
-
-  <div class="text-end">
-    <button type="submit" class="btn btn-custom btn-ajouter">Ajouter</button>
-    {% comment %} <button type="submit" class="btn btn-success btn-custom">Ajouter</button> {% endcomment %}
-    <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
-  </div>
-</form>
+      <!-- Ligne 1 : Nom & Prénom -->
+      <div class="row mb-3">
+        <div class="col-md-6 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500;">Nom</label>
+          <input type="text" name="nom" id="nom_eleve" class="form-control" placeholder="Nom" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight: 500;">Prénom</label>
+          <input type="text" name="prenom" id="prenom_eleve" class="form-control" placeholder="Prénom" readonly>
+        </div>
       </div>
-    </div>
 
-    <!-- Options affichage -->
+      <!-- Ligne 2 : Classe & Date -->
+      <div class="row mb-3">
+        <div class="col-md-6 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500;">Classe</label>
+          <input type="text" name="classe" id="classe_eleve" class="form-control" placeholder="Classe" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" style="font-weight: 500;">Date présence</label>
+          <input type="date" name="date_presence" id="date_presence" class="form-control" required>
+        </div>
+      </div>
+
+      <!-- Bouton anba an mitan, sou menm liy -->
+      <div class="text-center mt-3">
+        <button type="submit" class="btn btn-custom btn-ajouter me-2">Ajouter</button>
+        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Options affichage
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div>
         <label>Afficher 
@@ -192,7 +197,7 @@
         </label>
       </div>
     </div>
-  <br>
+  <br> -->
 
     <!-- Table -->
     <div class="table-responsive">

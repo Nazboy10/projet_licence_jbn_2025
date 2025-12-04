@@ -1,464 +1,354 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulletin</title>
+    <meta name="torrent-scale" content="width=device-width, initial-scale=1.0">
+    <title>BULLETIN DU COLLEGE BELL ANGELOT (CBA)</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-    
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="{% static 'app_bulletin/css/bulle.css' %}">
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'app_bulletin/css/bulle.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/role-control.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+    <!-- ✅ CSS pou enprime sèlman bulletin an -->
+    <style>
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #bulletinPrintArea, #bulletinPrintArea * {
+          visibility: visible;
+        }
+        #bulletinPrintArea {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 20px;
+          box-sizing: border-box;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
 </head>
 <body>
 
-    <div class="sidebar">
-       <div class="logo">
-     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+<div class="sidebar">
+  <div class="logo">
+    <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
     <span>SGCBA</span>
+  </div>
+  <nav>
+    <ul>
+      <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+      <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+      <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+      <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+      <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+      <li id="menu-bulletin"><a href="{% url 'bulletin' %}" class="active"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+      <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
+      <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+      <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+    </ul>
+  </nav>
 </div>
 
-      <nav>
-  <ul>
-    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-    <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-    <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-    <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
-    <li id="menu-bulletin"><a href="{% url 'bulletin' %}"class="active"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-     <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
-    <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-  </ul>
-</nav>
-       
-    </div>
-
-  
-    <div style="display:none;">
-    {% csrf_token %}
+<div style="display:none;">
+  {% csrf_token %}
 </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1>BULLETIN</h1>
-            <div class="search-profile">
-               <div class="search-bar">
-    <i class="fas fa-search"></i>
-    <input 
-        type="text" 
-        id="searchBulletinInput" 
-        placeholder="Rechercher Inscription, Élèves, Pre...">
-</div>
-               <div class="profile">
-    <i class="fas fa-bell notification-icon"></i>
-    <div class="user-avatar" id="profileDropdownToggle">
-    <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
-</div>
-
-    <!-- Dropdown menu -->
-    <div class="profile-dropdown" id="profileDropdown">
-        <ul>
-             <li><a href="{% url 'logout' %}">Déconnecter</a></li>
-        </ul>
-    </div>
-</div>
- </div>
+<div class="main-content">
+  <div class="header">
+    <h1>BULLETIN</h1>
+    <div class="search-profile">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchBulletinInput" placeholder="Rechercher...">
+      </div>
+      <div class="profile">
+        <i class="fas fa-bell notification-icon"></i>
+        <div class="user-avatar" id="profileDropdownToggle">
+          <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
         </div>
- 
+        <div class="profile-dropdown" id="profileDropdown">
+          <ul><li><a href="{% url 'logout' %}">Déconnecter</a></li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
-{% comment %} intefas bulletin an {% endcomment %}
-
-<div class="container">
-
-  <div class="top-right">
+  <!-- ✅ BTN "Générer Bulletin" -->
+  <div class="top-right no-print">
     <button id="btnAfficherFormulaire">Générer Bulletin</button>
   </div>
 
-  <div id="formulairePage">
-    <h1>Antre kòd elèv ou vle generer bulletin pou li a</h1>
-    <input type="text" id="inputCodeForm" placeholder="Entrez code élève">
-    <div id="formulaireButtons">
-      <button id="btnValiderForm">Valider</button>
-      <button id="btnRetourForm">Retour</button>
+  <h2 style="text-align: center;" class="no-print">La liste des Bulletins</h2>
+
+  <div class="container">
+    <!-- ✅ FÒM POU ANTRE KÒD -->
+    <div id="formulairePage" class="no-print" style="display:none; text-align:center; margin:20px;">
+      <h4>Entrer le code de l'élève</h4>
+      <input type="text" id="inputCodeForm" placeholder="Ex: ELEVE123" style="padding:8px; margin:10px; width:250px;">
+      <div>
+        <button id="btnValiderForm" style="margin:5px;">Valider</button>
+        <button id="btnRetourForm" style="margin:5px;">Retour</button>
+      </div>
     </div>
-  </div>
 
-  <div id="listeContainer">
-    <table id="listeBulletin">
-        <h2>La liste des Bulletins</h2>
-      <thead>
-        <tr>
-          <th>Code Élève</th>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Classe</th>
-           <th>Période</th> 
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td><button class="btnRechercher">Afficher</button></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td><button class="btnRechercher">Afficher</button></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- ✅ LIS ELEVE -->
+    <div id="listeContainer" class="no-print">
+      <table id="listeBulletin">
+        <thead>
+          <tr>
+            <th>Code Élève</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Classe</th>
+            <th>Période</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyBulletins">
+          <!-- Rempli pa JS -->
+        </tbody>
+      </table>
+    </div>
 
-  <div id="bulletinPage"></div>
-  <div id="logoCachetContainer"></div>
+    <!-- ✅ ZÒN POU AFICHE BULLETIN AN -->
+    <div id="bulletinPrintArea" style="display:none;"></div>
+  </div>
 </div>
 
 <script>
+  // ===== Inactivité =====
+  let inactivityTimer;
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      fetch('/api/logout/', { method: 'GET', credentials: 'same-origin' }).finally(() => {
+        Swal.fire({
+          title: 'Session expirée',
+          text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+          icon: 'warning',
+          confirmButtonText: 'OK',
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        }).then(() => {
+          window.location.href = '/connexion/';
+        });
+      });
+    }, 2 * 60 * 1000);
+  }
+  ['mousemove','keydown','scroll','click'].forEach(ev => window.addEventListener(ev, resetInactivityTimer));
+  resetInactivityTimer();
 
-    let inactivityTimer;
+  // ===== Profil =====
+  const toggle = document.getElementById('profileDropdownToggle');
+  const dropdown = document.getElementById('profileDropdown');
+  if (toggle && dropdown) {
+    toggle.addEventListener('click', e => {
+      e.stopPropagation();
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', () => dropdown.style.display = 'none');
+  }
 
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            fetch('/api/logout/', {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
-                Swal.fire({
-                    title: 'Session expirée',
-                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    window.location.href = '/connexion/';
-                });
-            });
-        },2 * 60 * 1000); // 2 minutes d'inactivité
+  // ===== Éléments =====
+  const btnAfficherFormulaire = document.getElementById('btnAfficherFormulaire');
+  const formulairePage = document.getElementById('formulairePage');
+  const inputCodeForm = document.getElementById('inputCodeForm');
+  const btnValiderForm = document.getElementById('btnValiderForm');
+  const btnRetourForm = document.getElementById('btnRetourForm');
+  const listeContainer = document.getElementById('listeContainer');
+  const bulletinPrintArea = document.getElementById('bulletinPrintArea');
+  const tbody = document.getElementById('tbodyBulletins');
+
+  // ===== Chaje lis eleve =====
+  async function chargerListeElevesPourBulletin() {
+    try {
+      const res = await fetch('/bulletin/api/liste_eleves/');
+      const eleves = await res.json();
+      if (eleves.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center">Aucun bulletin enregistré</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = eleves.map(e => `
+        <tr>
+          <td>${e.code}</td>
+          <td>${e.nom}</td>
+          <td>${e.prenom}</td>
+          <td>${e.classe}</td>
+          <td>${e.periode || 'N/A'}</td>
+          <td><button class="btnRechercher">Afficher</button></td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center">Erreur de chargement</td></tr>`;
     }
+  }
 
-    resetInactivityTimer();
-
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('keydown', resetInactivityTimer);
-    window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer);
-
-
-
-
-
-  document.addEventListener('DOMContentLoaded', () => {
-
-    // === Gestion du dropdown profil (inchangé) ===
-    const toggle = document.getElementById('profileDropdownToggle');
-    const dropdown = document.getElementById('profileDropdown');
-
-    if (toggle && dropdown) {
-        toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('click', () => {
-            dropdown.style.display = 'none';
-        });
-
-        dropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        const logoutLink = dropdown.querySelector("a");
-        if (logoutLink) {
-            logoutLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                const confirmLogout = confirm("Êtes-vous sûr nazboy de vouloir déconnecter ?");
-                if (confirmLogout) {
-                    window.location.href = this.href;
-                }
-            });
-        }
+  // ===== Fonksyon pou anrejistre =====
+  async function enregistrerBulletin(code, periode) {
+    try {
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                        document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+      const res = await fetch('/bulletin/api/enregistrer/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({ code, periode })
+      });
+      const result = await res.json();
+      if (res.ok) {
+        return { success: true, message: '✅ Bulletin enregistré avec succès !' };
+      } else {
+        throw new Error(result.erreur || 'Échec de l’enregistrement');
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, message: '❌ Erreur : ' + err.message };
     }
+  }
 
-    // === Éléments du bulletin ===
-    const tbody = document.querySelector("#listeBulletin tbody");
-    const bulletinPage = document.getElementById('bulletinPage');
-    const listeContainer = document.getElementById('listeContainer');
-    const logoCachetContainer = document.getElementById('logoCachetContainer');
-    const btnAfficherFormulaire = document.getElementById('btnAfficherFormulaire');
-    const formulairePage = document.getElementById('formulairePage');
-    const inputCodeForm = document.getElementById('inputCodeForm');
-    const btnValiderForm = document.getElementById('btnValiderForm');
-    const btnRetourForm = document.getElementById('btnRetourForm');
+  // ===== Afiche bulletin =====
+  async function chargerEtAfficherBulletin(code) {
+    try {
+      const res = await fetch(`/bulletin/api/bulletin/?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erreur || "Élève non trouvé");
 
-    // === Fonction principale : afficher bulletin depuis l'API ===
-    async function chargerEtAfficherBulletin(codeEleve) {
-        try {
-            const res = await fetch(`/bulletin/api/bulletin/?code=${encodeURIComponent(codeEleve)}`);
-            const data = await res.json();
+      const { eleve, notes, total_pondere, moyenne, mention } = data;
+      const lignes = notes.map(n => 
+        `<tr><td>${n.matiere}</td><td>${n.coef}</td><td>${n.note}</td><td>${n.pondere.toFixed(2)}</td></tr>`
+      ).join('');
 
-            if (!res.ok) {
-                alert(data.erreur || "Élève non trouvé ou aucune note disponible.");
-                return;
-            }
-
-            const { eleve, notes, total_pondere, moyenne, mention } = data;
-            listeContainer.style.display = 'none';
-            formulairePage.style.display = 'none';
-            btnAfficherFormulaire.style.display = 'inline-block';
-
-            const lignesNotes = notes.map(n => 
-                `<tr><td>${n.matiere}</td><td>${n.coef}</td><td>${n.note}</td><td>${n.pondere.toFixed(2)}</td></tr>`
-            ).join('');
-
-           bulletinPage.innerHTML = `
-    <img id="bulletinLogo" src="/static/icone/CBA.png" alt="Logo École" style="max-width:150px; margin-bottom:10px;">
-    <h3>Bulletin de ${eleve.prenom} ${eleve.nom} | Classe: ${eleve.classe}</h3>
-    <table border="1" style="width:100%; margin-top:10px; border-collapse: collapse;">
-        <thead>
+      bulletinPrintArea.innerHTML = `
+        <img src="/static/icone/CBA.png" alt="Logo" id="bulletinLogo" style="max-width:150px; display:block; margin:0 auto 10px;">
+        <h3 style="text-align:center;">Bulletin de ${eleve.prenom} ${eleve.nom} | Classe: ${eleve.classe}</h3>
+        <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+          <thead style="background-color:#0d6efd; color:white;">
             <tr><th>Matière</th><th>Coef</th><th>Note</th><th>Pondérée</th></tr>
-        </thead>
-        <tbody>
-            ${lignesNotes}
-        </tbody>
-        <tfoot>
+          </thead>
+          <tbody>${lignes}</tbody>
+          <tfoot>
             <tr><td colspan="3">Total pondéré</td><td>${total_pondere.toFixed(2)}</td></tr>
             <tr><td colspan="3">Moyenne</td><td>${moyenne} (${mention})</td></tr>
-        </tfoot>
-    </table>
-    <img id="bulletinCachet" src="/static/image/cachet.png" alt="Cachet Directeur" style="max-width:150px; margin-top:10px;">
-    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button onclick="window.print()">🖨️ Imprimer / PDF</button>
-        <button id="btnEnregistrerBulletin" data-code="${eleve.code}" data-periode="${data.periode || '1er_trimestre'}">
+          </tfoot>
+        </table>
+        
+        <!-- ✅ Cachet / Siyati -->
+        <div style="text-align:center; margin:20px 0;">
+          <img src="/static/image/cachet.png" alt="Cachet" id="bulletinCachet" style="max-width:150px; display:none;">
+          <div id="cachetPlaceholder" style="margin-top:10px; color:#666;">Aucun cachet sélectionné</div>
+          <input type="file" id="cachetInput" accept="image/*" style="display:none;">
+          <button id="btnChoisirCachet" style="margin-top:10px;">📎 Choisir Cachet / Siyati</button>
+        </div>
+
+        <!-- ✅ Bouton aksyon -->
+        <div style="text-align:center; margin-top:20px;" class="no-print">
+          <button id="btnEnregistrerBulletin" data-code="${eleve.code}" data-periode="${data.periode || '1er_trimestre'}">
             💾 Enregistrer dans la base
-        </button>
-        <button id="btnRetour">⬅️ Retour à la liste</button>
-    </div>
-`;
+          </button>
+          <button id="btnImprimerBulletin" style="display:none;">🖨️ Imprimer / PDF</button>
+          <button id="btnRetourDuBulletin">⬅️ Retour à la liste</button>
+        </div>
+      `;
 
-            // Réinitialiser la zone de chargement d'images
-            logoCachetContainer.innerHTML = `
-                <input type="file" id="logoChoix" accept="image/*" style="display:none;">
-                <input type="file" id="cachetChoix" accept="image/*" style="display:none;">
-            `;
+      // Kache tout lòt bagay
+      listeContainer.style.display = 'none';
+      formulairePage.style.display = 'none';
+      document.querySelector('.top-right').style.display = 'none';
+      document.querySelector('h2').style.display = 'none';
+      bulletinPrintArea.style.display = 'block';
 
-            // Gérer le retour
-            document.getElementById('btnRetour').addEventListener('click', () => {
-                bulletinPage.innerHTML = '';
-                logoCachetContainer.innerHTML = '';
-                listeContainer.style.display = 'block';
-            });
+      // ===== EVENMAN =====
+      document.getElementById('btnChoisirCachet').addEventListener('click', () => {
+        document.getElementById('cachetInput').click();
+      });
 
-
-
-             
-// ✅ NOUVEAU : Gérer l'enregistrement
-document.getElementById('btnEnregistrerBulletin')?.addEventListener('click', async () => {
-    const code = document.getElementById('btnEnregistrerBulletin').dataset.code;
-    const periode = document.getElementById('btnEnregistrerBulletin').dataset.periode;
-
-    try {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                          document.cookie.replace(/(?:(?:^|.*;\s*)csrftoken\s*=\s*([^;]*).*$)|^.*$/, "$1");
-
-        const res = await fetch('/bulletin/api/enregistrer/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({ code, periode })
-        });
-
-        const result = await res.json();
-        if (res.ok) {
-            alert('✅ Bulletin enregistré avec succès !');
-        } else {
-            alert('❌ Erreur : ' + (result.erreur || 'Échec'));
+      document.getElementById('cachetInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = document.getElementById('bulletinCachet');
+            img.src = event.target.result;
+            img.style.display = 'block';
+            document.getElementById('cachetPlaceholder').style.display = 'none';
+            document.getElementById('btnImprimerBulletin').style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
         }
-    } catch (err) {
-        console.error(err);
-        alert('Erreur réseau lors de l’enregistrement.');
-    }
-});
+      });
 
+      document.getElementById('btnEnregistrerBulletin').addEventListener('click', async () => {
+        const btn = document.getElementById('btnEnregistrerBulletin');
+        const result = await enregistrerBulletin(btn.dataset.code, btn.dataset.periode);
+        alert(result.message);
+      });
 
+      document.getElementById('btnImprimerBulletin').addEventListener('click', () => {
+        window.print();
+      });
 
-
-            // Gérer le changement de logo/cachet
-            const logoInput = document.getElementById('logoChoix');
-            const cachetInput = document.getElementById('cachetChoix');
-
-            if (logoInput) {
-                logoInput.addEventListener('change', e => {
-                    if (e.target.files[0]) {
-                        const url = URL.createObjectURL(e.target.files[0]);
-                        document.getElementById('bulletinLogo').src = url;
-                    }
-                });
-            }
-
-            if (cachetInput) {
-                cachetInput.addEventListener('change', e => {
-                    if (e.target.files[0]) {
-                        const url = URL.createObjectURL(e.target.files[0]);
-                        document.getElementById('bulletinCachet').src = url;
-                    }
-                });
-            }
-
-        } catch (err) {
-            console.error("Erreur de chargement du bulletin :", err);
-            alert("Erreur de connexion au serveur. Veuillez réessayer.");
-        }
-    }
-
-    // === Gestion des clics ===
-    tbody.addEventListener('click', e => {
-        if (e.target.classList.contains('btnRechercher')) {
-            const row = e.target.closest('tr');
-            const code = row?.children[0]?.textContent?.trim();
-            if (code) {
-                chargerEtAfficherBulletin(code);
-                logoCachetContainer.innerHTML = '';
-                btnAfficherFormulaire.style.display = 'none';
-            }
-        }
-    });
-
-    btnAfficherFormulaire.addEventListener('click', () => {
-        formulairePage.style.display = 'block';
-        inputCodeForm.value = '';
-        inputCodeForm.focus();
-        listeContainer.style.display = 'none';
-        bulletinPage.innerHTML = '';
-        btnAfficherFormulaire.style.display = 'none';
-    });
-
-    btnValiderForm.addEventListener('click', () => {
-        const code = inputCodeForm.value.trim();
-        if (!code) {
-            alert("Veuillez entrer le code de l'élève.");
-            return;
-        }
-        chargerEtAfficherBulletin(code);
-    });
-
-    btnRetourForm.addEventListener('click', () => {
-        formulairePage.style.display = 'none';
+      document.getElementById('btnRetourDuBulletin').addEventListener('click', () => {
+        bulletinPrintArea.innerHTML = '';
+        bulletinPrintArea.style.display = 'none';
         listeContainer.style.display = 'block';
-        btnAfficherFormulaire.style.display = 'inline-block';
-    });
+        document.querySelector('.top-right').style.display = 'inline-block';
+        document.querySelector('h2').style.display = 'block';
+      });
 
-
-
-
-  // === NOUVO: Chaje lis eleve ki kapab gen bulletin ===
-async function chargerListeElevesPourBulletin() {
-    try {
-        const res = await fetch('/bulletin/api/liste_eleves/');
-        if (!res.ok) throw new Error('Erreur serveur');
-        const eleves = await res.json();
-
-        const tbody = document.querySelector("#listeBulletin tbody");
-        if (eleves.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6">Aucun bulletin enregistré</td></tr>`; // ✅ Mete colspan = 6
-            return;
-        }
-
-        tbody.innerHTML = eleves.map(e => `
-            <tr>
-                <td>${e.code}</td>
-                <td>${e.nom}</td>
-                <td>${e.prenom}</td>
-                <td>${e.classe}</td>
-                <td>${e.periode || 'N/A'}</td>  <!-- ✅ Nouvo kolonn pou periode -->
-                <td><button class="btnRechercher">Afficher</button></td>
-            </tr>
-        `).join('');
     } catch (err) {
-        console.error("Erreur chargement liste élèves:", err);
-        document.querySelector("#listeBulletin tbody").innerHTML = 
-            `<tr><td colspan="6">❌ Erreur de connexion</td></tr>`; // ✅ Mete colspan = 6
+      alert("Erreur : " + err.message);
     }
-}
+  }
 
+  // ===== Événements =====
+  btnAfficherFormulaire.addEventListener('click', () => {
+    formulairePage.style.display = 'block';
+    listeContainer.style.display = 'none';
+    document.querySelector('h2').style.display = 'none';
+  });
 
-chargerListeElevesPourBulletin();
+  btnRetourForm.addEventListener('click', () => {
+    formulairePage.style.display = 'none';
+    listeContainer.style.display = 'block';
+    document.querySelector('h2').style.display = 'block';
+  });
 
+  btnValiderForm.addEventListener('click', () => {
+    const code = inputCodeForm.value.trim();
+    if (!code) {
+      alert("Veuillez entrer le code de l'élève.");
+      return;
+    }
+    chargerEtAfficherBulletin(code);
+  });
 
+  tbody.addEventListener('click', (e) => {
+    if (e.target.classList.contains('btnRechercher')) {
+      const row = e.target.closest('tr');
+      const code = row.children[0].textContent.trim();
+      if (code) chargerEtAfficherBulletin(code);
+    }
+  });
 
+  chargerListeElevesPourBulletin();
 
-
-
-
-
-
-});
-
-// === Recherche en temps réel pour la liste des bulletins ===
-const searchInput = document.getElementById('searchBulletinInput');
-const bulletinTable = document.getElementById('listeBulletin');
-const tbody = bulletinTable.querySelector('tbody');
-
-if (searchInput && tbody) {
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase().trim();
-        let visibleCount = 0;
-
-        // Parcourir chaque ligne du tableau
-        Array.from(tbody.rows).forEach(row => {
-            const text = row.textContent.toLowerCase();
-            
-            if (searchTerm === '' || text.includes(searchTerm)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Gérer le message "Aucun résultat"
-        const noResultRow = document.getElementById('no-result-row');
-        if (searchTerm !== '' && visibleCount === 0) {
-            if (!noResultRow) {
-                const newRow = document.createElement('tr');
-                newRow.id = 'no-result-row';
-                // 6 colonnes → colspan="6"
-                newRow.innerHTML = `<td colspan="6" class="text-center text-muted">Aucun bulletin trouvé</td>`;
-                tbody.appendChild(newRow);
-            }
-        } else if (noResultRow) {
-            noResultRow.remove();
-        }
+  document.getElementById('searchBulletinInput')?.addEventListener('input', function() {
+    const term = this.value.toLowerCase();
+    document.querySelectorAll('#tbodyBulletins tr').forEach(row => {
+      row.style.display = term && !row.textContent.toLowerCase().includes(term) ? 'none' : '';
     });
-}
-
-
-
-
-
+  });
 </script>
-
 
 <script src="{% static 'js/dropdown.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
-<script src="{% static 'app_bulletin/js/jo.js' %}"></script>
-
 </body>
 </html>

@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-      <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- CSS Custom -->
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- CSS Custom -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <link rel="stylesheet" href="{% static 'app_inscription/css/inscription.css' %}">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{% static 'app_inscription/css/inscription.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -73,9 +72,6 @@
     <button id="btnShowForm" class="btn btn-primary">Inscrire</button>
   </div>
 
-  
-  
-
   <style>
         .phone-input-group {
             display: flex;
@@ -93,121 +89,113 @@
             border-radius: 0 0.375rem 0.375rem 0 !important;
         }
     </style>
+<!-- ✅ Modal (3 kolon, net, responsive) -->
+<div id="formModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 750px;height: 590px; width: 95%; margin: 2rem auto; padding: 1.5rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <span id="closeModal" class="close" style="font-size: 1.8rem; cursor: pointer; float: right; color: #6c757d;">&times;</span>
+    <h4 class="text-center mb-4" id="formTitle" style="color: #343a40; font-weight: 550;">Formulaire Inscription</h4>
 
-  <!-- ✅ Modal -->
-  <div id="formModal" class="modal-overlay">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h4 class="text-center mb-3" id="formTitle">Formulaire Inscription</h4>
+    <form id="inscriptionForm" data-url="{% url 'ajouter_inscription' %}" enctype="multipart/form-data" method="POST" action="{% url 'ajouter_inscription' %}">
+      {% csrf_token %}
+      <input type="hidden" name="eleve_id" id="eleveId">
 
-      <form id="inscriptionForm"  data-url="{% url 'ajouter_inscription' %}" enctype="multipart/form-data" method="POST" action="{% url 'ajouter_inscription' %}">
-        {% csrf_token %}
-        <input type="hidden" name="eleve_id" id="eleveId">
+      <!-- Ligne 1 : Nom, Prénom, Sexe -->
+      <div class="row mb-3">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Nom</label>
+          <input type="text" name="nom" class="form-control" placeholder="nom" required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Prénom</label>
+          <input type="text" name="prenom" class="form-control" placeholder="prenom" required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Sexe</label>
+          <select name="sexe" class="form-select" required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+            <option value="" disabled selected>Sélectionner</option>
+            <option>Masculin</option>
+            <option>Féminin</option>
+          </select>
+        </div>
+      </div>
 
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Nom</label>
-            <input type="text" name="nom" class="form-control" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Prénom</label>
-            <input type="text" name="prenom" class="form-control" required>
+      <!-- Ligne 2 : Adresse, Date naissance, Lieu naissance -->
+      <div class="row mb-3">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Adresse</label>
+          <input type="text" name="adresse" class="form-control" placeholder="Cap-Haitien"  required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Date de naissance</label>
+          <input type="date" name="date_naissance" class="form-control" required max="{{ max_birth_date|date:'Y-m-d' }}" style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Lieu de naissance</label>
+          <input type="text" name="lieu_naissance" class="form-control" placeholder="Ex: Port-au-Prince" style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+      </div>
+
+      <!-- Ligne 3 : Classe, Téléphone, Nom Tuteur -->
+      <div class="row mb-3">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Classe</label>
+          <select name="classe" class="form-select" required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+            <option value="" disabled selected>Sélectionner</option>
+            {% for classe in classes %}
+              <option value="{{ classe.nom_classe }}">{{ classe.nom_classe }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Téléphone</label>
+          <div class="phone-input-group" style="display: flex; align-items: center; border: 1px solid #ced4da; border-radius: 6px; overflow: hidden;">
+            <span class="phone-prefix" style="background-color: #e9ecef; padding: 0.5rem 0.75rem; font-weight: 500; border-right: 1px solid #ced4da;">+509</span>
+            <input type="text" name="telephone" class="form-control" placeholder="Ex: 3812 3456" maxlength="9" pattern="[0-9]{8,9}" required style="border: none; padding: 0.5rem; flex: 1;">
           </div>
         </div>
+        <div class="col-md-4">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Nom Tuteur</label>
+          <input type="text" name="nom_tuteur" class="form-control" required style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        </div>
+      </div>
 
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Sexe</label>
-            <select name="sexe" class="form-select" required>
-              <option value=""disabled>Sélectionner</option>
-              <option>Masculin</option>
-              <option>Féminin</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Adresse</label>
-            <input type="text" name="adresse" class="form-control" required>
+      <!-- Ligne 4 : Téléphone Tuteur, Email, Date inscription -->
+      <div class="row mb-3">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Téléphone Tuteur</label>
+          <div class="phone-input-group" style="display: flex; align-items: center; border: 1px solid #ced4da; border-radius: 6px; overflow: hidden;">
+            <span class="phone-prefix" style="background-color: #e9ecef; padding: 0.5rem 0.75rem; font-weight: 500; border-right: 1px solid #ced4da;">+509</span>
+            <input type="text" name="tel_tuteur" class="form-control" placeholder="Ex: 3812 3456" maxlength="9" pattern="[0-9]{8,9}" required style="border: none; padding: 0.5rem; flex: 1;">
           </div>
         </div>
-
-        <!-- Nan fòm modal la -->
-
-
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Date de naissance</label>
-            <input type="date" name="date_naissance" class="form-control" required max="{{ max_birth_date|date:'Y-m-d' }}">
-          </div>
-         <div class="col-md-6">
-  <label class="form-label">Classe</label>
-  <select name="classe" class="form-select" required>
-    <option value="">Sélectionner une classe</option>
-    {% for classe in classes %}
-     <!-- ✅ Bon -->
-<option value="{{ classe.nom_classe }}">{{ classe.nom_classe }}</option>
-    {% endfor %}
-  </select>
-</div>
+        <div class="col-md-4 mb-2 mb-md-0">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="exemple.@gmail.com" style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
         </div>
-
-       <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Lieu de naissance</label>
-            <input type="text" name="lieu_naissance" class="form-control" placeholder="Ex: Port-au-Prince">
-          </div>
-          
+        <div class="col-md-4">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Date d’inscription</label>
+          <input type="date" name="date_inscription" class="form-control" value="{{ today|date:'Y-m-d' }}" style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
         </div>
-         
+      </div>
 
-
-        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Téléphone</label>
-                                <div class="phone-input-group">
-                                    <span class="phone-prefix">+509</span>
-                                    <input type="text" name="telephone" class="form-control" placeholder="Ex: 3812 3456" maxlength="9" pattern="[0-9]{8,9}" required>
-                                </div>
-                            </div>
-          <div class="col-md-6">
-            <label class="form-label">Nom Tuteur</label>
-            <input type="text" name="nom_tuteur" class="form-control" required>
-          </div>
+      <!-- Ligne 5 : Photo (sou liy li, san 3 kolon) -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <label class="form-label" style="font-weight: 500; color: #495057;">Photo élève</label>
+          <input type="file" name="photo" class="form-control" accept="image/*" style="border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
         </div>
+      </div>
 
-         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Téléphone Tuteur</label>
-                                <div class="phone-input-group">
-                                    <span class="phone-prefix">+509</span>
-                                    <input type="text" name="tel_tuteur" class="form-control" placeholder="Ex: 3812 3456" maxlength="9" pattern="[0-9]{8,9}" required>
-                                </div>
-                            </div>
-          <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control">
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Date d’inscription</label>
-            <input type="date" name="date_inscription" class="form-control" value="{{ today|date:'Y-m-d' }}">
-          </div>
-          
-          <div class="col-md-6">
-            <label class="form-label">Photo élève</label>
-            <input type="file" name="photo" class="form-control" accept="image/*">
-          </div>
-        </div>
-
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary" id="btnSubmit">Inscrire</button>
-          <button type="button" id="cancelForm" class="btn btn-secondary">Fermer</button>
-        </div>
-      </form>
-    </div>
+      <!-- Bouton -->
+      <div class="text-center mt-2">
+        <button type="submit" class="btn btn-primary" id="btnSubmit" style="padding: 0.5rem 1.2rem; font-weight: 500; border-radius: 6px;">Inscrire</button>
+        <button type="button" id="cancelForm" class="btn btn-secondary ms-2" style="padding: 0.5rem 1.2rem; font-weight: 500; border-radius: 6px;">Fermer</button>
+      </div>
+    </form>
   </div>
-  <!-- Options affichage -->
+</div>
+
+  <!-- Options affichage
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div>
         <label>Afficher 
@@ -219,9 +207,8 @@
           Inscription
         </label>
       </div>
-    </div>
+    </div> -->
  
-
   <!-- ✅ Tableau -->
   <div class="table-responsive mt-4">
     <table class="table table-striped table-bordered align-middle" id="tableEleves">
@@ -252,32 +239,22 @@
           <td>{{ eleve.nom }}</td>
           <td>{{ eleve.prenom }}</td>
           <td>{{ eleve.sexe }}</td>
-          
-         
           <td>{{ eleve.classe }}</td>
-         
-          
-         
           <td>{{ eleve.date_inscription }}</td>
           <td>{{ annee_academique }}</td>
         <td class="text-center">
   <div class="d-flex justify-content-center gap-2">
-    
-    <!-- bouton je -->
-    
     <button class="btn btn-sm btn-outline-primary" onclick="showDetails('{{ eleve.id }}')">
       <i class="bi bi-eye"></i>
     </button>
 
     {% if eleve.valide %}
-      <!-- ✅ Bouton Modifier -->
-     <button class="btn btn-warning btn-sm"
+      <button class="btn btn-warning btn-sm"
   onclick="editEleve('{{ eleve.id }}', '{{ eleve.nom }}', '{{ eleve.prenom }}', '{{ eleve.sexe }}', '{{ eleve.adresse }}', '{{ eleve.date_naissance }}', '{{ eleve.lieu_naissance|default:'' }}', '{{ eleve.classe }}', '{{ eleve.telephone }}', '{{ eleve.email }}', '{{ eleve.nom_tuteur }}', '{{ eleve.tel_tuteur }}')">
   <i class="bi bi-pencil"></i>
 </button>
 
       {% if role == 'directeur' %}
-        <!-- ✅ Bouton Supprimer -->
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ eleve.id }}')">
           <i class="bi bi-trash"></i>
         </button>
@@ -309,7 +286,6 @@
   </div>
 </div>
 
-
 <!-- Modal Detay Elèv -->
 <div class="modal fade" id="modalDetails" tabindex="-1" aria-labelledby="modalDetailsLabel" aria-hidden="true">
   <div class="modal-dialog modal-md">
@@ -320,12 +296,9 @@
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <!-- Photo centrée en haut (plus élégante) -->
           <div class="col-12 text-center">
             <img id="detail-photo" src="" alt="Photo élève" class="rounded-circle shadow" style="width: 90px; height: 90px; object-fit: cover;">
           </div>
-
-          <!-- Infos en 2 colonnes -->
           <div class="col-md-6">
             <p class="mb-1"><strong>Code :</strong> <span id="detail-code" class="text-muted">—</span></p>
             <p class="mb-1"><strong>Nom :</strong> <span id="detail-nom" class="text-muted">—</span></p>
@@ -351,7 +324,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- ✅ Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -460,8 +432,6 @@
     }
   });
 
-
-
     let inactivityTimer;
 
     function resetInactivityTimer() {
@@ -471,7 +441,6 @@
                 method: 'GET',
                 credentials: 'same-origin'
             }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
                 Swal.fire({
                     title: 'Session expirée',
                     text: 'Vous avez été déconnecté automatiquement pour inactivité.',
@@ -492,13 +461,7 @@
     window.addEventListener('keydown', resetInactivityTimer);
     window.addEventListener('scroll', resetInactivityTimer);
     window.addEventListener('click', resetInactivityTimer);
-
-
-
-
-
 </script>
-
 
 <script>
 // ✅ Afficher détails élève
@@ -542,11 +505,10 @@ function editEleve(id, nom, prenom, sexe, adresse, date_naissance, lieu_naissanc
   form.sexe.value = sexe;
   form.adresse.value = adresse;
 
-  // ✅ Kòrèk pou date_naissance
   if (date_naissance) {
-    form.date_naissance.value = date_naissance;  // Si gen dat, mete
+    form.date_naissance.value = date_naissance;
   } else {
-    form.date_naissance.value = "";  // Si pa gen dat, vide chpo a
+    form.date_naissance.value = "";
   }
 
   form.lieu_naissance.value = lieu_naissance;
@@ -556,11 +518,9 @@ function editEleve(id, nom, prenom, sexe, adresse, date_naissance, lieu_naissanc
   form.nom_tuteur.value = nom_tuteur;
   form.tel_tuteur.value = tel_tuteur;
 
-  // Action URL pou modification
   form.action = `/inscription/modifier/${id}/`;
 }
 
-// ✅ Bouton fermer
 document.getElementById("cancelForm").addEventListener("click", function() {
   document.getElementById("formModal").style.display = "none";
   const form = document.getElementById("inscriptionForm");
@@ -570,12 +530,10 @@ document.getElementById("cancelForm").addEventListener("click", function() {
   document.getElementById("formTitle").textContent = "Formulaire Inscription";
 });
 
-// ✅ Bouton afficher fòm
 document.getElementById("btnShowForm").addEventListener("click", function() {
   document.getElementById("formModal").style.display = "block";
 });
 
-// ✅ Bouton X pou fèmen modal
 document.getElementById("closeModal").addEventListener("click", function() {
   document.getElementById("formModal").style.display = "none";
 });
@@ -587,7 +545,6 @@ document.getElementById("closeModal").addEventListener("click", function() {
   <script src="{% static 'js/role-control.js' %}"></script>
 
  <script>
-    // ✅ Fonction pour gérer le bouton "Valider"
     function setupValiderButtons() {
         document.querySelectorAll('.btn-valider').forEach(button => {
             button.addEventListener('click', function () {
@@ -597,7 +554,7 @@ document.getElementById("closeModal").addEventListener("click", function() {
                 fetch(`/inscription/valider/${id}/`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': getCSRFToken(),  // Assure-toi que cette fonction est accessible
+                        'X-CSRFToken': getCSRFToken(),
                     },
                 })
                 .then(response => response.json())
@@ -612,7 +569,7 @@ document.getElementById("closeModal").addEventListener("click", function() {
                         }).then(() => {
                              const url = new URL(window.location);
     url.searchParams.set('page', currentPage);
-    window.location.href = url; // ✅ Recharge la page pour mise à jour
+    window.location.href = url;
                         });
                     } else {
                         Swal.fire({
@@ -634,12 +591,10 @@ document.getElementById("closeModal").addEventListener("click", function() {
         });
     }
 
-    // ✅ Appelle la fonction une fois que le DOM est chargé
     document.addEventListener('DOMContentLoaded', function() {
         setupValiderButtons();
     });
   </script>
-
 
 </body>
 </html>

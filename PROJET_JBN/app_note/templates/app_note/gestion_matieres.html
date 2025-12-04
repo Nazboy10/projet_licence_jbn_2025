@@ -20,12 +20,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .card-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0d6efd,#0d6efd);
             color: white;
             border-bottom: none;
         }
         .btn-custom {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg,#0d6efd, #0d6efd);
             border: none;
             padding: 8px 20px;
             border-radius: 6px;
@@ -35,11 +35,11 @@
             transform: translateY(-2px);
         }
         .list-group-item {
-            border-left: 4px solid #1e3c72;
+            border-left: 4px solid #0d6efd;
             border-radius: 6px !important;
             margin-bottom: 8px;
             background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(243, 5, 5, 0.05);
         }
         .empty-state {
             text-align: center;
@@ -65,7 +65,7 @@
                 <i class="fas fa-book me-2"></i>Gestion des matières
             </h2>
             <a href="{% url 'note' %}" class="back-link">
-                <i class="fas fa-arrow-left me-1"></i>Retour au notes
+                <i class="fas fa-arrow-left me-1" style="background-color: #0d6efd; color: white;"></i><span style="color: #0d6efd;">Retour</span>
             </a>
         </div>
 
@@ -89,7 +89,7 @@
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-custom w-100">
-                            <i class="fas fa-plus me-2"></i>Ajouter
+                            <i class="fas fa-plus me-2" style="color: white;"></i><span style="color: white;">Ajouter Matiere</span>
                         </button>
                     </div>
                 </form>
