@@ -100,7 +100,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOWED_ORIGINS += [
-    "https://projet-licence-jbn-2025.onrender.com",
+    "https://projet-licence-jbn-2025.onrender.com  ",
 ]
 
 
@@ -193,12 +193,24 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ===========================
-# EMAIL (GMAIL)
+# EMAIL (Sendinblue / Brevo)
 # ===========================
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'collegebellangelot5@gmail.com'
-EMAIL_HOST_PASSWORD = 'blredshkwzdlzuht'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+if os.environ.get("ENVIRONMENT") == "production":
+    # ✅ Mode production : Envoie via Sendinblue (Brevo)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp-relay.brevo.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')  # 👈 Mets dans Render Dashboard
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # 👈 Mets dans Render Dashboard
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'SGCBA <collegebellangelot5@gmail.com>')
+else:
+    # ✅ Mode développement : Affiche dans la console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # Si tu veux envoyer via Gmail en local, décommente les lignes ci-dessous :
+    # EMAIL_HOST = 'smtp.gmail.com'
+    # EMAIL_PORT = 587
+    # EMAIL_USE_TLS = True
+    # EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER_GMAIL')
+    # EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD_GMAIL')
+    # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

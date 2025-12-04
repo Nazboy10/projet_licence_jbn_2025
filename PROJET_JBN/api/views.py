@@ -279,7 +279,8 @@ class ResetPasswordAPIView(APIView):
        # api/views.py
        # api/views.py
         # api/views.py
-        reset_link = f"http://localhost:8000/reset_password_confirm/{uid}/{token}/"
+        reset_link = f"https://projet-licence-jbn-2025.onrender.com/reset_password_confirm/{uid}/{token}/"
+
 
 
 

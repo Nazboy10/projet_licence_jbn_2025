@@ -10,4 +10,6 @@ urlpatterns = [
     path("matieres/gestion/", views.gestion_matieres, name="gestion_matieres"),
     path("api/notes/", views.lister_notes, name="lister_notes"),
      path('matieres/', views.gestion_matieres, name='gestion_matieres'),
+     path('api/supprimer-notes/<str:code_eleve>/', views.supprimer_notes_eleve, name='supprimer_notes_eleve'),
+     path('api/modifier-notes/', views.modifier_notes_eleve, name='modifier_notes_eleve'),
 ]

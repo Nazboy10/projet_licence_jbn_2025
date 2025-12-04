@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestion Notes</title>
 <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
- <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+ <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css  ' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css  ">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css  " rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css  " rel="stylesheet">
  <link rel="stylesheet" href="{% static 'app_note/css/note.css' %}">
 <script src="{% static 'js/role-control.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11  "></script>
 </head>
 <body>
 
@@ -143,7 +143,7 @@
     <th>Nom</th>
     <th>Prénom</th>
     <th>Classe</th>
-    
+     <th>Période</th>
     <th>Notes</th>
     
     <th>Action</th>
@@ -157,95 +157,576 @@
     </div>
 </div>
 
+  <!-- Modal pour éditer les notes -->
+<div id="editNotesModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001;">
+  <div style="background:white; margin:50px auto; padding:20px; width:90%; max-width:600px; border-radius:8px;">
+    <h5>Modifier les notes de <span id="editModalEleveNom"></span></h5>
+    <form id="editFormNotes">
+      <div id="editNotesFields">
+        <!-- Les champs seront insérés ici dynamiquement -->
+      </div>
+      {% comment %} <button type="button" id="addEditNoteRow" class="btn btn-secondary mb-2">Ajouter Matière</button> {% endcomment %}
+      <button type="submit" class="btn btn-success">Enregistrer Modifications</button>
+      <button type="button" id="closeEditModal" class="btn btn-secondary ms-2">Fermer</button>
+    </form>
+  </div>
+</div>
+<!-- ... (reste du HTML inchangé) ... -->
+
 <script>
-
-    let inactivityTimer;
-
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            fetch('/api/logout/', {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
-                Swal.fire({
-                    title: 'Session expirée',
-                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    window.location.href = '/connexion/';
-                });
-            });
-        },2 * 60 * 1000); // 2 minutes d'inactivité
+    // === Fonction pour obtenir le cookie CSRF ===
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
-    resetInactivityTimer();
+    // === Charger les matières ===
+    let matieresList = [];
+    fetch('/note/api/matieres/')
+        .then(res => res.json())
+        .then(data => {
+            matieresList = data;
+        })
+        .catch(err => console.error("Erreur chargement matières:", err));
 
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('keydown', resetInactivityTimer);
-    window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('DOMContentLoaded', () => {
+        let inactivityTimer;
 
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                fetch('/api/logout/', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                }).finally(() => {
+                    // ✅ Remplace alert() par SweetAlert2
+                    Swal.fire({
+                        title: 'Session expirée',
+                        text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        window.location.href = '/connexion/';
+                    });
+                });
+            }, 2 * 60 * 1000); // 2 minutes d'inactivité
+        }
 
+        resetInactivityTimer();
 
-// === Recherche en temps réel ===
-const searchInput = document.getElementById('searchNotesInput');
-const tbody = document.getElementById('tableElevesBody');
+        window.addEventListener('mousemove', resetInactivityTimer);
+        window.addEventListener('keydown', resetInactivityTimer);
+        window.addEventListener('scroll', resetInactivityTimer);
+        window.addEventListener('click', resetInactivityTimer);
 
-if (searchInput && tbody) {
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase().trim();
-        let visibleCount = 0;
+        // === Recherche en temps réel ===
+        const searchInput = document.getElementById('searchNotesInput');
+        const tbody = document.getElementById('tableElevesBody');
 
-        // Parcourir chaque ligne du tableau
-        Array.from(tbody.rows).forEach(row => {
-            const text = row.textContent.toLowerCase();
-            
-            if (searchTerm === '' || text.includes(searchTerm)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
+        if (searchInput && tbody) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                // Parcourir chaque ligne du tableau
+                Array.from(tbody.rows).forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    
+                    if (searchTerm === '' || text.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Gérer le message "Aucun résultat"
+                const noResultRow = document.getElementById('no-result-row');
+                if (searchTerm !== '' && visibleCount === 0) {
+                    if (!noResultRow) {
+                        const newRow = document.createElement('tr');
+                        newRow.id = 'no-result-row';
+                        // ⚠️ 7 colonnes → colspan="7"
+                        newRow.innerHTML = `<td colspan="7" class="text-center text-muted">Aucun résultat trouvé</td>`;
+                        tbody.appendChild(newRow);
+                    }
+                } else if (noResultRow) {
+                    noResultRow.remove();
+                }
+            });
+        }
+
+        const toggle = document.getElementById('profileDropdownToggle');
+        const dropdown = document.getElementById('profileDropdown');
+
+        if (toggle && dropdown) {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', () => {
+                dropdown.style.display = 'none';
+            });
+
+            dropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            const logoutLink = dropdown.querySelector("a");
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                      title: 'Déconnexion',
+                      text: "Êtes-vous sûr de vouloir déconnecter ?",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonText: 'Oui',
+                      cancelButtonText: 'Non'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        window.location.href = this.href;
+                      }
+                    });
+                });
+            }
+        }
+
+        // === Modal gestion notes ===
+        const btnShowForm = document.getElementById('btnShowForm');
+        const formModal = document.getElementById('formModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelForm = document.getElementById('cancelForm');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const inputCodeEleve = document.getElementById('inputCodeEleve');
+        const btnVerifyCode = document.getElementById('btnVerifyCode');
+        const codeError = document.getElementById('codeError');
+        const nomEleve = document.getElementById('nomEleve');
+        const prenomEleve = document.getElementById('prenomEleve');
+        const classeEleve = document.getElementById('classeEleve');
+        const notesFields = document.getElementById('notesFields');
+        const addNoteRow = document.getElementById('addNoteRow');
+        const successMessage = document.getElementById('successMessage');
+
+        let currentCodeEleve = null;
+
+        function createNoteRow(matiereId = '', noteValue = '') {
+            const div = document.createElement('div');
+            div.classList.add('row', 'g-2', 'mb-2', 'noteRow');
+            const options = matieresList.map(m =>
+                `<option value="${m.id}" ${m.id == matiereId ? 'selected' : ''}>${m.nom}</option>`
+            ).join('');
+            div.innerHTML = `
+                <div class="col">
+                    <select class="form-select" required>
+                        <option value="">Choisir matière</option>
+                        ${options}
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" step="0.01" min="0" max="100" value="${noteValue}" placeholder="Note" required>
+                </div>
+                <div class="col-auto d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-row">✕</button>
+                </div>
+            `;
+            notesFields.appendChild(div);
+
+            div.querySelector('.remove-row').addEventListener('click', () => div.remove());
+        }
+
+        btnShowForm.addEventListener('click', () => {
+            formModal.style.display = 'flex';
+            step1.style.display = 'block';
+            step2.style.display = 'none';
+            codeError.style.display = 'none';
+            inputCodeEleve.value = '';
+            successMessage.style.display = 'none';
+            notesFields.innerHTML = '';
+            createNoteRow();
+            createNoteRow();
+        });
+
+        [closeModal, cancelForm].forEach(btn => {
+            btn.addEventListener('click', () => formModal.style.display = 'none');
+        });
+
+        btnVerifyCode.addEventListener('click', async () => {
+            const code = inputCodeEleve.value.trim();
+            if (!code) {
+                codeError.style.display = 'block';
+                codeError.textContent = 'Veuillez entrer un code.';
+                return;
+            }
+
+            try {
+                const res = await fetch('/note/api/verifier-eleve/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: `code=${encodeURIComponent(code)}`
+                });
+                const data = await res.json();
+
+                if (data.existe) {
+                    codeError.style.display = 'none';
+                    step1.style.display = 'none';
+                    step2.style.display = 'block';
+                    nomEleve.textContent = data.nom;
+                    prenomEleve.textContent = data.prenom;
+                    classeEleve.textContent = data.classe;
+                    currentCodeEleve = code;
+                } else {
+                    codeError.style.display = 'block';
+                    codeError.textContent = 'Élève non trouvé ou non validé.';
+                    step2.style.display = 'none';
+                }
+            } catch (e) {
+                alert('Erreur de connexion au serveur.');
             }
         });
 
-        // Gérer le message "Aucun résultat"
-        const noResultRow = document.getElementById('no-result-row');
-        if (searchTerm !== '' && visibleCount === 0) {
-            if (!noResultRow) {
-                const newRow = document.createElement('tr');
-                newRow.id = 'no-result-row';
-                // ⚠️ 7 colonnes → colspan="7"
-                newRow.innerHTML = `<td colspan="7" class="text-center text-muted">Aucun résultat trouvé</td>`;
-                tbody.appendChild(newRow);
-            }
-        } else if (noResultRow) {
-            noResultRow.remove();
+        addNoteRow.addEventListener('click', () => createNoteRow());
+
+        // Soumission des notes
+        const formNotes = document.getElementById('formNotes');
+        if (formNotes) {
+            formNotes.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const rows = notesFields.querySelectorAll('.noteRow');
+                const notes = [];
+
+                for (const row of rows) {
+                    const select = row.querySelector('select');
+                    const input = row.querySelector('input');
+                    if (!select.value || !input.value) continue;
+                    notes.push({
+                        matiere_id: select.value,
+                        valeur: parseFloat(input.value)
+                    });
+                }
+
+                if (notes.length === 0) {
+                    alert('Veuillez entrer au moins une note.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/note/api/enregistrer-notes/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            code_eleve: currentCodeEleve,
+                            notes: notes
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        successMessage.style.display = 'block';
+                        setTimeout(() => formModal.style.display = 'none', 2000);
+                         chargerNotes();
+                    } else {
+                        alert('Erreur : ' + (result.erreur || 'Échec'));
+                    }
+                } catch (e) {
+                    alert('Erreur réseau : ' + e.message);
+                }
+            });
         }
+
+        // === Fonction pour attacher les événements de suppression ===
+        function attacherEcouteursSuppression() {
+            document.querySelectorAll('.delete-note').forEach(button => {
+                button.addEventListener('click', function () {
+                    const codeEleve = this.dataset.code;
+                    console.log("Bouton Supprimer cliqué pour code:", codeEleve); // ✅ Debug
+
+                    Swal.fire({
+                        title: 'Supprimer les notes ?',
+                        text: "Cette action supprimera toutes les notes de cet élève pour le trimestre en cours. Êtes-vous sûr ?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                        confirmButtonColor: '#d33'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const token = getCookie('csrftoken');
+                            console.log("CSRF Token (suppression):", token); // ✅ Debug
+                            if (!token) {
+                                alert("Erreur CSRF token manquant.");
+                                return;
+                            }
+
+                            fetch(`/note/api/supprimer-notes/${encodeURIComponent(codeEleve)}/`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRFToken': token
+                                }
+                            })
+                            .then(res => {
+                                console.log("Réponse suppression:", res.status); // ✅ Debug
+                                return res.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Supprimé !', data.message || 'Notes supprimées.', 'success');
+                                    chargerNotes(); // Recharger le tableau
+                                } else {
+                                    Swal.fire('Erreur', data.erreur || 'Impossible de supprimer.', 'error');
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Erreur suppression:", err);
+                                Swal.fire('Erreur', 'Erreur réseau ou serveur.', 'error');
+                            });
+                        }
+                    });
+                });
+            });
+        }
+
+        // === Fonction pour créer une ligne de note éditable ===
+        function createEditNoteRow(matiereId = '', noteValue = '', nomMatiere = '') {
+            const div = document.createElement('div');
+            div.classList.add('row', 'g-2', 'mb-2', 'editNoteRow');
+            let options = matieresList.map(m =>
+                `<option value="${m.id}" ${m.id == matiereId ? 'selected' : ''}>${m.nom}</option>`
+            ).join('');
+            if (!matiereId && nomMatiere) {
+                options = `<option value="" selected disabled>${nomMatiere}</option>` + options;
+            }
+            div.innerHTML = `
+                <div class="col">
+                    <select class="form-select" required>
+                        <option value="">Choisir matière</option>
+                        ${options}
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" step="0.01" min="0" max="100" value="${noteValue}" placeholder="Note" required>
+                </div>
+                <div class="col-auto d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-edit-row">✕</button>
+                </div>
+            `;
+            document.getElementById('editNotesFields').appendChild(div);
+
+            div.querySelector('.remove-edit-row').addEventListener('click', () => div.remove());
+        }
+
+        // === Fonction pour ouvrir le modal d’édition ===
+        function ouvrirModalEdition(codeEleve, nom, prenom, classe, notes) { // ✅ Retiré "periode"
+            const modal = document.getElementById('editNotesModal');
+            const nomSpan = document.getElementById('editModalEleveNom');
+            const form = document.getElementById('editFormNotes');
+            const fieldsDiv = document.getElementById('editNotesFields');
+
+            nomSpan.textContent = `${prenom} ${nom}`;
+            fieldsDiv.innerHTML = '';
+
+            // Remplir les lignes avec les notes existantes
+            notes.forEach(n => {
+                const matiere = matieresList.find(m => m.nom === n.matiere);
+                const matiereId = matiere ? matiere.id : '';
+                createEditNoteRow(matiereId, n.valeur, n.matiere);
+            });
+
+            if (notes.length === 0) {
+                createEditNoteRow();
+            }
+
+            modal.style.display = 'block';
+
+            document.getElementById('closeEditModal').addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                console.log("Formulaire de modification soumis"); // ✅ Debug
+                const rows = fieldsDiv.querySelectorAll('.editNoteRow');
+                const nouvellesNotes = [];
+
+                for (const row of rows) {
+                    const select = row.querySelector('select');
+                    const input = row.querySelector('input');
+                    if (!select.value || !input.value) continue;
+                    nouvellesNotes.push({
+                        matiere_id: select.value,
+                        valeur: parseFloat(input.value)
+                    });
+                }
+
+                if (nouvellesNotes.length === 0) {
+                    alert('Veuillez entrer au moins une note.');
+                    return;
+                }
+
+                const token = getCookie('csrftoken');
+                console.log("CSRF Token (modif):", token); // ✅ Debug
+                if (!token) {
+                    alert("Erreur CSRF token manquant.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/note/api/modifier-notes/', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': token
+                        },
+                        body: JSON.stringify({
+                            code_eleve: codeEleve,
+                            notes: nouvellesNotes
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        Swal.fire('Modifié !', result.message || 'Notes mises à jour.', 'success');
+                        modal.style.display = 'none';
+                        chargerNotes(); // Recharger le tableau
+                    } else {
+                        alert('Erreur : ' + (result.erreur || 'Échec'));
+                    }
+                } catch (e) {
+                    console.error("Erreur modification:", e);
+                    alert('Erreur réseau : ' + e.message);
+                }
+            };
+        }
+
+        // === Charger et afficher les notes ===
+        function chargerNotes() {
+            const tbody = document.getElementById('tableElevesBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>'; // ✅ Mis à jour en 7
+
+            fetch('/note/api/notes/')
+                .then(res => res.json())
+                .then(eleves => {
+                    if (eleves.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucune note enregistrée.</td></tr>'; // ✅ Mis à jour en 7
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    eleves.forEach(el => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${el.code_eleve}</td>
+                            <td>${el.nom}</td>
+                            <td>${el.prenom}</td>
+                            <td>${el.classe}</td>
+                            <td>${el.periode}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info show-notes" data-notes='${JSON.stringify(el.matieres_notes)}'>
+                                    👁️ Voir notes
+                                </button>
+                            </td>
+                            <td>
+                               <div class="d-flex gap-1">
+        <button class="btn btn-warning btn-sm edit-note" data-code="${el.code_eleve}">
+            <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-danger btn-sm delete-note" data-code="${el.code_eleve}">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    // Attacher les événements suppression et modification
+                    attacherEcouteursSuppression();
+
+                    document.querySelectorAll('.edit-note').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const codeEleve = this.dataset.code;
+                            console.log("Bouton Modifier cliqué pour code:", codeEleve); // ✅ Debug
+
+                            const row = this.closest('tr');
+                            const nom = row.children[1].textContent;
+                            const prenom = row.children[2].textContent;
+                            const classe = row.children[3].textContent;
+
+                            const showBtn = row.querySelector('.show-notes');
+                            const notes = JSON.parse(showBtn.dataset.notes);
+
+                            ouvrirModalEdition(codeEleve, nom, prenom, classe, notes); // ✅ Retiré "periode"
+                        });
+                    });
+
+                    // Bouton "Voir notes"
+                    document.querySelectorAll('.show-notes').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const notes = JSON.parse(this.dataset.notes);
+                            const modal = document.getElementById('notesModal');
+                            const list = document.getElementById('modalNotesList');
+                            const nomSpan = document.getElementById('modalEleveNom');
+
+                            const row = this.closest('tr');
+                            const nom = row.children[1].textContent;
+                            const prenom = row.children[2].textContent;
+                            nomSpan.textContent = `${prenom} ${nom}`;
+
+                            list.innerHTML = '';
+                            notes.forEach(n => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<strong>${n.matiere}:</strong> ${n.valeur}`;
+                                list.appendChild(li);
+                            });
+
+                            modal.style.display = 'block';
+                        });
+                    });
+
+                    document.getElementById('closeNotesModal').addEventListener('click', () => {
+                        document.getElementById('notesModal').style.display = 'none';
+                    });
+                })
+                .catch(err => {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erreur de chargement.</td></tr>'; // ✅ Mis à jour en 7
+                    console.error("Erreur chargement tableau:", err);
+                });
+        }
+
+        // === Charger les notes au démarrage ===
+        chargerNotes();
     });
-}
-
-
-
-
-
-
-
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'app_note/js/notes.js' %}"></script>
-<!-- <script>
-// Toggle dropdown profile
-const profileToggle = document.getElementById('profileDropdownToggle');
-const profileDropdown = document.getElementById('profileDropdown');
-profileToggle.addEventListener('click', () => {
-    profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
-});
-</script> -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js    "></script>
+<!-- Supprimé : <script src="{% static 'app_note/js/notes.js' %}"></script> -->
+</body>
+</html>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js  "></script>
+<!-- Supprimé : <script src="{% static 'app_note/js/notes.js' %}"></script> -->
 </body>
 </html>
