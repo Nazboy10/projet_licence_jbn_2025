@@ -134,12 +134,11 @@ async function loadAndEdit(id) {
 // Confirmation suppression
 async function confirmDelete(id) {
   const result = await Swal.fire({
-    title: 'Supprimer élève',
-    text: '⚠️ Eske w vle efase elèv sa a ?',
+    text: '⚠️ est-ce que vous voulez supprimer?',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Oui, supprimer',
-    cancelButtonText: 'Annuler'
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Non'
   });
 
   if (!result.isConfirmed) return;
