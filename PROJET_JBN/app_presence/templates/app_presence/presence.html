@@ -7,92 +7,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presence</title>
     <link rel="icon" type="image/png" href="{% static 'icone/CBA.png' %}">
-     <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css    " rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css    " rel="stylesheet">
-  <!-- CSS Custom -->
-     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css    ' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css    ">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'app_presence/css/pre.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js    "></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
-
 </head>
 <body>
 
-    <div class="sidebar">
-       <div class="logo">
-     <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
-    <span>SGCBA</span>
-</div>
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #qr-fullscreen, #qr-fullscreen * {
+            visibility: visible;
+        }
+        #qr-fullscreen {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            padding: 50px 20px;
+            box-sizing: border-box;
+            text-align: center;
+            background: white;
+        }
+        #qr-fullscreen-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        #qr-fullscreen-code {
+            display: inline-block;
+        }
+        /* Kache bouton yo */
+        #qr-print-btn,
+        #qr-back-btn {
+            display: none !important;
+        }
+    }
+</style>
 
-       <nav>
-  <ul>
-    <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
-    <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
-    <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
-    <li id="menu-presence"><a href="{% url 'presence' %}"class="active"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
-    <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
-    <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
-     <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
-    <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
-    <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
-  </ul>
-</nav>
-       
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{% static '/icone/CBA.png' %}" alt="Logo SGCBA" class="logo-img">  
+            <span>SGCBA</span>
+        </div>
+        <nav>
+            <ul>
+                <li id="menu-dashboard"><a href="{% url 'tableau_de_bord' %}"><i class="fas fa-th-large"></i>TABLEAU DE BORD</a></li>
+                <li id="menu-inscription"><a href="{% url 'inscription' %}"><i class="fa-solid fa-notes-medical"></i> Inscription</a></li>
+                <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
+                <li id="menu-presence"><a href="{% url 'presence' %}" class="active"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
+                <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
+                <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+                <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
+                <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
+                <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
+            </ul>
+        </nav>
     </div>
 
+    <!-- Kontni orijinal -->
     <div class="main-content">
         <div class="header">
             <h1>PRESENCE</h1>
             <div class="search-profile">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                   <input id="searchPresence" type="text" placeholder="Rechercher...">
-
+                    <input id="searchPresence" type="text" placeholder="Rechercher...">
                 </div>
-               <div class="profile">
-    <!-- Cloche avec badge -->
-    <div class="position-relative d-inline-block me-3">
-        <i class="fas fa-bell notification-icon" id="notificationBell" style="cursor:pointer;"></i>
-        <span id="notificationBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display:none; font-size:0.7em;">0</span>
+                <div class="profile">
+                    <div class="position-relative d-inline-block me-3">
+                        <i class="fas fa-bell notification-icon" id="notificationBell" style="cursor:pointer;"></i>
+                        <span id="notificationBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display:none; font-size:0.7em;">0</span>
+                    </div>
+                    <div class="user-avatar" id="profileDropdownToggle">
+                       <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown" style="display:none;">
+                        <ul id="notificationList">
+                            <li>Aucune notification</li>
+                        </ul>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <ul>
+                            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton pou jenere QR (koulè ble) -->
+        <button id="openQRModalBtn" class="btn btn-primary">Générer QR de Présence</button>
+ 
+        <!-- Lis prezan orijinal -->
+        <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+       <h4 style="text-align: center;">Liste des presences</h4>
+        <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter Presence</button>
     </div>
 
-    <!-- Avatar utilisateur -->
-    <div class="user-avatar" id="profileDropdownToggle">
-       <img src="{{ user_photo|default:'/static/image/pro.png' }}" alt="Profil">
-    </div>
-
-    <!-- Dropdown des notifications -->
-    <div class="notification-dropdown" id="notificationDropdown" style="display:none;">
-        <ul id="notificationList">
-            <li>Aucune notification</li>
-        </ul>
-    </div>
-
-    <!-- Dropdown menu profil -->
-    <div class="profile-dropdown" id="profileDropdown">
-        <ul>
-            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
-        </ul>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="tableEleves">
+            <thead class="table-header-blue">
+                <tr>
+                    <th>Code</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Classe</th>
+                    <th>Statut</th>
+                    <th>Date Presence</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in presences %}
+                <tr>
+                    <td>{{ p.eleve.code_eleve }}</td>
+                    <td>{{ p.eleve.nom }}</td>
+                    <td>{{ p.eleve.prenom }}</td>
+                    <td>{% if p.klas %}{{ p.klas.nom_classe }}{% else %}N/A{% endif %}</td>
+                    <td>{{ p.statut }}</td>
+                    <td>{{ p.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-</div>
-</div>
-
-
-
-
-
-<!-- Bouton pour ouvrir la modale -->
-<button id="openQRModalBtn" class="btn btn-info">Générer QR de Présence</button>
-
-<!-- Modale pour choisir la classe -->
+      <!-- Modale pour choisir la classe -->
 <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="qrModalLabel">Choisir la classe</h5>
@@ -113,265 +164,128 @@
     </div>
   </div>
 </div>
-
-<!-- Conteneur pour afficher le QR généré -->
-<div id="qrcode-container" class="mt-3 text-center" style="display:none;">
-  <h4>QR pour la classe : <span id="selectedClassName"></span></h4>
-  <div id="qrcode-display"></div>
-  <button id="printQRBtn" class="btn btn-success mt-2">Imprimer QR</button>
-</div>
-
-
-
-
-
-  
-{% comment %} intefas pwezans an {% endcomment %}
-  <div class="container">
-    {% comment %} <h2 class="text-center mb-4">PRESENCE</h2> {% endcomment %}
-
-    <!-- Bouton Ajouter -->
-    <div class="mb-3 text-end">
-      <button id="btnShowForm" class="btn btn-primary btn-custom">Ajouter Presence</button>
-    </div>
- 
-
-  <!-- Formulaire (modal) - MODIFYE -->
-<div id="formModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 700px; width: 95%; margin: 2rem auto; padding: 1.5rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-    <span id="closeModal" class="close" style="font-size: 1.8rem; cursor: pointer; float: right; color: #6c757d;">&times;</span>
-    <h4 class="mb-3 text-center">Ajouter une présence</h4>
-
-    <form id="presenceForm">
-      {% csrf_token %}
-
-        <!-- Code Élève (AN MITAN ANLÈ) -->
-    <div class="mb-4 text-center">
-      <label class="form-label" style="font-weight: 500; color: #495057; display: block; margin-bottom: 0.5rem;">Code de l'élève</label>
-      <input type="text" name="code_eleve" id="code_eleve" class="form-control" placeholder="Code" required style="width: 80%; margin: 0 auto; max-width: 300px; border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+        <!-- Formulaire Ajouter Présence (pa modifye) -->
+        <div id="formModal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 700px; width: 95%; margin: 2rem auto; padding: 1.5rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <span id="closeModal" class="close" style="font-size: 1.8rem; cursor: pointer; float: right; color: #6c757d;">&times;</span>
+                <h4 class="mb-3 text-center">Ajouter une présence</h4>
+                <form id="presenceForm">{% csrf_token %}
+                    <div class="mb-4 text-center">
+                        <label class="form-label" style="font-weight: 500; color: #495057; display: block; margin-bottom: 0.5rem;">Code de l'élève</label>
+                        <input type="text" name="code_eleve" id="code_eleve" class="form-control" placeholder="Code" required style="width: 80%; margin: 0 auto; max-width: 300px; border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem;">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="form-label" style="font-weight: 500;">Nom</label><input type="text" name="nom" id="nom_eleve" class="form-control" placeholder="Nom" readonly></div>
+                        <div class="col-md-6"><label class="form-label" style="font-weight: 500;">Prénom</label><input type="text" name="prenom" id="prenom_eleve" class="form-control" placeholder="Prénom" readonly></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="form-label" style="font-weight: 500;">Classe</label><input type="text" name="classe" id="classe_eleve" class="form-control" placeholder="Classe" readonly></div>
+                        <div class="col-md-6"><label class="form-label" style="font-weight: 500;">Date présence</label><input type="date" name="date_presence" id="date_presence" class="form-control" required></div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-custom btn-ajouter me-2">Ajouter</button>
+                        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-      <!-- Ligne 1 : Nom & Prénom -->
-      <div class="row mb-3">
-        <div class="col-md-6 mb-2 mb-md-0">
-          <label class="form-label" style="font-weight: 500;">Nom</label>
-          <input type="text" name="nom" id="nom_eleve" class="form-control" placeholder="Nom" readonly>
+    <!-- ✅ FULLSCREEN QR VIEW (sèl sa ki parèt aprè chwazi klas) -->
+    <div id="qr-fullscreen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; text-align:center; padding-top:10%;">
+        <h1 id="qr-fullscreen-title" style="margin-bottom:20px; font-weight:bold;"></h1>
+        <div id="qr-fullscreen-code" style="display:inline-block;"></div>
+        <div style="margin-top:30px;">
+            <button id="qr-print-btn" class="btn btn-success mx-2">Imprimer QR</button>
+            <button id="qr-back-btn" class="btn btn-secondary mx-2">Retour</button>
         </div>
-        <div class="col-md-6">
-          <label class="form-label" style="font-weight: 500;">Prénom</label>
-          <input type="text" name="prenom" id="prenom_eleve" class="form-control" placeholder="Prénom" readonly>
-        </div>
-      </div>
-
-      <!-- Ligne 2 : Classe & Date -->
-      <div class="row mb-3">
-        <div class="col-md-6 mb-2 mb-md-0">
-          <label class="form-label" style="font-weight: 500;">Classe</label>
-          <input type="text" name="classe" id="classe_eleve" class="form-control" placeholder="Classe" readonly>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" style="font-weight: 500;">Date présence</label>
-          <input type="date" name="date_presence" id="date_presence" class="form-control" required>
-        </div>
-      </div>
-
-      <!-- Bouton anba an mitan, sou menm liy -->
-      <div class="text-center mt-3">
-        <button type="submit" class="btn btn-custom btn-ajouter me-2">Ajouter</button>
-        <button type="button" id="cancelForm" class="btn btn-secondary btn-custom">Fermer</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-    <!-- Options affichage
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div>
-        <label>Afficher 
-          <select class="form-select d-inline w-auto">
-            <option>10</option>
-            <option>25</option>
-            <option>50</option>
-          </select> 
-          Presence
-        </label>
-      </div>
     </div>
-  <br> -->
 
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped" id="tableEleves">
-       <thead class="table-header-blue">
-          <tr>
-            <th>Code</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Classe</th>
-             <th>Statut</th>
-            <th>Date Presence</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in presences %}
-          <tr>
-            <td>{{ p.eleve.code_eleve }}</td>
-            <td>{{ p.eleve.nom }}</td>
-            <td>{{ p.eleve.prenom }}</td>
-           <td>
-  {% if p.klas %}
-    {{ p.klas.nom_classe }}
-  {% else %}
-    N/A
-  {% endif %}
-</td>
- <td>{{ p.statut }}</td>
-            <td>{{ p.date }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="{% static 'app_presence/js/presen.js' %}"></script>
+    <script src="{% static 'js/charts.js' %}"></script>
+    <script src="{% static 'js/role-control.js' %}"></script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ouvri modale chwazi klas
+        document.getElementById('openQRModalBtn').addEventListener('click', () => {
+            new bootstrap.Modal(document.getElementById('qrModal')).show();
+        });
 
-
-
-  
-
-  <!--lien paj javascrip-->
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- 2. QRCode.js (nécessaire pour générer le QR) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <!-- Script Custom -->
- <script src="{% static 'app_presence/js/presen.js' %}"></script>
- <script src="{% static 'js/charts.js' %}"></script>
- <script src="{% static 'js/role-control.js' %}"></script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🟢 Script chargé');
-
-    const openQRModalBtn = document.getElementById('openQRModalBtn');
-    const qrModalElement = document.getElementById('qrModal');
-    const generateQRBtn = document.getElementById('generateQRBtn');
-    const classeSelect = document.getElementById('classeSelect');
-    const qrContainer = document.getElementById('qrcode-container');
-    const selectedClassName = document.getElementById('selectedClassName');
-    const qrDisplay = document.getElementById('qrcode-display');
-    const printQRBtn = document.getElementById('printQRBtn');
-
-    // Vérifier que Bootstrap Modal est disponible
-    if (typeof bootstrap === 'undefined') {
-        console.error('❌ Bootstrap n\'est pas chargé !');
-        return;
-    }
-
-    const qrModal = new bootstrap.Modal(qrModalElement);
-
-    // Ouvrir la modale
-    openQRModalBtn.addEventListener('click', () => {
-        console.log('🔵 Bouton "Générer QR" cliqué');
-        qrModal.show();
-    });
-
-    // Générer le QR
-    generateQRBtn.addEventListener('click', async () => {
-        const classeId = classeSelect.value;
-        console.log('🔵 Classe sélectionnée:', classeId);
-
-        if (!classeId) {
-            alert('Veuillez sélectionner une classe.');
-            return;
-        }
-
-        try {
-            qrModal.hide();
-            console.log('⏳ Requête en cours...');
-
-            const response = await fetch(`/presence/generate-qr-permanent/${classeId}/`, {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            const data = await response.json();
-            console.log('📦 Réponse reçue:', data);
-
-            if (data.success) {
-                selectedClassName.textContent = data.classe_nom;
-                qrDisplay.innerHTML = '';
-                qrContainer.style.display = 'block';
-
-                // Vérifier que QRCode est disponible
-                if (typeof QRCode === 'undefined') {
-                    console.error('❌ QRCode.js n\'est pas chargé !');
-                    alert('Erreur : QRCode.js non chargé');
-                    return;
-                }
-
-                console.log('✅ Génération du QR Code');
-                new QRCode(qrDisplay, {
-                    text: data.qr_url,
-                    width: 250,
-                    height: 250
-                });
-
-                printQRBtn.onclick = () => window.print();
-            } else {
-                alert('Erreur: ' + data.error);
+        // Jenere QR → montre sèlman QR (fullscreen)
+        document.getElementById('generateQRBtn').addEventListener('click', async () => {
+            const classeId = document.getElementById('classeSelect').value;
+            if (!classeId) {
+                alert('Veuillez sélectionner une classe.');
+                return;
             }
-        } catch (error) {
-            console.error('❌ Erreur:', error);
-            alert('Erreur réseau ou serveur.');
-        }
-    });
-});
 
-
-
-
-
-    let inactivityTimer;
-
-    function resetInactivityTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-            fetch('/api/logout/', {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).finally(() => {
-                // ✅ Remplace alert() par SweetAlert2
-                Swal.fire({
-                    title: 'Session expirée',
-                    text: 'Vous avez été déconnecté automatiquement pour inactivité.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    window.location.href = '/connexion/';
+            try {
+                const response = await fetch(`/presence/generate-qr-permanent/${classeId}/`, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
-            });
-        },2 * 60 * 1000); // 2 minutes d'inactivité
-    }
+                const data = await response.json();
 
-    resetInactivityTimer();
+                if (data.success) {
+                    // Antre non klas ak QR nan fullscreen view
+                    document.getElementById('qr-fullscreen-title').textContent = data.classe_nom;
+                    document.getElementById('qr-fullscreen-code').innerHTML = '';
+                    new QRCode(document.getElementById('qr-fullscreen-code'), {
+                        text: data.qr_url,
+                        width: 300,
+                        height: 300
+                    });
 
-    window.addEventListener('mousemove', resetInactivityTimer);
-    window.addEventListener('keydown', resetInactivityTimer);
-    window.addEventListener('scroll', resetInactivityTimer);
-    window.addEventListener('click', resetInactivityTimer);
+                    // Kache tout, montre sèlman QR
+                    document.querySelector('.sidebar').style.display = 'none';
+                    document.querySelector('.main-content').style.display = 'none';
+                    document.getElementById('qr-fullscreen').style.display = 'block';
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erreur lors de la génération du QR.');
+            }
+        });
 
+        // Imprime sèlman sa ki sou ekran an
+        document.getElementById('qr-print-btn').addEventListener('click', () => {
+            window.print();
+        });
 
+        // Retounen nan paj orijinal la
+        document.getElementById('qr-back-btn').addEventListener('click', () => {
+            document.getElementById('qr-fullscreen').style.display = 'none';
+            document.querySelector('.sidebar').style.display = 'block';
+            document.querySelector('.main-content').style.display = 'block';
+        });
 
-
-
-</script>
-
-
-
+        // Gestion déconnexion inactivité (pa modifye)
+        let inactivityTimer;
+        const resetInactivityTimer = () => {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                fetch('/api/logout/', { method: 'GET', credentials: 'same-origin' }).finally(() => {
+                    Swal.fire({
+                        title: 'Session expirée',
+                        text: 'Vous avez été déconnecté automatiquement pour inactivité.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(() => {
+                        window.location.href = '/connexion/';
+                    });
+                });
+            }, 2 * 60 * 1000);
+        };
+        resetInactivityTimer();
+        ['mousemove', 'keydown', 'scroll', 'click'].forEach(ev => window.addEventListener(ev, resetInactivityTimer));
+    });
+    </script>
 </body>
 </html>

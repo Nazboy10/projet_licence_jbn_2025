@@ -35,8 +35,17 @@
         }
       }
     </style>
+
+    <style>
+.bulletin-header th {
+    color: white !important;
+    background-color:  #0d6efd;
+}
+</style>
 </head>
 <body>
+
+
 
 <div class="sidebar">
   <div class="logo">
@@ -87,7 +96,7 @@
     <button id="btnAfficherFormulaire">Générer Bulletin</button>
   </div>
 
-  <h2 style="text-align: center;" class="no-print">La liste des Bulletins</h2>
+  <h2 style="text-align: center;" class="no-print">Liste des Bulletins</h2>
 
   <div class="container">
     <!-- ✅ FÒM POU ANTRE KÒD -->
@@ -103,7 +112,7 @@
     <!-- ✅ LIS ELEVE -->
     <div id="listeContainer" class="no-print">
       <table id="listeBulletin">
-        <thead>
+       <thead class="bulletin-header">
           <tr>
             <th>Code Élève</th>
             <th>Nom</th>
