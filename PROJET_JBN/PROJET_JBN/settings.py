@@ -200,5 +200,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'collegebellangelot5@gmail.com'
-EMAIL_HOST_PASSWORD = 'blredshkwzdlzuht'
+EMAIL_HOST_PASSWORD = 'slgmgjnroksjvfrs'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
