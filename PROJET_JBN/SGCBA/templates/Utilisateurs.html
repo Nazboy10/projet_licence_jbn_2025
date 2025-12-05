@@ -233,9 +233,7 @@
                 <th>Action</th>
               </tr>
             </thead>
-             <button class="btn btn-light btn-sm btn-reset-password" data-id="${utilisateur.id}" data-email="${utilisateur.email}">
-                    <i class="fas fa-key text-dark"></i>
-                </button>
+           
             <tbody id="tableUsersBody">
               <!-- Done ak JavaScript -->
             </tbody>
@@ -461,6 +459,9 @@ async function loadUsers() {
                 </button>
                 <button class="btn btn-danger btn-sm btn-delete" data-id="${utilisateur.id}">
                     <i class="fas fa-trash-alt"></i>
+                </button>
+                  <button class="btn btn-light btn-sm btn-reset-password" data-id="${utilisateur.id}" data-email="${utilisateur.id}">
+                    <i class="fas fa-key text-dark"></i>
                 </button>
                
             `;
