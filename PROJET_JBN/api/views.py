@@ -245,101 +245,124 @@ class UploadPhotoAPIView(APIView):
 
 
 
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
-from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
 from SGCBA.models import Utilisateur
-from .tokens import custom_token_generator
 
 class ResetPasswordAPIView(APIView):
     """
-    Voye imel reset password ak token
+    Pèmèt itilizatè ki konekte a chanje modpas li
     """
+    permission_classes = [IsAuthenticated]  # Fòk itilizatè a konekte
+
     def post(self, request):
-        email = request.data.get('email')
-        if not email:
-            return Response({"success": False, "error": "Email requis"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = Utilisateur.objects.get(email=email)
-        except Utilisateur.DoesNotExist:
-            return Response({"success": False, "error": "Email non trouvé"}, status=status.HTTP_404_NOT_FOUND)
-
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = custom_token_generator.make_token(user)
-
-        # Lyen frontend pou reset password
-       # api/views.py
-       # api/views.py
-        # api/views.py
-        reset_link = f"https://projet-licence-jbn-2025.onrender.com/reset_password_confirm/{uid}/{token}/"
-
-
-
-
-        # Imel
-        subject = "Réinitialisation du mot de passe"
-        message = f"Bonjour {user.nom},\n\nCliquez sur ce lien pour réinitialiser votre mot de passe:\n{reset_link}"
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-
-        return Response({"success": True, "message": "Email de réinitialisation envoyé"}, status=status.HTTP_200_OK)
-
-
-
-
-
-class ResetPasswordConfirmAPIView(APIView):
-    """
-    Verifye token epi mete nouvo modpas
-    """
-    def post(self, request, uidb64, token):
+        user = request.user  # Itilizatè ki konekte a
         password = request.data.get('password')
         password2 = request.data.get('password2')
 
+        # Validation
         if not password or not password2:
-            return Response(
-                {"success": False, "error": "Tous les champs sont requis"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"success": False, "error": "Tous les champs sont requis"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if password != password2:
-            return Response(
-                {"success": False, "error": "Les mots de passe ne correspondent pas"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"success": False, "error": "Les mots de passe ne correspondent pas"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = Utilisateur.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, Utilisateur.DoesNotExist):
-            return Response(
-                {"success": False, "error": "Lien invalide"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # ✅ verifye validite token la
-        if not custom_token_generator.check_token(user, token):
-            return Response(
-                {"success": False, "error": "Lien expiré ou invalide"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # ✅ mete nouvo modpas
+        # Mete nouvo modpas
         user.set_password(password)
         user.save()
-        return Response(
-            {"success": True, "message": "Mot de passe changé avec succès"},
-            status=status.HTTP_200_OK
-        )
+
+        return Response({"success": True, "message": "Mot de passe changé avec succès"},
+                        status=status.HTTP_200_OK)
 
 
+
+
+# class ResetPasswordConfirmAPIView(APIView):
+#     """
+#     Verifye token epi mete nouvo modpas
+#     """
+#     def post(self, request, uidb64, token):
+#         password = request.data.get('password')
+#         password2 = request.data.get('password2')
+
+#         if not password or not password2:
+#             return Response(
+#                 {"success": False, "error": "Tous les champs sont requis"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         if password != password2:
+#             return Response(
+#                 {"success": False, "error": "Les mots de passe ne correspondent pas"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         try:
+#             uid = force_str(urlsafe_base64_decode(uidb64))
+#             user = Utilisateur.objects.get(pk=uid)
+#         except (TypeError, ValueError, OverflowError, Utilisateur.DoesNotExist):
+#             return Response(
+#                 {"success": False, "error": "Lien invalide"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         # ✅ verifye validite token la
+#         if not custom_token_generator.check_token(user, token):
+#             return Response(
+#                 {"success": False, "error": "Lien expiré ou invalide"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         # ✅ mete nouvo modpas
+#         user.set_password(password)
+#         user.save()
+#         return Response(
+#             {"success": True, "message": "Mot de passe changé avec succès"},
+#             status=status.HTTP_200_OK
+#         )
+
+
+
+
+
+# api/views.py
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from SGCBA.models import Utilisateur
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def changer_mot_de_passe(request, utilisateur_id):
+    """
+    Pèmèt yon itilizatè modifye modpas li
+    """
+    password = request.data.get('password')
+    password2 = request.data.get('password2')
+
+    if not password or not password2:
+        return Response({"success": False, "error": "Tous les champs sont requis"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if password != password2:
+        return Response({"success": False, "error": "Les mots de passe ne correspondent pas"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Utilisateur.objects.get(pk=utilisateur_id)
+    except Utilisateur.DoesNotExist:
+        return Response({"success": False, "error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+
+    # ✅ Opsyon: verifye si itilizatè a se menm moun ki konekte a
+    if request.user != user:
+        return Response({"success": False, "error": "Accès refusé"}, status=status.HTTP_403_FORBIDDEN)
+
+    user.set_password(password)
+    user.save()
+    return Response({"success": True, "message": "Mot de passe modifié avec succès"}, status=status.HTTP_200_OK)
 
 # api/views.py
 from django.shortcuts import render

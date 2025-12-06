@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{% static '/css/tabs.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -28,7 +29,7 @@
           <li id="menu-eleve"><a href="{% url 'eleve' %}"><i class="fa-solid fa-user-tie"></i> Eleve</a></li>
           <li id="menu-presence"><a href="{% url 'presence' %}"><i class="fas fa-chalkboard-teacher"></i> Presence</a></li>
           <li id="menu-note"><a href="{% url 'note' %}"><i class='bx bx-note'></i> Note</a></li>
-          <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Bulletin</a></li>
+          <li id="menu-bulletin"><a href="{% url 'bulletin' %}"><i class="fa-solid fa-file-lines"></i> Bulletin</a></li>
            <li id="menu-classe"><a href="{% url 'classe' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Classe</a></li>
           <li id="menu-utilisateur"><a href="{% url 'utilisateurs' %}"><i class="fa-solid fa-user"></i> Utilisateur</a></li>
           <li id="menu-parametre"><a href="{% url 'parametre' %}"><i class="fa-solid fa-gear"></i> Parametres</a></li>
@@ -40,10 +41,10 @@
         <div class="header">
             <h1>TABLEAU DE BORD</h1>
             <div class="search-profile">
-                <div class="search-bar">
+                {% comment %} <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Rechercher Inscription, Élèves, Pre...">
-                </div>
+                </div> {% endcomment %}
                 <div class="profile">
                     <i class="fas fa-bell notification-icon"></i>
                     <h6 class="username"><span id="username"></span></h6>
@@ -52,13 +53,13 @@
 </div>
 
 
-
-
-
                     <!-- Dropdown menu -->
                     <div class="profile-dropdown" id="profileDropdown">
+                    
                         <ul>
                            <li><a href="{% url 'logout' %}">Déconnecter</a></li>
+                         
+
                            <li><a href="#" onclick="document.getElementById('photoInput').click(); return false;">Changer photo profil</a></li>
                         </ul>
                        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto()">
@@ -138,10 +139,11 @@
                         <div class="label">Total Inscription</div>
                     </div>
                     <div class="summary-card income">
-                        <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
-                        <div class="value">0</div>
-                        <div class="label">Total Eleve</div>
-                    </div>
+    <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
+    <div class="value">{{ total_eleve }}</div>
+    <div class="label">Total Eleve</div>
+</div>
+
                     <div class="summary-card expenses">
                         <div class="icon"><i class="fa-solid fa-percent"></i></div>
                         <div class="value">0%</div>
@@ -193,6 +195,7 @@
     <!-- Scripts pour gérer l'utilisateur connecté -->
     <script>
     document.addEventListener("DOMContentLoaded", () => {
+        
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user) {
             window.location.href = "/connexion/";
@@ -303,10 +306,114 @@ function uploadPhoto() {
         alert('Erreur de connexion à l\'API');
     });
 }
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('profileDropdownToggle');
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (toggle && dropdown) {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Pa fè click la monte nan document
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+
+        // Confirmation de déconnexion
+       const logoutLink = dropdown.querySelector("a");
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                  title: 'Déconnexion',
+                  text: "Êtes-vous sûr de  vouloir déconnecter ?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Oui',
+                  cancelButtonText: 'Non'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = this.href;
+                  }
+                });
+            });
+        }
+    }
+
+
+
+
+
+
+    
+});
+
+
+//upload photo de profil
+
+function uploadPhoto() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const fileInput = document.getElementById("photoInput");
+
+    if (!fileInput.files.length) return;
+
+    const formData = new FormData();
+    formData.append("photo", fileInput.files[0]);
+    formData.append("user_id", user.id);  // voye id itilizatè
+
+    // 👉 Ranmase CSRF token la
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/api/upload-photo/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrftoken  // ajoute CSRF token nan headers
+        },
+        body: formData,
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.photo_url) {
+            // ajoute timestamp pou evite cache
+            document.querySelector(".user-avatar img").src = data.photo_url + "?t=" + new Date().getTime();
+            alert("Photo de profil mise à jour !");
+        } else {
+            alert("Erreur lors de la mise à jour de la photo");
+        }
+    })
+    .catch(err => console.error(err));
+}
+
+
+
+// Fonksyon pou jwenn CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 </script>
 
 
-    <script src="{% static 'js/dropdown.js' %}"></script>
+    <script src="{% static 'js/d.js' %}"></script>
     <script src="{% static 'js/charts.js' %}"></script>
 </body>
 </html>

@@ -209,6 +209,7 @@
           </button>
 
           <!-- 🔁 Activer/Désactiver -->
+          {% if request.session.role == 'directeur' %}
           {% if e.actif %}
             <button class="btn btn-sm btn-outline-danger" onclick="toggleActif({{ e.id }}, false)" title="Désactiver">
               <i class="bi bi-x-circle"></i>
@@ -217,6 +218,7 @@
             <button class="btn btn-sm btn-outline-success" onclick="toggleActif({{ e.id }}, true)" title="Activer">
               <i class="bi bi-check-circle"></i>
             </button>
+          {% endif %}
           {% endif %}
         </td>
       </tr>

@@ -134,12 +134,11 @@ async function loadAndEdit(id) {
 // Confirmation suppression
 async function confirmDelete(id) {
   const result = await Swal.fire({
-    title: 'Supprimer élève',
-    text: '⚠️ Eske w vle efase elèv sa a ?',
+    text: '⚠️ est-ce que vous voulez supprimer?',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Oui, supprimer',
-    cancelButtonText: 'Annuler'
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Non'
   });
 
   if (!result.isConfirmed) return;
@@ -165,6 +164,7 @@ async function confirmDelete(id) {
       const row = btn ? btn.closest("tr") : null;
       if (row) row.remove();
       Swal.fire({icon:'success', title:'Supprimé', text: data.message || 'Suppression réussie', timer:1500, showConfirmButton:false});
+      
     } else {
       console.error("Suppression error:", data);
       Swal.fire({icon:'error', title:'Erreur', text: data.error || 'Erreur suppression (voir console)'});

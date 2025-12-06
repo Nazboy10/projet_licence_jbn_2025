@@ -127,3 +127,16 @@ def modifier_eleve(request, id):
         return JsonResponse({"success": True})
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+
+
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from app_eleve.models import Eleve  # Asire model Eleve a egziste
+
+@api_view(['GET'])
+def total_eleves(request):
+    total = Eleve.objects.count()
+    return Response({"total": total})
